@@ -1,0 +1,3 @@
+// the configured options and settings for mini-renderer
+#define Tutorial_VERSION_MAJOR @mini-renderer_VERSION_MAJOR@
+#define Tutorial_VERSION_MINOR @mini-renderer_VERSION_MINOR@
