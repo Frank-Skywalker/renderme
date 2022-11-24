@@ -29,24 +29,23 @@ endforeach(SRC_DIRECTORY)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 # set include directories
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 ############# lib part ##############
 file(GLOB LIB_DIRECTORIES lib/*)
 foreach(LIB_DIRECTORY ${LIB_DIRECTORIES})
     if(IS_DIRECTORY ${LIB_DIRECTORY})
-        add_subdirectory(${LIB_DIRECTORY})
+        if(EXISTS ${LIB_DIRECTORY}/CMakeLists.txt)
+            add_subdirectory(${LIB_DIRECTORY})
+        endif()
         if(IS_DIRECTORY ${LIB_DIRECTORY}/include)
-            target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIRECTORY}/include)
+            target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIRECTORY}/include)
         endif()
     endif()
 endforeach(LIB_DIRECTORY)
 
 target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} freeglut)
-target_link_libraries(${PROJECT_NAME} hah)
-
-
 
 ############ config part ############
 # use double or not
@@ -66,6 +65,6 @@ endif(USE_CUDA)
 
 # configure a header file to pass some of the CMake settings to the source code
 configure_file(
-    src/config/renderme-config.h.in
-    ${PROJECT_SOURCE_DIR}/src/config/renderme-config.h
+    src/core/config.hpp.in
+    ${PROJECT_SOURCE_DIR}/src/core/config.hpp
 )

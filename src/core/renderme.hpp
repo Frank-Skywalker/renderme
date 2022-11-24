@@ -1,7 +1,12 @@
-#include <config/mini-renderer-config.h>
+#include <config/renderme-config.h>
 
 #ifdef USE_DOUBLE
-typedef Float double
+typedef double Float;
 #else
-typedef Float float
+typedef float Float;
 #endif
+
+namespace renderme::core
+{
+
+}
