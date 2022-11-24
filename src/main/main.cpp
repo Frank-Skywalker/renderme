@@ -7,10 +7,9 @@
 
 auto main(int argc, char* argv[]) -> int
 {
+    //Read obj
     std::cout << "hello, renderme" << std::endl;
-
     auto obj_path = std::string{};
-
     if (argc > 1) {
         obj_path = std::string{argv[1]};
     } else {
@@ -19,9 +18,10 @@ auto main(int argc, char* argv[]) -> int
     }
     std::cout << "Reading obj from " << obj_path << std::endl;
 
+
+    //Start GL_Viewer
     auto& gl_viewer=renderme::glviewer::GL_Viewer::instance();
-    gl_viewer.init(&argc,argv);
-    gl_viewer.main_loop();
+    gl_viewer.main_loop(&argc, argv);
 
     return 0;
 

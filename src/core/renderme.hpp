@@ -1,3 +1,4 @@
+#pragma once
 #include <config/renderme-config.h>
 
 #ifdef USE_DOUBLE

@@ -1,42 +1,49 @@
 #include "glviewer.hpp"
+#include <cstdio>
 #include<gl/freeglut.h>
 namespace renderme::glviewer
 {
 
-
-
     void RenderScenceCB()
     {
-        // 清空颜色缓存
         glClear(GL_COLOR_BUFFER_BIT);
-        // 交换前后缓存
         glutSwapBuffers();
     }
 
-    auto GL_Viewer::main_loop()->void
+    auto GL_Viewer::main_loop(int* argc, char** argv)->void
     {
-        // 通知开始GLUT的内部循环
-        glutMainLoop();
-    }
-
-    auto GL_Viewer::init(int* argc, char** argv)->void
-    {
-        // 初始化GLUT
-        glutInit(argc,argv);
-
-        // 显示模式：双缓冲、RGBA
+        //Initialization
+        //Routines beginning with the glutInit- prefix are used to initialize GLUT state. 
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+        glutInitWindowSize(480, 320);
+        glutInitWindowPosition(100, 100);
 
-        // 窗口设置
-        glutInitWindowSize(480, 320);      // 窗口尺寸
-        glutInitWindowPosition(100, 100);  // 窗口位置
-        glutCreateWindow("Tutorial 01");   // 窗口标题
+        glutInitErrorFunc(
+            [] (char const* fmt, va_list ap) {
+                vprintf(fmt, ap);
+                exit(1);
+            }
+        );
+        glutInitWarningFunc(
+            [] (char const* fmt, va_list ap) {
+                vprintf(fmt, ap);
+            }
+        );
+        glutInit(argc, argv);
 
-        // 开始渲染
+        //Window Management
+        glutCreateWindow("renderme");   
+
+        //Callback Registration
         glutDisplayFunc(RenderScenceCB);
 
-        // 缓存清空后的颜色值
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+
+        //Beginning Event Processing
+        //After a GLUT program has done initial setup such as creating windowsand menus, 
+        //GLUT programs enter the GLUT event processing loop by calling glutMainLoop.
+        glutMainLoop();
     }
 
 
