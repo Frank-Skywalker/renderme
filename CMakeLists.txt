@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
-PROJECT(mini-renderer 
-        VERSION 2.3
-        DESCRIPTION "a mini renderer"
+PROJECT(renderme 
+        VERSION 0.0
+        DESCRIPTION "a renderme"
         LANGUAGES CXX)
 
 #set(CMAKE_C_STANDARD 99)
@@ -17,7 +17,6 @@ message(STATUS ${PROJECT_BINARY_DIR})
 
 # set exe and lib output path
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 ############# src part ##############
 # add source files
@@ -36,20 +35,37 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 file(GLOB LIB_DIRECTORIES lib/*)
 foreach(LIB_DIRECTORY ${LIB_DIRECTORIES})
     if(IS_DIRECTORY ${LIB_DIRECTORY})
+        add_subdirectory(${LIB_DIRECTORY})
         if(IS_DIRECTORY ${LIB_DIRECTORY}/include)
             target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIRECTORY}/include)
         endif()
     endif()
 endforeach(LIB_DIRECTORY)
 
+target_link_libraries(${PROJECT_NAME} assimp)
+target_link_libraries(${PROJECT_NAME} freeglut)
+target_link_libraries(${PROJECT_NAME} hah)
+
 
 
 ############ config part ############
 # use double or not
 option(USE_DOUBLE "real uses double instead of float" ON)
+option(USE_CUDA "use CUDA to pipeline" OFF)
+
+if(USE_CUDA)
+    find_package(CUDA)
+    if(CUDA_FOUND)
+        message(STATUS ${CUDA_INCLUDE_DIRS})
+        include_directories(${CUDA_INCLUDE_DIRS})
+    else(CUDA_FOUND)
+        message(FATAL_ERROR "CUDA not found")
+    endif(CUDA_FOUND)
+endif(USE_CUDA)
+
 
 # configure a header file to pass some of the CMake settings to the source code
 configure_file(
-    src/config/mini-renderer-config.h.in
-    ${PROJECT_SOURCE_DIR}/src/config/mini-renderer-config.h
+    src/config/renderme-config.h.in
+    ${PROJECT_SOURCE_DIR}/src/config/renderme-config.h
 )

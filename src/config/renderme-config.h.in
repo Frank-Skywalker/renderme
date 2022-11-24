@@ -1,4 +1,5 @@
-// the configured options and settings for mini-renderer
+// the configured options and settings for renderme
 #define PROJECT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define PROJECT_VERSION_MINOR @PROJECT_VERSION_MINOR@
 #cmakedefine USE_DOUBLE
+#cmakedefine USE_CUDA
