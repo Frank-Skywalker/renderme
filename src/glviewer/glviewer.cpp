@@ -1,49 +1,48 @@
 #include "glviewer.hpp"
 #include <cstdio>
-#include<gl/freeglut.h>
+
+#include <GLFW/glfw3.h>
+
 namespace renderme::glviewer
 {
 
     void RenderScenceCB()
     {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glutSwapBuffers();
+
     }
 
-    auto GL_Viewer::main_loop(int* argc, char** argv)->void
+    auto GL_Viewer::main_loop()->void
     {
-        //Initialization
-        //Routines beginning with the glutInit- prefix are used to initialize GLUT state. 
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-        glutInitWindowSize(480, 320);
-        glutInitWindowPosition(100, 100);
+        GLFWwindow* window;
 
-        glutInitErrorFunc(
-            [] (char const* fmt, va_list ap) {
-                vprintf(fmt, ap);
-                exit(1);
-            }
-        );
-        glutInitWarningFunc(
-            [] (char const* fmt, va_list ap) {
-                vprintf(fmt, ap);
-            }
-        );
-        glutInit(argc, argv);
+        /* Initialize the library */
+        if (!glfwInit())
+            return;
 
-        //Window Management
-        glutCreateWindow("renderme");   
+        /* Create a windowed mode window and its OpenGL context */
+        window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+        if (!window) {
+            glfwTerminate();
+            return;
+        }
 
-        //Callback Registration
-        glutDisplayFunc(RenderScenceCB);
+        /* Make the window's context current */
+        glfwMakeContextCurrent(window);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window)) {
+            /* Render here */
+            glClear(GL_COLOR_BUFFER_BIT);
 
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
 
-        //Beginning Event Processing
-        //After a GLUT program has done initial setup such as creating windowsand menus, 
-        //GLUT programs enter the GLUT event processing loop by calling glutMainLoop.
-        glutMainLoop();
+            /* Poll for and process events */
+            glfwPollEvents();
+        }
+
+        glfwTerminate();
+        return;
     }
 
 

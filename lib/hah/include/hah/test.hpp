@@ -1,1 +1,1 @@
-auto test(void)->int;
+auto _declspec(dllexport)test(void)->int;

@@ -29,31 +29,53 @@ endforeach(SRC_DIRECTORY)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 # set include directories
-target_include_directories(${PROJECT_NAME} PUBLIC src)
+target_include_directories(${PROJECT_NAME} PRIVATE src)
 
-############# lib part ##############
+############# build lib part ##############
 file(GLOB LIB_DIRECTORIES lib/*)
 foreach(LIB_DIRECTORY ${LIB_DIRECTORIES})
     if(IS_DIRECTORY ${LIB_DIRECTORY})
+        # build library
         if(EXISTS ${LIB_DIRECTORY}/CMakeLists.txt)
             add_subdirectory(${LIB_DIRECTORY})
-        endif()
-        if(IS_DIRECTORY ${LIB_DIRECTORY}/include)
-            target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIRECTORY}/include)
+            # Copy library's .dll files to executable output path
+            file(RELATIVE_PATH LIB_DIRECTORY_RELATIVE ${PROJECT_SOURCE_DIR} ${LIB_DIRECTORY})
+            add_custom_command(
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${PROJECT_BINARY_DIR}/${LIB_DIRECTORY_RELATIVE}/bin
+                    ${EXECUTABLE_OUTPUT_PATH}
+            )
+            # add library include files
+            if(IS_DIRECTORY ${LIB_DIRECTORY}/include)
+                target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIRECTORY}/include)
+            endif()
         endif()
     endif()
 endforeach(LIB_DIRECTORY)
 
-target_link_libraries(${PROJECT_NAME} assimp)
-target_link_libraries(${PROJECT_NAME} freeglut)
-
-############ config part ############
+############ config part #################
 # use double or not
 option(USE_DOUBLE "real uses double instead of float" ON)
 option(USE_CUDA "use CUDA to pipeline" OFF)
 
+# configure a header file to pass some of the CMake settings to the source code
+configure_file(
+    src/core/config.hpp.in
+    ${PROJECT_SOURCE_DIR}/src/core/config.hpp
+)
+
+########## library link part ##############
+find_package(OpenGL REQUIRED)
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME} assimp)
+target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} hah)
+
+# Find CUDA
 if(USE_CUDA)
-    find_package(CUDA)
+    find_package(CUDA REQUIRED)
     if(CUDA_FOUND)
         message(STATUS ${CUDA_INCLUDE_DIRS})
         include_directories(${CUDA_INCLUDE_DIRS})
@@ -61,10 +83,3 @@ if(USE_CUDA)
         message(FATAL_ERROR "CUDA not found")
     endif(CUDA_FOUND)
 endif(USE_CUDA)
-
-
-# configure a header file to pass some of the CMake settings to the source code
-configure_file(
-    src/core/config.hpp.in
-    ${PROJECT_SOURCE_DIR}/src/core/config.hpp
-)
