@@ -1,12 +1,8 @@
 #include<iostream>
 #include<string>
-
 #include<glviewer/glviewer.hpp>
-#include<hah/test.hpp>
 
-
-
-auto main(int argc, char* argv) -> int
+auto main(int argc, char* argv[]) -> int
 {
     //Read obj
     std::cout << "hello, renderme" << std::endl;
@@ -18,7 +14,6 @@ auto main(int argc, char* argv) -> int
         std::cin >> obj_path;
     }
     std::cout << "Reading obj from " << obj_path << std::endl;
-    std::cout << test();
 
     //Start GL_Viewer
     auto& gl_viewer=renderme::glviewer::GL_Viewer::instance();
