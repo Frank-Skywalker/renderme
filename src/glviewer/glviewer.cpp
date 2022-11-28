@@ -1,9 +1,10 @@
+#include <GL/glew.h>
 #include "glviewer.hpp"
-#include <cstdio>
 
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <cstdio>
 namespace renderme::glviewer
 {
 
@@ -23,6 +24,8 @@ namespace renderme::glviewer
         // Decide GL+GLSL versions
         // GL 3.0 + GLSL 130
         const char* glsl_version = "#version 130";
+
+        // require a minimum OpenGL context version
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
         //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
@@ -34,9 +37,12 @@ namespace renderme::glviewer
             glfwTerminate();
             return;
         }
-        //Make the window's context current
+        //Make the window and OpenGL's context current
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
+
+
+        ///////////ImGui part//////////////
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -76,18 +82,26 @@ namespace renderme::glviewer
             // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
             // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
             // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-            glfwPollEvents();
+            //glfwPollEvents();
+            glfwWaitEvents();
             //Poll for and process events
 
+            int display_w, display_h;
+            glfwGetFramebufferSize(window, &display_w, &display_h);
+            glViewport(0, 0, display_w, display_h);
             glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            double time = glfwGetTime();
 
             render_scene();
             show_imgui_menu();
 
             //Swap front and back buffers
             glfwSwapBuffers(window);
+
+
+
         }
     }
 
@@ -104,15 +118,15 @@ namespace renderme::glviewer
 
         // Rendering
         ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
+
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
 
     auto GL_Viewer::render_scene()->void
     {
+        GLuint vertex;
+        glGenBuffers(1, &vertex);
     }
 
 

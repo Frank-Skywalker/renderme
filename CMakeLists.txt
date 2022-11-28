@@ -18,6 +18,12 @@ message(STATUS ${PROJECT_BINARY_DIR})
 # set exe and lib output path
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
+# set all lib/dll output path of externals
+# make sure to prevent reset of these variables in subdirectory's CMakeLists.txt
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
 ############# src part ##############
 # add source files
 file(GLOB SRC_DIRECTORIES src/*)
@@ -32,24 +38,25 @@ add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 ############# build lib part ##############
-file(GLOB LIB_DIRECTORIES lib/*)
+file(GLOB LIB_DIRECTORIES external/*)
 foreach(LIB_DIRECTORY ${LIB_DIRECTORIES})
     if(IS_DIRECTORY ${LIB_DIRECTORY})
         # build library
         if(EXISTS ${LIB_DIRECTORY}/CMakeLists.txt)
             add_subdirectory(${LIB_DIRECTORY})
-            # Copy library's .dll files to executable output path
-            file(RELATIVE_PATH LIB_DIRECTORY_RELATIVE ${PROJECT_SOURCE_DIR} ${LIB_DIRECTORY})
-            add_custom_command(
-                TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory
-                    ${PROJECT_BINARY_DIR}/${LIB_DIRECTORY_RELATIVE}/bin
-                    ${EXECUTABLE_OUTPUT_PATH}
-            )
             # add library include files
             if(IS_DIRECTORY ${LIB_DIRECTORY}/include)
                 target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIRECTORY}/include)
             endif()
+            # Copy library's .dll files to executable output path
+            # This step isn't needed any more if we set all dll output path directly as exe output path
+            # file(RELATIVE_PATH LIB_DIRECTORY_RELATIVE ${PROJECT_SOURCE_DIR} ${LIB_DIRECTORY})
+            #add_custom_command(
+            #    TARGET ${PROJECT_NAME} POST_BUILD
+            #    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            #        ${PROJECT_BINARY_DIR}/${LIB_DIRECTORY_RELATIVE}/bin
+            #        ${EXECUTABLE_OUTPUT_PATH}
+            #)
         endif()
     endif()
 endforeach(LIB_DIRECTORY)
@@ -71,6 +78,7 @@ target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} glfw)
+target_link_libraries(${PROJECT_NAME} glew)
 target_link_libraries(${PROJECT_NAME} hah)
 
 # Find CUDA
