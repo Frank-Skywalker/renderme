@@ -1,6 +1,10 @@
 #pragma once
 #include <core/util.hpp>
+
+//explicitly disable inclusion of the development environment header of glfw
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+
 #include <imgui/imgui.h>
 
 namespace renderme::glviewer

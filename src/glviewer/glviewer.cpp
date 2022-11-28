@@ -1,6 +1,5 @@
-#include <GL/glew.h>
 #include "glviewer.hpp"
-
+#include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
@@ -10,6 +9,7 @@ namespace renderme::glviewer
 
     GL_Viewer::GL_Viewer()
     {
+        ///////////////GLFW Init//////////////////////////
         // Setup window
         glfwSetErrorCallback(
             [] (int error, char const* description) {
@@ -41,8 +41,17 @@ namespace renderme::glviewer
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
 
+        /////////////GLEW Init///////////////
+        auto err = glewInit();
+        if (err!=GLEW_OK) {
+            /* Problem: glewInit failed, something is seriously wrong. */
+            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+            return;
+        }
+        fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-        ///////////ImGui part//////////////
+
+        ///////////ImGui Init//////////////
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -63,11 +72,13 @@ namespace renderme::glviewer
 
     GL_Viewer::~GL_Viewer()
     {
-        // Cleanup
+        ////////////ImGui Cleanup///////////
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
+
+        ////////////GLFW Cleanup///////////
         glfwDestroyWindow(window);
         glfwTerminate();
     }
@@ -125,8 +136,8 @@ namespace renderme::glviewer
 
     auto GL_Viewer::render_scene()->void
     {
-        GLuint vertex;
-        glGenBuffers(1, &vertex);
+        //GLuint vertex;
+        //glGenBuffers(1, &vertex);
     }
 
 

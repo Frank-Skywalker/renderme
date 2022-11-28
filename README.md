@@ -4,11 +4,31 @@
 
 ## CMakeLists
 
-如何将lib目录下的所有依赖库自动编译并将库输出到指定位置
 
-如何自动将依赖这些库
 
-没有检查OpenGL的依赖性
+##### assimp/CMakeLists.txt
+
+未作修改，写的本来就很好
+
+##### glfw/CMakeLists.txt
+
+禁掉CMake对dll/lib输出位置的修改
+
+##### glew/CMakeLists.txt
+
+将build/cmake/拷贝到glew根目录
+
+将GLEW_DIR变量修改为正确目录
+
+禁掉CMake对dll/lib输出位置的修改
+
+```cmake
+#set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+#set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+#set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+```
+
+
 
 
 
