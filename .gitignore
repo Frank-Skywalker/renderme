@@ -1,12 +1,15 @@
-#Be aware that we must add '/' ahead of each item
-#or it will also match subdirecories with the same name that are not in the root directory
+# Be aware that we must add '/' ahead of each item
+# or it will also match subdirecories with the same name that are not in the root directory
 
-#IDE files
+# IDE files
 /.vs/
 /.vscode/
 
-#build files
+# build files
 /out/
 /build/
 /bin/
 /lib/
+
+# data is too big
+/data/
