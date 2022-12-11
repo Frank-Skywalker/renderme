@@ -1,5 +1,5 @@
 #pragma once
-#include <config/renderme-config.h>
+#include "config.hpp"
 
 #ifdef USE_DOUBLE
 typedef double Float;
@@ -7,7 +7,7 @@ typedef double Float;
 typedef float Float;
 #endif
 
-namespace renderme::core
+namespace renderme
 {
 
 }

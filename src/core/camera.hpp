@@ -1,6 +1,6 @@
 #pragma once
 
-namespace renderme::core
+namespace renderme
 {
 	struct Camera
 	{

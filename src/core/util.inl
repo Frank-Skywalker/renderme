@@ -1,6 +1,6 @@
 #pragma once
 #include "util.hpp"
-namespace renderme::util
+namespace renderme
 {
 	template<class T>
 	auto Singleton<T>::instance()->T&

@@ -16,7 +16,7 @@ auto main(int argc, char* argv[]) -> int
     std::cout << "Reading obj from " << obj_path << std::endl;
 
     //Start GL_Viewer
-    auto& gl_viewer=renderme::glviewer::GL_Viewer::instance();
+    auto& gl_viewer=renderme::GL_Viewer::instance();
     gl_viewer.main_loop();
 
     return 0;

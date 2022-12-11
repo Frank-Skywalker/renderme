@@ -1,5 +1,5 @@
 #pragma once
-namespace renderme::util
+namespace renderme
 {
 
 	struct Only_Movable

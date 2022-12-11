@@ -4,7 +4,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include <cstdio>
-namespace renderme::glviewer
+namespace renderme
 {
 
     GL_Viewer::GL_Viewer()
@@ -32,7 +32,7 @@ namespace renderme::glviewer
         //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
         //Create a windowed mode window and its OpenGL context
-        window = glfwCreateWindow(window_size.x, window_size.y, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+        window = glfwCreateWindow(window_size.x, window_size.y, "renderme", NULL, NULL);
         if (window == nullptr) {
             glfwTerminate();
             return;

@@ -7,14 +7,13 @@
 
 #include <imgui/imgui.h>
 
-namespace renderme::glviewer
+namespace renderme
 {
-	struct GL_Viewer final: util::Singleton<GL_Viewer>
+	struct GL_Viewer final: Singleton<GL_Viewer>
 	{
 		GL_Viewer();
 		~GL_Viewer();
 		auto main_loop()->void;
-
 
 	private:
 		auto show_imgui_menu()->void;
