@@ -3,17 +3,13 @@
 #include <core/shape.hpp>
 #include <core/geometry.hpp>
 
-#include <vector>
-
-struct Triangle_Mesh
-{
-	std::vector<unsigned int> indices;
-	std::vector<Point3f> vertices;
-	std::vector<Normal3f> normals;
-	std::vector<Vector2f> uvs;
-};
-
-struct Triangle: Shape
+namespace renderme
 {
 
-};
+	struct Triangle final: Shape
+	{
+		auto gl_draw() const noexcept ->void;
+		auto intersect() const noexcept ->void;
+		auto intersect_shadow() const noexcept ->void;
+	};
+}

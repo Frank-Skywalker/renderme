@@ -1,5 +1,6 @@
 #pragma once
 #include <core/util.hpp>
+#include <core/scene.hpp>
 
 //explicitly disable inclusion of the development environment header of glfw
 #define GLFW_INCLUDE_NONE
@@ -20,6 +21,8 @@ namespace renderme
 		auto render_scene()->void;
 
 	private:
+		std::vector<Scene> scenes;
+
 		GLFWwindow* window;
 		ImGuiIO* io;
 

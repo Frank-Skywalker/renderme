@@ -93,6 +93,11 @@ namespace renderme
 
 	}
 
+	Shader::~Shader()
+	{
+		glDeleteProgram(_id);
+	}
+
 	auto Shader::id() const noexcept ->unsigned int
 	{
 		return _id;
@@ -117,27 +122,27 @@ namespace renderme
 	}
 	auto Shader::set_uniform_vec2(std::string const& name, Vector2f value) const noexcept ->void
 	{
-		//glUniform2fv(glGetUniformLocation(id, name.c_str()), 1, );
+		glUniform2f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y) );
 	}
 	auto Shader::set_uniform_vec2(std::string const& name, float x, float y) const noexcept ->void
 	{
-
+		glUniform2f(glGetUniformLocation(_id, name.c_str()), x, y);
 	}
 	auto Shader::set_uniform_vec3(std::string const& name, Vector3f value) const noexcept ->void
 	{
-
+		glUniform3f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y), static_cast<float>(value.z));
 	}
 	auto Shader::set_uniform_vec3(std::string const& name, float x, float y, float z) const noexcept ->void
 	{
-
+		glUniform3f(glGetUniformLocation(_id, name.c_str()), x, y, z);
 	}
 	auto Shader::set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void
 	{
-
+		glUniform4f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y), static_cast<float>(value.z), static_cast<float>(value.w));
 	}
 	auto Shader::set_uniform_vec4(std::string const& name, float x, float y, float z, float w) const noexcept ->void
 	{
-
+		glUniform4f(glGetUniformLocation(_id, name.c_str()), x, y, z, w);
 	}
 
 }

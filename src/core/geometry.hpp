@@ -5,16 +5,18 @@ namespace renderme
 {
 	//////Vectors//////
 	template<typename T>
-	struct Vector2
+	struct Vector2 final
 	{
+		Vector2();
 		T x;
 		T y;
 	};
 
 
 	template<typename T>
-	struct Vector3
+	struct Vector3 final
 	{
+		Vector3();
 		T x;
 		T y;
 		T z;
@@ -22,7 +24,7 @@ namespace renderme
 
 
 	template<typename T>
-	struct Vector4
+	struct Vector4 final
 	{
 		T x;
 		T y;
@@ -41,7 +43,7 @@ namespace renderme
 
 	//////Points//////
 	template<typename T>
-	struct Point2
+	struct Point2 final
 	{
 		T x;
 		T y;
@@ -49,7 +51,7 @@ namespace renderme
 
 
 	template<typename T>
-	struct Point3
+	struct Point3 final
 	{
 		T x;
 		T y;
@@ -58,7 +60,7 @@ namespace renderme
 
 
 	template<typename T>
-	struct Point4
+	struct Point4 final
 	{
 		T x;
 		T y;
@@ -78,7 +80,7 @@ namespace renderme
 
 	//////Normals//////
 	template<typename T>
-	struct Normal2
+	struct Normal2 final
 	{
 		T x;
 		T y;
@@ -86,7 +88,7 @@ namespace renderme
 
 
 	template<typename T>
-	struct Normal3
+	struct Normal3 final
 	{
 		T x;
 		T y;
@@ -95,7 +97,7 @@ namespace renderme
 
 
 	template<typename T>
-	struct Normal4
+	struct Normal4 final
 	{
 		T x;
 		T y;

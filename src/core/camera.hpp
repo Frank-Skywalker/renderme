@@ -1,8 +1,9 @@
 #pragma once
+#include "util.hpp"
 
 namespace renderme
 {
-	struct Camera
+	struct Camera: Only_Movable
 	{
 
 	};

@@ -1,6 +1,8 @@
+#include<core/transform.hpp>
+#include<glviewer/glviewer.hpp>
+
 #include<iostream>
 #include<string>
-#include<glviewer/glviewer.hpp>
 
 auto main(int argc, char* argv[]) -> int
 {

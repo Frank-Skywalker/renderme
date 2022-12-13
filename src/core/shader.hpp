@@ -14,6 +14,7 @@ namespace renderme
 	struct Shader
 	{
 		Shader(std::string const& vertex_path, std::string const& fragment_path);
+		~Shader();
 		auto id() const noexcept ->unsigned int;
 		auto use() const noexcept -> void;
 		auto set_uniform_bool(std::string const& name, bool value) const noexcept ->void;

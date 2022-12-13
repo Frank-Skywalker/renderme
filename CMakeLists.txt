@@ -63,7 +63,7 @@ endforeach(LIB_DIRECTORY)
 
 ############ config part #################
 # use double or not
-option(USE_DOUBLE "real uses double instead of float" ON)
+option(USE_DOUBLE "real uses double instead of float" OFF)
 option(USE_CUDA "use CUDA to pipeline" OFF)
 
 # configure a header file to pass some of the CMake settings to the source code
