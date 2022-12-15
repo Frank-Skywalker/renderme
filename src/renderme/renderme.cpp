@@ -107,8 +107,8 @@ namespace renderme
             // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
             // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
             // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-            //glfwPollEvents();
-            glfwWaitEvents();
+            glfwPollEvents();
+            //glfwWaitEvents();
             //Poll for and process events
 
             int display_w, display_h;
@@ -174,6 +174,16 @@ namespace renderme
 	{
 	}
 
+
+    // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
+    auto process_node(aiNode* ainode, aiScene const* aiscene) -> void
+    {
+        for (auto i = 0u; i < ainode->mNumMeshes; i++) {
+            auto aimesh = aiscene->mMeshes[ainode->mMeshes[i]];
+
+        }
+    }
+
     auto Renderme::parse_obj(std::string const& path)->void
     {
         Assimp::Importer importer;
@@ -191,8 +201,11 @@ namespace renderme
             (aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) ||
             (aiscene->mRootNode == nullptr)
             ) {
-            log(Status::fatal, importer.GetErrorString());
+            log(Status::error, importer.GetErrorString());
+            return;
         }
+
+        process_node(aiscene->mRootNode, aiscene);
     }
 
 

@@ -2,7 +2,8 @@
 
 namespace renderme
 {
-
+	Triangle::Triangle(Transform const* object_to_world, Transform const* world_to_object)
+		:Shape{object_to_world, world_to_object}{}
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
 	{
