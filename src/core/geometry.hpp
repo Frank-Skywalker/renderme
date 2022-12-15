@@ -1,5 +1,5 @@
 #pragma once
-#include"renderme.hpp"
+#include"type.hpp"
 
 namespace renderme
 {
@@ -7,7 +7,8 @@ namespace renderme
 	template<typename T>
 	struct Vector2 final
 	{
-		Vector2();
+		Vector2():x{0}, y{0} {}
+		Vector2(T _x, T _y):x{_x}, y{_y} {}
 		T x;
 		T y;
 	};
@@ -16,7 +17,8 @@ namespace renderme
 	template<typename T>
 	struct Vector3 final
 	{
-		Vector3();
+		Vector3():x{0}, y{0}, z{0} {}
+		Vector3(T _x, T _y, T _z):x{_x}, y{_y}, z{_z} {}
 		T x;
 		T y;
 		T z;
@@ -26,6 +28,8 @@ namespace renderme
 	template<typename T>
 	struct Vector4 final
 	{
+		Vector4():x{0}, y{0}, z{0}, w{0} {}
+		Vector4(T _x, T _y, T _z, T _w):x{_x}, y{_y}, z{_z}, w{_w} {}
 		T x;
 		T y;
 		T z;
@@ -115,3 +119,5 @@ namespace renderme
 
 
 }
+
+#include "geometry.inl"

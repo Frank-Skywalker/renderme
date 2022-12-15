@@ -7,19 +7,19 @@ namespace renderme
 		this->shape.reset(shape);
 	}
 
-	auto Shape_Primitive::gl_draw() const noexcept ->void
+	auto Shape_Primitive::gl_draw(Shader const& shader) const noexcept -> void
 	{
-		shape->gl_draw();
+		shape->gl_draw(shader);
 	}
 
-	auto Shape_Primitive::intersect() const noexcept ->void
+	auto Shape_Primitive::intersect() const noexcept ->bool
 	{
-		shape->intersect();
+		return shape->intersect();
 	}
 
-	auto Shape_Primitive::intersect_shadow() const noexcept ->void
+	auto Shape_Primitive::intersect_shadow() const noexcept ->bool
 	{
-		shape->intersect_shadow();
+		return shape->intersect_shadow();
 	}
 
 
@@ -74,21 +74,21 @@ namespace renderme
 
 
 
-	auto Mesh::gl_draw() const noexcept ->void
+	auto Mesh::gl_draw(Shader const& shader) const noexcept -> void
 	{
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 	}
 
-	auto Mesh::intersect() const noexcept ->void
+	auto Mesh::intersect() const noexcept ->bool
 	{
-
+		return true;
 	}
 
-	auto Mesh::intersect_shadow() const noexcept ->void
+	auto Mesh::intersect_shadow() const noexcept ->bool
 	{
-
+		return true;
 	}
 
 }

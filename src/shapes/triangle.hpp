@@ -8,8 +8,8 @@ namespace renderme
 
 	struct Triangle final: Shape
 	{
-		auto gl_draw() const noexcept ->void;
-		auto intersect() const noexcept ->void;
-		auto intersect_shadow() const noexcept ->void;
+		auto gl_draw(Shader const& shader) const noexcept -> void;
+		auto intersect() const noexcept ->bool;
+		auto intersect_shadow() const noexcept ->bool;
 	};
 }

@@ -9,17 +9,17 @@ namespace renderme
 {
 	struct Primitive : Only_Movable
 	{
-		virtual auto gl_draw() const noexcept ->void = 0;
-		virtual auto intersect() const noexcept ->void = 0;
-		virtual auto intersect_shadow() const noexcept ->void = 0;
+		virtual auto gl_draw(Shader const& shader) const noexcept -> void =0;
+		virtual auto intersect() const noexcept ->bool = 0;
+		virtual auto intersect_shadow() const noexcept ->bool= 0;
 	};
 
 	struct Shape_Primitive final: Primitive
 	{
 		Shape_Primitive(Shape* shape);
-		auto gl_draw() const noexcept ->void;
-		auto intersect() const noexcept ->void;
-		auto intersect_shadow() const noexcept ->void;
+		auto gl_draw(Shader const& shader) const noexcept -> void;
+		auto intersect() const noexcept ->bool;
+		auto intersect_shadow() const noexcept ->bool;
 
 	private:
 		std::unique_ptr<Shape> shape;
@@ -35,9 +35,9 @@ namespace renderme
 		Mesh(Mesh&&) = default;
 		auto operator=(Mesh&&)->Mesh & = default;
 
-		auto gl_draw() const noexcept ->void;
-		auto intersect() const noexcept ->void;
-		auto intersect_shadow() const noexcept ->void;
+		auto gl_draw(Shader const& shader) const noexcept -> void;
+		auto intersect() const noexcept ->bool;
+		auto intersect_shadow() const noexcept ->bool;
 
 	private:
 		unsigned int vao;

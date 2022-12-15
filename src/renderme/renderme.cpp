@@ -1,19 +1,30 @@
-#include "glviewer.hpp"
+#include "renderme.hpp"
+
+#include<core/log.hpp>
+
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
 #include <cstdio>
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 namespace renderme
 {
 
-    GL_Viewer::GL_Viewer()
+
+
+    Renderme::Renderme()
     {
         ///////////////GLFW Init//////////////////////////
         // Setup window
         glfwSetErrorCallback(
             [] (int error, char const* description) {
-                fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+                //fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+                std::string info{description};
+                log(Status::fatal, info);
             }
         );
 
@@ -43,13 +54,16 @@ namespace renderme
 
         /////////////GLEW Init///////////////
         auto err = glewInit();
-        if (err!=GLEW_OK) {
+        if (err != GLEW_OK) {
             /* Problem: glewInit failed, something is seriously wrong. */
-            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+            //fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+            std::string info{(const char*)glewGetErrorString(err)};
+            log(Status::fatal, info);
             return;
         }
-        fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-
+        //fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+        std::string info{(const char*)glewGetString(GLEW_VERSION)};
+        log(Status::log, info);
 
         ///////////ImGui Init//////////////
 
@@ -70,7 +84,7 @@ namespace renderme
     }
 
 
-    GL_Viewer::~GL_Viewer()
+    Renderme::~Renderme()
     {
         ////////////ImGui Cleanup///////////
         ImGui_ImplOpenGL3_Shutdown();
@@ -84,7 +98,7 @@ namespace renderme
     }
 
 
-    auto GL_Viewer::main_loop()->void
+    auto Renderme::main_loop()->void
     {
         while (!glfwWindowShouldClose(window)) {
 
@@ -105,18 +119,15 @@ namespace renderme
 
             double time = glfwGetTime();
 
-            render_scene();
+            show_scene();
             show_imgui_menu();
 
             //Swap front and back buffers
             glfwSwapBuffers(window);
-
-
-
         }
     }
 
-    auto GL_Viewer::show_imgui_menu()->void
+    auto Renderme::show_imgui_menu()->void
     {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -124,21 +135,81 @@ namespace renderme
         ImGui::NewFrame();
 
         // Imgui content
-        bool show=true;
-        ImGui::ShowDemoWindow(&show);
+        if (config.show_imgui_demo_window) {
+            ImGui::ShowDemoWindow(&config.show_imgui_demo_window);
+        }
+
+        if (ImGui::Begin("Config")) {
+            ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
+            if (ImGui::Button("load")) {
+                parse_from_file("data/");
+            }
+            ImGui::Checkbox("raytrace", &config.raytrace);
+        }
+        ImGui::End();
 
         // Rendering
         ImGui::Render();
-
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
 
-    auto GL_Viewer::render_scene()->void
+    auto Renderme::show_scene()->void
     {
-        //GLuint vertex;
-        //glGenBuffers(1, &vertex);
+        if (state != Renderme::State::ready) {
+            return;
+        }
+
+        if (config.raytrace) {
+            render();
+        }
+        else {
+            gl_draw();
+        }
+
     }
 
+
+	auto Renderme::parse_from_file(std::string const& path) -> void
+	{
+	}
+
+    auto Renderme::parse_obj(std::string const& path)->void
+    {
+        Assimp::Importer importer;
+
+        auto aiscene = importer.ReadFile(path,
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_FlipUVs |
+            aiProcess_CalcTangentSpace |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_SortByPType
+        );
+
+        if ((aiscene == nullptr) ||
+            (aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) ||
+            (aiscene->mRootNode == nullptr)
+            ) {
+            log(Status::fatal, importer.GetErrorString());
+        }
+    }
+
+
+	auto Renderme::gl_draw() const noexcept->void
+	{
+		if (state != Renderme::State::ready) {
+			return;
+		}
+		integrator->gl_draw(*scene);
+	}
+
+	auto Renderme::render() const noexcept->void
+	{
+		if(state!=Renderme::State::ready){
+			return;
+		}
+		integrator->render(*scene);
+	}
 
 }

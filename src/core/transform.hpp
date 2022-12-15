@@ -1,5 +1,5 @@
 #pragma once
-#include"renderme.hpp"
+#include"type.hpp"
 #include <iostream>
 
 namespace renderme
