@@ -8,14 +8,14 @@
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
+#include <assimp/scene.h>
+
 #include<string>
 #include<memory>
 
 
 namespace renderme
 {
-
-
 	struct Renderme: Singleton<Renderme>
 	{
 		enum struct State
@@ -41,7 +41,6 @@ namespace renderme
 	private:
 		auto show_imgui_menu()->void;
 		auto show_scene()->void;
-
 	private:
 		GLFWwindow* window;
 		ImGuiIO* io;
@@ -53,11 +52,8 @@ namespace renderme
 
 		//////Backend//////
 	private:
-		auto parse_obj(std::string const& path)->void;
-		auto parse_from_file(std::string const& path)->void;
 		auto gl_draw() const noexcept->void;
 		auto render() const noexcept->void;
-
 	private:
 		State state{State::uninit};
 		//std::vector<Scene> scenes;
@@ -65,6 +61,16 @@ namespace renderme
 		//std::vector<Integrator> integrators;
 		std::unique_ptr<Integrator> integrator;
 
+
+		//////Parsing//////
+	private:
+		auto parse_file(std::string const& path)->void;
+	    auto parse_obj(std::string const& path)->void;
+		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> void;
+		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> void;
+
+	private:
+		std::vector<Primitive> primitives;
 	};
 
 }

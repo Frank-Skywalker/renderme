@@ -46,6 +46,8 @@ namespace renderme
 		std::vector<Point3f> vertices;
 		std::vector<Normal3f> normals;
 		std::vector<Vector2f> uvs;
+		std::vector<Vector3f> tangents;
+		std::vector<Vector3f> bitangents;
 	};
 
 
