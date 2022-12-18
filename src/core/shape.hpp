@@ -12,7 +12,6 @@ namespace renderme
 		virtual auto intersect() const noexcept ->bool = 0;
 		virtual auto intersect_shadow() const noexcept ->bool = 0;
 
-
 		Transform const* object_to_world;
 		Transform const* world_to_object;
 	};

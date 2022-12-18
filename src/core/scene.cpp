@@ -3,6 +3,14 @@
 namespace renderme
 {
 
+	Scene::Scene(std::string _name, std::vector<std::unique_ptr<Transform>> _transforms,
+		std::vector<std::unique_ptr<Primitive>> _primitives,
+		std::vector<std::unique_ptr<Light>> _lights)
+		:name{std::move(_name)}, primitives{std::move(_primitives)},
+		lights{std::move(_lights)}, transforms{std::move(_transforms)}
+	{}
+
+
 	auto Scene::gl_draw(Shader const& shader) const noexcept -> void
 	{
 		for (auto const& primitive : primitives) {

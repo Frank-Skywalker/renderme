@@ -1,13 +1,11 @@
 #pragma once
 #include "util.hpp"
 #include "shape.hpp"
-#include "geometry.hpp"
 
-#include<vector>
 #include<memory>
 namespace renderme
 {
-	struct Primitive : Only_Movable
+	struct Primitive
 	{
 		virtual auto gl_draw(Shader const& shader) const noexcept -> void =0;
 		virtual auto intersect() const noexcept ->bool = 0;
@@ -16,38 +14,13 @@ namespace renderme
 
 	struct Shape_Primitive final: Primitive
 	{
-		Shape_Primitive(Shape* shape);
+		Shape_Primitive(std::unique_ptr<Shape> shape);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto intersect() const noexcept ->bool;
 		auto intersect_shadow() const noexcept ->bool;
 
 	private:
 		std::unique_ptr<Shape> shape;
-	};
-
-
-	struct Mesh final: Primitive
-	{
-		Mesh(std::vector<Point3f> vertices, std::vector<Normal3f> normals, std::vector<Vector2f> uvs, std::vector<unsigned int> indices);
-		~Mesh() = default;
-		Mesh(Mesh const&) = default;
-		auto operator=(Mesh const&)->Mesh & = default;
-		Mesh(Mesh&&) = default;
-		auto operator=(Mesh&&)->Mesh & = default;
-
-		auto gl_draw(Shader const& shader) const noexcept -> void;
-		auto intersect() const noexcept ->bool;
-		auto intersect_shadow() const noexcept ->bool;
-
-	private:
-		unsigned int vao;
-
-		std::vector<unsigned int> indices;
-		std::vector<Point3f> vertices;
-		std::vector<Normal3f> normals;
-		std::vector<Vector2f> uvs;
-		std::vector<Vector3f> tangents;
-		std::vector<Vector3f> bitangents;
 	};
 
 

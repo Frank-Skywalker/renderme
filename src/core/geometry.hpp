@@ -8,7 +8,7 @@ namespace renderme
 	struct Vector2 final
 	{
 		Vector2():x{0}, y{0} {}
-		Vector2(T _x, T _y):x{_x}, y{_y} {}
+		Vector2(T x, T y):x{x}, y{y} {}
 		T x;
 		T y;
 	};
@@ -18,7 +18,7 @@ namespace renderme
 	struct Vector3 final
 	{
 		Vector3():x{0}, y{0}, z{0} {}
-		Vector3(T _x, T _y, T _z):x{_x}, y{_y}, z{_z} {}
+		Vector3(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
@@ -29,7 +29,7 @@ namespace renderme
 	struct Vector4 final
 	{
 		Vector4():x{0}, y{0}, z{0}, w{0} {}
-		Vector4(T _x, T _y, T _z, T _w):x{_x}, y{_y}, z{_z}, w{_w} {}
+		Vector4(T x, T y, T z, T w):x{x}, y{y}, z{z}, w{w} {}
 		T x;
 		T y;
 		T z;
@@ -49,6 +49,8 @@ namespace renderme
 	template<typename T>
 	struct Point2 final
 	{
+		Point2():x{0}, y{0} {}
+		Point2(T x, T y):x{x}, y{y} {}
 		T x;
 		T y;
 	};
@@ -57,67 +59,33 @@ namespace renderme
 	template<typename T>
 	struct Point3 final
 	{
+		Point3():x{0}, y{0}, z{0} {}
+		Point3(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
-	};
-
-
-	template<typename T>
-	struct Point4 final
-	{
-		T x;
-		T y;
-		T z;
-		T w;
 	};
 
 	using Point2i = Point2<int>;
 	using Point3i = Point3<int>;
-	using Point4i = Point4<int>;
+	using Point3ui = Point3<unsigned int>;
 
 	using Point2f = Point2<Float>;
 	using Point3f = Point3<Float>;
-	using Point4f = Point4<Float>;
-
 
 
 	//////Normals//////
 	template<typename T>
-	struct Normal2 final
-	{
-		T x;
-		T y;
-	};
-
-
-	template<typename T>
 	struct Normal3 final
 	{
+		Normal3():x{0}, y{0}, z{0} {}
+		Normal3(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
 	};
 
-
-	template<typename T>
-	struct Normal4 final
-	{
-		T x;
-		T y;
-		T z;
-		T w;
-	};
-
-	using Normal2i = Normal2<int>;
-	using Normal3i = Normal3<int>;
-	using Normal4i = Normal4<int>;
-
-	using Normal2f = Normal2<Float>;
 	using Normal3f = Normal3<Float>;
-	using Normal4f = Normal4<Float>;
-
-
 }
 
 #include "geometry.inl"

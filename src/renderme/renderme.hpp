@@ -14,6 +14,8 @@
 #include<memory>
 
 
+#define MAX_FILE_NAME_LENGTH 1000
+
 namespace renderme
 {
 	struct Renderme: Singleton<Renderme>
@@ -26,9 +28,15 @@ namespace renderme
 
 		struct Config
 		{
-			std::string file_path;
+			char file_path[MAX_FILE_NAME_LENGTH];
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
+			unsigned int scene_index;
+			unsigned int integrator_index;
+
+			//Metadata
+			const ImVec2 window_size{1280, 720};
+			const ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
 		};
 
 		Renderme();
@@ -44,9 +52,6 @@ namespace renderme
 	private:
 		GLFWwindow* window;
 		ImGuiIO* io;
-		//Metadata
-		const ImVec2 window_size{1280, 720};
-		const ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
 		Config config;
 
 
@@ -56,21 +61,21 @@ namespace renderme
 		auto render() const noexcept->void;
 	private:
 		State state{State::uninit};
-		//std::vector<Scene> scenes;
-		std::unique_ptr<Scene> scene;
-		//std::vector<Integrator> integrators;
-		std::unique_ptr<Integrator> integrator;
-
+		std::vector<Scene> scenes;
+		std::vector<Integrator> integrators;
 
 		//////Parsing//////
 	private:
-		auto parse_file(std::string const& path)->void;
-	    auto parse_obj(std::string const& path)->void;
-		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> void;
-		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> void;
+		auto parse_file()->void;
+	    auto parse_obj(std::string const& path)->bool;
+		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> bool;
+		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> bool;
 
 	private:
-		std::vector<Primitive> primitives;
+		std::vector<std::unique_ptr<Transform>> parsing_transforms;
+		std::vector<std::unique_ptr<Primitive>> parsing_primitives;
+		std::vector<std::unique_ptr<Light>> parsing_lights;
+		std::vector<std::unique_ptr<Camera>> parsing_cameras;
 	};
 
 }

@@ -10,8 +10,8 @@ namespace renderme
 	struct Integrator : Only_Movable
 	{
 		Integrator(std::unique_ptr<Camera> camera, std::unique_ptr<Shader> shader);
-		virtual void gl_draw(Scene const& scene) = 0;
-		virtual void render(Scene const& scene) = 0;
+		virtual auto gl_draw(Scene const& scene) const noexcept -> void = 0;
+		virtual auto render(Scene const& scene) const noexcept -> void = 0;
 
 		std::unique_ptr<Camera> camera;
 		std::unique_ptr<Shader> shader;
@@ -20,8 +20,8 @@ namespace renderme
 
 	struct Sample_Integrator: Integrator
 	{
-		void gl_draw(Scene const& scene);
-		void render(Scene const& scene);
+		auto gl_draw(Scene const& scene) const noexcept -> void;
+		auto render(Scene const& scene) const noexcept -> void;
 	};
 
 }

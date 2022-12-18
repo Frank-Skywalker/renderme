@@ -9,12 +9,12 @@ namespace renderme
 	}
 
 
-	void Sample_Integrator::gl_draw(Scene const& scene)
+	auto Sample_Integrator::gl_draw(Scene const& scene) const noexcept -> void
 	{
 		scene.gl_draw(*shader);
 	}
 
-	void Sample_Integrator::render(Scene const& scene)
+	auto Sample_Integrator::render(Scene const& scene) const noexcept -> void
 	{
 		scene.intersect();
 	}

@@ -2,6 +2,8 @@
 
 #include<core/log.hpp>
 
+#include <shapes/triangle.hpp>
+
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -41,7 +43,7 @@ namespace renderme
         //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
         //Create a windowed mode window and its OpenGL context
-        window = glfwCreateWindow(window_size.x, window_size.y, "renderme", NULL, NULL);
+        window = glfwCreateWindow(config.window_size.x, config.window_size.y, "renderme", NULL, NULL);
         if (window == nullptr) {
             glfwTerminate();
             return;
@@ -113,7 +115,7 @@ namespace renderme
             int display_w, display_h;
             glfwGetFramebufferSize(window, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
-            glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+            glClearColor(config.clear_color.x * config.clear_color.w, config.clear_color.y * config.clear_color.w, config.clear_color.z * config.clear_color.w, config.clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
 
             double time = glfwGetTime();
@@ -141,9 +143,14 @@ namespace renderme
         if (ImGui::Begin("Config")) {
             ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
             if (ImGui::Button("load")) {
-                parse_file("data/");
+                parse_file();
             }
+            ImGui::SameLine();
+            ImGui::InputText("load path", config.file_path, MAX_FILE_NAME_LENGTH);
+
             ImGui::Checkbox("raytrace", &config.raytrace);
+            ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size());
+            ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size());
         }
         ImGui::End();
 
@@ -173,7 +180,8 @@ namespace renderme
 		if (state != Renderme::State::ready) {
 			return;
 		}
-		integrator->gl_draw(*scene);
+        assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
+		integrators[config.integrator_index].gl_draw(scenes[config.scene_index]);
 	}
 
 	auto Renderme::render() const noexcept->void
@@ -181,20 +189,57 @@ namespace renderme
 		if(state!=Renderme::State::ready){
 			return;
 		}
-		integrator->render(*scene);
+        assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
+        integrators[config.integrator_index].render(scenes[config.scene_index]);
 	}
 
 
 
     //////Parsing//////
-    auto Renderme::parse_file(std::string const& path)->void
+    auto Renderme::parse_file()->void
     {
-        parse_obj(path);
+        auto clean_parsing_cache = [&] () {
+            parsing_transforms.clear();
+            parsing_primitives.clear();
+            parsing_lights.clear();
+            parsing_cameras.clear();
+
+        };
+
+        auto create_new_scene = [&] () {
+            //Create a new Scene and Integrator
+            std::vector<std::unique_ptr<Transform>> tmp_transforms;
+            std::vector<std::unique_ptr<Primitive>> tmp_primitives;
+            std::vector<std::unique_ptr<Light>> tmp_lights;
+            std::vector<std::unique_ptr<Camera>> tmp_cameras;
+
+            for (auto& transform : parsing_transforms) {
+                tmp_transforms.push_back(std::move(transform));
+            }
+            for (auto& primitive : parsing_primitives) {
+                tmp_primitives.push_back(std::move(primitive));
+            }
+            for (auto& light : parsing_lights) {
+                tmp_lights.push_back(std::move(light));
+            }
+            for (auto& camera : parsing_cameras) {
+                tmp_cameras.push_back(std::move(camera));
+            }
+            scenes.push_back(
+                Scene("test", std::move(tmp_transforms), std::move(tmp_primitives), std::move(tmp_lights))
+            );
+        };
+
+        if (parse_obj(config.file_path)) {
+            create_new_scene();
+        }
+
+        clean_parsing_cache();
     }
 
 
     // loads a model with supported ASSIMP extensions from file
-    auto Renderme::parse_obj(std::string const& path)->void
+    auto Renderme::parse_obj(std::string const& path)->bool
     {
         // read file via ASSIMP
         Assimp::Importer importer;
@@ -213,40 +258,114 @@ namespace renderme
             (aiscene->mRootNode == nullptr)
             ) {
             log(Status::error, importer.GetErrorString());
-            return;
+            return false;
         }
 
         // process ASSIMP's root node recursively
-        parse_ainode(aiscene, aiscene->mRootNode);
+        return parse_ainode(aiscene, aiscene->mRootNode);
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-    auto Renderme::parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> void
+    auto Renderme::parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> bool
     {
         // process each mesh located at the current node
         for (auto i = 0u; i < ainode->mNumMeshes; ++i) {
             // the node object only contains indices to index the actual objects in the scene. 
             // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             auto aimesh = aiscene->mMeshes[ainode->mMeshes[i]];
-            parse_aimesh(aiscene, aimesh);
+            if (!parse_aimesh(aiscene, aimesh)) {
+                return false;
+            }
         }
 
         // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for (auto i = 0u; i < ainode->mNumChildren; ++i) {
-            parse_ainode(aiscene, ainode->mChildren[i]);
+            if (!parse_ainode(aiscene, ainode->mChildren[i])) {
+                return false;
+            }
         }
+        return true;
     }
 
-    auto Renderme::parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> void
+    auto Renderme::parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> bool
     {
         // data to fill
-        std::vector<Point3f> vertices;
+        std::vector<Point3f> positions;
         std::vector<Normal3f> normals;
+        std::vector<Point2f> uvs;
+        std::vector<Vector3f> tangents;
+        std::vector<Vector3f> bitangents;
+        std::vector<Point3ui> faces;
+
 
         // walk through each of the mesh's vertices
         for (auto i = 0u; i < aimesh->mNumVertices; ++i) {
+            //positions
+            positions.push_back(Point3f(aimesh->mVertices[i].x, aimesh->mVertices[i].y, aimesh->mVertices[i].z));
+            //normals
+            if (aimesh->HasNormals()) {
+                normals.push_back(Normal3f(aimesh->mNormals[i].x, aimesh->mNormals[i].y, aimesh->mNormals[i].z));
+            } 
+            else {
+                //normals.push_back(Normal3f());
+                log(Status::error, "obj has no normal");
+                return false;
+            }
+            //texture coordinates
+            if (aimesh->mTextureCoords[0]) {
+                //uv
+                uvs.push_back(Point2f(aimesh->mTextureCoords[0][i].x, aimesh->mTextureCoords[0][i].y));
+                //tangent
+                tangents.push_back(Vector3f(aimesh->mTangents[i].x, aimesh->mTangents[i].y, aimesh->mTangents[i].z));
+                //bitangent
+                bitangents.push_back(Vector3f(aimesh->mBitangents[i].x, aimesh->mBitangents[i].y, aimesh->mBitangents[i].z));
+            }
+            else {
+                //uvs.push_back(Point2f());
+                //tangents.push_back(Vector3f());
+                //bitangents.push_back(Vector3f());
+                log(Status::error, "obj has no uv");
+                return false;
+            }
         }
-    }
 
+        // walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+        for (auto i = 0u; i < aimesh->mNumFaces; ++i) {
+            auto aiface = aimesh->mFaces[i];
+            if (aiface.mNumIndices != 3) {
+                log(Status::error, "obj face is not triangle");
+                return false;
+            }
+            faces.push_back(Point3ui(aiface.mIndices[0], aiface.mIndices[1], aiface.mIndices[2]));
+        }
+
+        //process materials
+        auto aimaterial = aiscene->mMaterials[aimesh->mMaterialIndex];
+        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
+        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+        // Same applies to other texture as the following list summarizes:
+        // diffuse: texture_diffuseN
+        // specular: texture_specularN
+        // normal: texture_normalN
+
+
+        //Store mesh back to primitives
+        auto triangle_mesh = std::make_unique<Triangle_Mesh>(
+            nullptr, nullptr,
+            std::move(faces), std::move(positions), std::move(normals),
+            std::move(uvs), std::move(tangents), std::move(bitangents)
+            );
+        auto triangles =triangle_mesh->create_triangles();
+        auto triangle_mesh_primitive = std::make_unique<Shape_Primitive>(std::move(triangle_mesh));
+        parsing_primitives.push_back(std::move(triangle_mesh_primitive));
+
+        for (auto& tri : triangles) {
+            auto triangle = std::make_unique<Triangle>(std::move(tri));
+            auto triangle_primitive = std::make_unique<Shape_Primitive>(std::move(triangle));
+            parsing_primitives.push_back(std::move(triangle_primitive));
+        }
+
+        return true;
+    }
 
 }
