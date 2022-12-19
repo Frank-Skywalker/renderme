@@ -20,6 +20,8 @@ namespace renderme
 
 	auto Sample_Integrator::gl_draw(Scene const& scene) const noexcept -> void
 	{
+		//Be sure to enable shader before setting uniforms
+		shader->use();
 		scene.gl_draw(*shader);
 	}
 

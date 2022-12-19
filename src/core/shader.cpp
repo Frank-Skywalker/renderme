@@ -33,7 +33,6 @@ namespace renderme
 		// retrieve the shader source code from file
 		auto vshader_code=read_shader_from_file(vertex_path.path());
 		auto fshader_code=read_shader_from_file(fragment_path.path());
-
 		
 		auto compile_shader = [] (Shader_Type type, std::string shader_code) -> unsigned int {
 
@@ -55,7 +54,7 @@ namespace renderme
 					shader = glCreateShader(GL_VERTEX_SHADER);
 					break;
 				case Shader_Type::fragment:
-					shader = glCreateShader(GL_VERTEX_SHADER);
+					shader = glCreateShader(GL_FRAGMENT_SHADER);
 					break;
 			}
 			glShaderSource(shader, 1, &vsc, nullptr);
@@ -98,6 +97,11 @@ namespace renderme
 		glDeleteProgram(_id);
 	}
 
+
+	auto Shader::use()->void
+	{
+		glUseProgram(_id);
+	}
 
 	auto Shader::imgui_config()->void
 	{

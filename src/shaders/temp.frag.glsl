@@ -1,10 +1,9 @@
 #version 330 core
-out vec4 FragColor;
-
-in vec2 TexCoords;
+out vec4 fragment_color;
+in vec2 tex_coords;
 
 
 void main()
 {
-    FragColor = vec4(1.0f,1.0f,1.0f, 1.0f);
+    fragment_color = vec4(1.0f, 0.0f,1.0f, 1.0f);
 }

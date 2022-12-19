@@ -13,8 +13,6 @@
 #include <assimp/postprocess.h>
 namespace renderme
 {
-
-
     Renderme::Renderme()
     {
         ///////////////GLFW Init//////////////////////////
@@ -182,18 +180,12 @@ namespace renderme
     //////Backend//////
 	auto Renderme::gl_draw() const noexcept->void
 	{
-		if (state != Renderme::State::ready) {
-			return;
-		}
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
 		integrators[config.integrator_index]->gl_draw(scenes[config.scene_index]);
 	}
 
 	auto Renderme::render() const noexcept->void
 	{
-		if(state!=Renderme::State::ready){
-			return;
-		}
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
         integrators[config.integrator_index]->render(scenes[config.scene_index]);
 	}
@@ -208,8 +200,12 @@ namespace renderme
         ImGui::InputText("load path", config.file_path, MAX_FILE_NAME_LENGTH);
 
         ImGui::Checkbox("raytrace", &config.raytrace);
-        ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size());
-        ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size());
+        if (scenes.size() > 0) {
+            ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
+        }
+        if (integrators.size() > 0) {
+            ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size() - 1);
+        }
     }
 
 
@@ -221,7 +217,6 @@ namespace renderme
             parsing_primitives.clear();
             parsing_lights.clear();
             parsing_cameras.clear();
-
         };
 
         auto create_new_scene = [&] () {
@@ -268,6 +263,10 @@ namespace renderme
         }
 
         clean_parsing_cache();
+
+        if (scenes.size() > 0 && integrators.size() > 0) {
+            state = State::ready;
+        }
     }
 
 

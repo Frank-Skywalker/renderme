@@ -24,7 +24,7 @@ namespace renderme
 		/////Vertex/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, num_faces * sizeof(Point3f), positions.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(Point3f), positions.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Point3f), nullptr);
@@ -32,30 +32,24 @@ namespace renderme
 		/////Normal/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, num_faces * sizeof(Normal3f), normals.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Normal3f), normals.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Point3f), nullptr);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Normal3f), nullptr);
 
 		/////UV/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, num_faces * sizeof(Point2f), uvs.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(Point2f), uvs.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), nullptr);
-
-		//Unbind vbo
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Point2f), nullptr);
 
 		/////EBO/////
 		unsigned int ebo;
 		glGenBuffers(1, &ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_faces * sizeof(Point3ui), faces.data(), GL_STATIC_DRAW);
-
-		//Unbind ebo
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.size() * sizeof(Point3ui), faces.data(), GL_STATIC_DRAW);
 
 		//Unbind vao
 		glBindVertexArray(0);
@@ -66,7 +60,7 @@ namespace renderme
 	auto Triangle_Mesh::gl_draw(Shader const& shader) const noexcept -> void
 	{
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, num_faces, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, num_faces*3 , GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 	}
 

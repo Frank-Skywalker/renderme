@@ -17,6 +17,7 @@ namespace renderme
 		Shader(Runtime_Path vertex_path, Runtime_Path fragment_path);
 		~Shader();
 
+		auto use()->void;
 		auto imgui_config()->void;
 
 		auto id() const noexcept ->unsigned int;
