@@ -1,6 +1,7 @@
 #pragma once
 
-#include<core/geometry.hpp>
+#include "geometry.hpp"
+#include "file-system.hpp"
 
 #include <string>
 namespace renderme
@@ -11,10 +12,13 @@ namespace renderme
 		fragment
 	};
 
-	struct Shader
+	struct Shader final
 	{
-		Shader(std::string const& vertex_path, std::string const& fragment_path);
+		Shader(Runtime_Path vertex_path, Runtime_Path fragment_path);
 		~Shader();
+
+		auto imgui_config()->void;
+
 		auto id() const noexcept ->unsigned int;
 		auto use() const noexcept -> void;
 		auto set_uniform_bool(std::string const& name, bool value) const noexcept ->void;

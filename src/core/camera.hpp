@@ -6,7 +6,8 @@ namespace renderme
 {
 	struct Camera: Only_Movable
 	{
-		Camera(Transform t);
+		virtual auto generate_ray() const noexcept ->Float = 0;
+		virtual auto imgui_config() ->void = 0;
 
 		Transform camera_to_world;
 	};

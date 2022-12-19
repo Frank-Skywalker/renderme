@@ -3,12 +3,11 @@
 #include<core/log.hpp>
 
 #include <shapes/triangle.hpp>
+#include <cameras/perspective-camera.hpp>
 
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
-
-#include <cstdio>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -140,17 +139,23 @@ namespace renderme
             ImGui::ShowDemoWindow(&config.show_imgui_demo_window);
         }
 
-        if (ImGui::Begin("Config")) {
-            ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
-            if (ImGui::Button("load")) {
-                parse_file();
+        if (ImGui::Begin("CONFIG")) {
+            
+            if (ImGui::CollapsingHeader("Renderme Config")) {
+                imgui_config();
             }
-            ImGui::SameLine();
-            ImGui::InputText("load path", config.file_path, MAX_FILE_NAME_LENGTH);
 
-            ImGui::Checkbox("raytrace", &config.raytrace);
-            ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size());
-            ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size());
+            if (ImGui::CollapsingHeader("Integrator Config")) {
+                if (config.integrator_index < integrators.size()) {
+                    integrators[config.integrator_index]->imgui_config();
+                }
+            }
+
+            if (ImGui::CollapsingHeader("Scene Config")) {
+                if (config.scene_index < scenes.size()) {
+                    scenes[config.scene_index].imgui_config();
+                }
+            }
         }
         ImGui::End();
 
@@ -181,7 +186,7 @@ namespace renderme
 			return;
 		}
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-		integrators[config.integrator_index].gl_draw(scenes[config.scene_index]);
+		integrators[config.integrator_index]->gl_draw(scenes[config.scene_index]);
 	}
 
 	auto Renderme::render() const noexcept->void
@@ -190,13 +195,26 @@ namespace renderme
 			return;
 		}
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-        integrators[config.integrator_index].render(scenes[config.scene_index]);
+        integrators[config.integrator_index]->render(scenes[config.scene_index]);
 	}
 
+    auto Renderme::imgui_config()->void
+    {
+        ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
+        if (ImGui::Button("load")) {
+            parse_file(config.file_path);
+        }
+        ImGui::SameLine();
+        ImGui::InputText("load path", config.file_path, MAX_FILE_NAME_LENGTH);
+
+        ImGui::Checkbox("raytrace", &config.raytrace);
+        ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size());
+        ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size());
+    }
 
 
     //////Parsing//////
-    auto Renderme::parse_file()->void
+    auto Renderme::parse_file(Runtime_Path path)->void
     {
         auto clean_parsing_cache = [&] () {
             parsing_transforms.clear();
@@ -230,8 +248,23 @@ namespace renderme
             );
         };
 
-        if (parse_obj(config.file_path)) {
+        auto create_new_integrator = [&] () {
+            auto camera = std::make_unique<Perspective_Camera>();
+            auto shader = std::make_unique<Shader>("src/shaders/temp.vert.glsl", "src/shaders/temp.frag.glsl");
+            integrators.push_back(
+                std::make_unique<Sample_Integrator>(
+                    std::move(camera),
+                    std::move(shader)
+                )
+            );
+        };
+
+        if (parse_obj(path)) {
             create_new_scene();
+        }
+
+        if (true) {
+            create_new_integrator();
         }
 
         clean_parsing_cache();
@@ -239,11 +272,11 @@ namespace renderme
 
 
     // loads a model with supported ASSIMP extensions from file
-    auto Renderme::parse_obj(std::string const& path)->bool
+    auto Renderme::parse_obj(Runtime_Path path)->bool
     {
         // read file via ASSIMP
         Assimp::Importer importer;
-        auto aiscene = importer.ReadFile(path,
+        auto aiscene = importer.ReadFile(path.path(),
             aiProcess_Triangulate |
             aiProcess_GenSmoothNormals |
             aiProcess_FlipUVs |

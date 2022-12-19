@@ -15,11 +15,6 @@ namespace renderme
 	{
 		num_faces = faces.size();
 
-		if (num_faces != positions.size() || num_faces != normals.size() || num_faces != uvs.size()
-			|| num_faces != tangents.size() || num_faces != bitangents.size()) {
-			log(Status::fatal, "num faces doesn't match");
-		}
-
 		// create buffers/arrays
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -51,7 +46,7 @@ namespace renderme
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), nullptr);
 
 		//Unbind vbo
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		/////EBO/////
 		unsigned int ebo;

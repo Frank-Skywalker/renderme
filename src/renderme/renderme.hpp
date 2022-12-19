@@ -2,6 +2,7 @@
 #include<core/util.hpp>
 #include<core/scene.hpp>
 #include<core/integrator.hpp>
+#include<core/file-system.hpp>
 
 //explicitly disable inclusion of the development environment header of glfw
 #define GLFW_INCLUDE_NONE
@@ -59,19 +60,22 @@ namespace renderme
 	private:
 		auto gl_draw() const noexcept->void;
 		auto render() const noexcept->void;
+		auto imgui_config()->void;
 	private:
 		State state{State::uninit};
 		std::vector<Scene> scenes;
-		std::vector<Integrator> integrators;
+		std::vector<std::unique_ptr<Integrator>> integrators;
 
+		
 		//////Parsing//////
 	private:
-		auto parse_file()->void;
-	    auto parse_obj(std::string const& path)->bool;
+		auto parse_file(Runtime_Path path)->void;
+		auto parse_obj(Runtime_Path path)->bool;
 		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> bool;
 		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> bool;
 
 	private:
+		//Transform must not move in memory, so use unique_ptr to store Transforms on stack
 		std::vector<std::unique_ptr<Transform>> parsing_transforms;
 		std::vector<std::unique_ptr<Primitive>> parsing_primitives;
 		std::vector<std::unique_ptr<Light>> parsing_lights;

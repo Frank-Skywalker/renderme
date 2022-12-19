@@ -37,4 +37,8 @@ namespace renderme
 		}
 		return result;
 	}
+
+	auto Scene::imgui_config()->void
+	{
+	}
 }

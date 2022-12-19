@@ -17,6 +17,7 @@ namespace renderme
 			std::vector<std::unique_ptr<Primitive>> primitives, 
 			std::vector<std::unique_ptr<Light>> lights);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
+		auto imgui_config()->void;
 		auto intersect() const noexcept->bool;
 		auto intersect_shadow() const noexcept->bool;
 
