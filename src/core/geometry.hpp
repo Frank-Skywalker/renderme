@@ -1,91 +1,134 @@
 #pragma once
 #include"type.hpp"
 
+#include <cstring>
+
 namespace renderme
 {
 	//////Vectors//////
-	template<typename T>
-	struct Vector2 final
+	
+	//template<class T, size_t dim>
+	//struct Vector final
+	//{
+	//	Vector()
+	//	{
+	//		memset(v, 0, sizeof(T) * dim);
+	//		//for (auto i = 0u; i < dim; ++i) {
+	//		//	v[i] = 0;
+	//		//}
+	//	}
+
+	//	Vector(T value[dim])
+	//	{
+	//		memcpy(v, value, sizeof(T) * dim);
+	//	}
+	//	T v[dim];
+	//};
+
+	enum struct Category
 	{
-		Vector2():x{0}, y{0} {}
-		Vector2(T x, T y):x{x}, y{y} {}
+		vector,
+		point,
+		normal
+	};
+
+	template<Category category, size_t dim, typename T> struct Vector;
+
+	template<typename T>
+	struct Vector<Category::vector, 2, T>
+	{
+		Vector():x{0}, y{0} {}
+		Vector(T x, T y):x{x}, y{y} {}
+
+		auto operator+(Vector const& v) const noexcept->Vector
+		{
+			return Vector(x + v.x, y + v.y);
+		}
+
+		auto operator+=(Vector const& v) -> Vector&
+		{
+			x += v.x;
+			y += v.y;
+			return *this;
+		}
+
 		T x;
 		T y;
 	};
 
+	using Vector2i = Vector<Category::vector, 2, int>;
+	using Vector2f = Vector<Category::vector, 2, Float>;
 
-	template<typename T>
-	struct Vector3 final
+	template<class T>
+	struct Vector<Category::vector, 3, T> final
 	{
-		Vector3():x{0}, y{0}, z{0} {}
-		Vector3(T x, T y, T z):x{x}, y{y}, z{z} {}
+		Vector():x{0}, y{0}, z{0} {}
+		Vector(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
 	};
 
+	using Vector3i = Vector<Category::vector, 3, int>;
+	using Vector3f = Vector<Category::vector, 3, Float>;
 
-	template<typename T>
-	struct Vector4 final
+	template<class T>
+	struct Vector<Category::vector, 4, T> final
 	{
-		Vector4():x{0}, y{0}, z{0}, w{0} {}
-		Vector4(T x, T y, T z, T w):x{x}, y{y}, z{z}, w{w} {}
+		Vector():x{0}, y{0}, z{0}, w{0} {}
+		Vector(T x, T y, T z, T w):x{x}, y{y}, z{z}, w{w} {}
 		T x;
 		T y;
 		T z;
 		T w;
 	};
 
-	using Vector2i = Vector2<int>;
-	using Vector3i = Vector3<int>;
-	using Vector4i = Vector4<int>;
-
-	using Vector2f = Vector2<Float>;
-	using Vector3f = Vector3<Float>;
-	using Vector4f = Vector4<Float>;
+	using Vector4i = Vector<Category::vector, 4, int>;
+	using Vector4f = Vector<Category::vector, 4, Float>;
 
 
 	//////Points//////
-	template<typename T>
-	struct Point2 final
+	template<class T>
+	struct Vector<Category::point, 2, T> final
 	{
-		Point2():x{0}, y{0} {}
-		Point2(T x, T y):x{x}, y{y} {}
+		Vector():x{0}, y{0} {}
+		Vector(T x, T y):x{x}, y{y} {}
 		T x;
 		T y;
 	};
 
+	using Point2i = Vector<Category::point, 2, int>;
+	using Point2f = Vector<Category::point, 2, Float>;
 
-	template<typename T>
-	struct Point3 final
+
+	template<class T>
+	struct Vector<Category::point, 3, T> final
 	{
-		Point3():x{0}, y{0}, z{0} {}
-		Point3(T x, T y, T z):x{x}, y{y}, z{z} {}
+		Vector():x{0}, y{0}, z{0} {}
+		Vector(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
 	};
 
-	using Point2i = Point2<int>;
-	using Point3i = Point3<int>;
-	using Point3ui = Point3<unsigned int>;
-
-	using Point2f = Point2<Float>;
-	using Point3f = Point3<Float>;
+	using Point3ui = Vector<Category::point,3,unsigned int>;
+	using Point3i = Vector<Category::point, 3, int>;
+	using Point3f = Vector<Category::point, 3, Float>;
 
 
 	//////Normals//////
-	template<typename T>
-	struct Normal3 final
+	template<class T>
+	struct Vector<Category::normal, 3, T> final
 	{
-		Normal3():x{0}, y{0}, z{0} {}
-		Normal3(T x, T y, T z):x{x}, y{y}, z{z} {}
+		Vector():x{0}, y{0}, z{0} {}
+		Vector(T x, T y, T z):x{x}, y{y}, z{z} {}
 		T x;
 		T y;
 		T z;
 	};
 
-	using Normal3f = Normal3<Float>;
+	using Normal3i = Vector<Category::normal, 3, int>;
+	using Normal3f = Vector<Category::normal, 3, Float>;
 }
 
 #include "geometry.inl"

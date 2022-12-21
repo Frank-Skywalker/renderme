@@ -47,6 +47,30 @@ namespace renderme
         }
         //Make the window and OpenGL's context current
         glfwMakeContextCurrent(window);
+        glfwSetFramebufferSizeCallback(window, [] (GLFWwindow* window, int width, int height) {
+            glViewport(0, 0, width, height);
+            });
+        glfwSetCursorPosCallback(window, [] (GLFWwindow* window, double xpos_in, double ypos_in) {
+            float xpos = static_cast<float>(xpos_in);
+            float ypos = static_cast<float>(ypos_in);
+
+            //if (firstMouse) {
+            //    lastX = xpos;
+            //    lastY = ypos;
+            //    firstMouse = false;
+            //}
+
+            //float xoffset = xpos - lastX;
+            //float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+            //lastX = xpos;
+            //lastY = ypos;
+
+            //camera.ProcessMouseMovement(xoffset, yoffset);
+            });
+        glfwSetScrollCallback(window, [] (GLFWwindow* window, double xoffset, double yoffset) {
+            
+            });
         glfwSwapInterval(1); // Enable vsync
 
         /////////////GLEW Init///////////////
@@ -109,9 +133,9 @@ namespace renderme
             //glfwWaitEvents();
             //Poll for and process events
 
-            int display_w, display_h;
-            glfwGetFramebufferSize(window, &display_w, &display_h);
-            glViewport(0, 0, display_w, display_h);
+            //int display_w, display_h;
+            //glfwGetFramebufferSize(window, &display_w, &display_h);
+            //glViewport(0, 0, display_w, display_h);
             glClearColor(config.clear_color.x * config.clear_color.w, config.clear_color.y * config.clear_color.w, config.clear_color.z * config.clear_color.w, config.clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
 
