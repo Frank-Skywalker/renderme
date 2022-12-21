@@ -1,6 +1,6 @@
 #pragma once
 #include <core/camera.hpp>
-#include <core/geometry.hpp>
+#include <core/vector.hpp>
 namespace renderme
 {
 	struct Perspective_Camera final: Camera

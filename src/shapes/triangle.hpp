@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/shape.hpp>
-#include <core/geometry.hpp>
+#include <core/vector.hpp>
 #include <core/primitive.hpp>
 
 #include<vector>

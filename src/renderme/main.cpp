@@ -1,5 +1,5 @@
 #include<core/transform.hpp>
-#include <core/geometry.hpp>
+#include <core/vector.hpp>
 #include "renderme.hpp"
 
 #include<iostream>
@@ -9,7 +9,6 @@ auto main(int argc, char* argv[]) -> int
 {
     renderme::Vector2f vec2;
     std::cerr<<vec2.x;
-
 
     //Start Renderme
     auto& renderme=renderme::Renderme::instance();

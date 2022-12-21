@@ -1,4 +1,4 @@
-#include "geometry.hpp"
+#include "bounds.hpp"
 
 namespace renderme
 {
