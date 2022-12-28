@@ -187,6 +187,7 @@ namespace renderme
 	template<typename T>
 	using Matrix4 = Mat<4, 4, T>;
 	using Matrix4f = Matrix4<Float>;
+	static_assert(std::is_standard_layout_v<Matrix4f>);
 
 	struct Transform final
 	{

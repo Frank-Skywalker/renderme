@@ -2,9 +2,9 @@
 #include "config.hpp"
 
 #ifdef USE_DOUBLE
-typedef double Float;
+using Float = double;
 #else
-typedef float Float;
+using Float = float;
 #endif
 
 namespace renderme
