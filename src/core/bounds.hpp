@@ -22,7 +22,10 @@ namespace renderme
 	};
 
 	using Bounds2i = Bounds<2, int>;
+	static_assert(std::is_standard_layout_v<Bounds2i>);
+
 	using Bounds2f = Bounds<2, Float>;
+	static_assert(std::is_standard_layout_v<Bounds2f>);
 
 	template<typename T>
 	struct Bounds<3, T>
@@ -39,6 +42,9 @@ namespace renderme
 	};
 
 	using Bounds3i = Bounds<3, int>;
+	static_assert(std::is_standard_layout_v<Bounds3i>);
+
 	using Bounds3f = Bounds<3, Float>;
+	static_assert(std::is_standard_layout_v<Bounds3f>);
 
 }

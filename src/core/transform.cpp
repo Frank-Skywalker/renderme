@@ -202,47 +202,51 @@ namespace renderme
 
 	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up)
 	{
-		//Matrix4f cameratoworld;
-		//// Initialize fourth column of viewing matrix
-		//cameratoworld.m[0][3] = position.x;
-		//cameratoworld.m[1][3] = position.y;
-		//cameratoworld.m[2][3] = position.z;
-		//cameratoworld.m[3][3] = 1;
+		Matrix4f cameratoworld;
+		// Initialize fourth column of viewing matrix
+		cameratoworld.m[0][3] = position.x;
+		cameratoworld.m[1][3] = position.y;
+		cameratoworld.m[2][3] = position.z;
+		cameratoworld.m[3][3] = 1;
 
-		//// Initialize first three columns of viewing matrix
-		//Vector3f dir = normalize(lookat - position);
-		//if (Cross(Normalize(up), dir).Length() == 0) {
-		//	Error(
-		//		"\"up\" vector (%f, %f, %f) and viewing direction (%f, %f, %f) "
-		//		"passed to LookAt are pointing in the same direction.  Using "
-		//		"the identity transformation.",
-		//		up.x, up.y, up.z, dir.x, dir.y, dir.z);
-		//	return Transform();
-		//}
-		//Vector3f right = Normalize(Cross(Normalize(up), dir));
-		//Vector3f newUp = Cross(dir, right);
-		//cameraToWorld.m[0][0] = right.x;
-		//cameraToWorld.m[1][0] = right.y;
-		//cameraToWorld.m[2][0] = right.z;
-		//cameraToWorld.m[3][0] = 0.;
-		//cameraToWorld.m[0][1] = newUp.x;
-		//cameraToWorld.m[1][1] = newUp.y;
-		//cameraToWorld.m[2][1] = newUp.z;
-		//cameraToWorld.m[3][1] = 0.;
-		//cameraToWorld.m[0][2] = dir.x;
-		//cameraToWorld.m[1][2] = dir.y;
-		//cameraToWorld.m[2][2] = dir.z;
-		//cameraToWorld.m[3][2] = 0.;
-		//return Transform(Inverse(cameraToWorld), cameraToWorld);
+		// Initialize first three columns of viewing matrix
+		Vector3f dir = normalize(lookat - position);
+		if (length(cross(normalize(up), dir)) == 0){
+			log(Status::error, "up and viewing direction");
+			return Transform();
+		}
+
+		Vector3f right = normalize(cross(normalize(up), dir));
+		Vector3f newup = cross(dir, right);
+		cameratoworld.m[0][0] = right.x;
+		cameratoworld.m[1][0] = right.y;
+		cameratoworld.m[2][0] = right.z;
+		cameratoworld.m[3][0] = 0.;
+		cameratoworld.m[0][1] = newup.x;
+		cameratoworld.m[1][1] = newup.y;
+		cameratoworld.m[2][1] = newup.z;
+		cameratoworld.m[3][1] = 0.;
+		cameratoworld.m[0][2] = dir.x;
+		cameratoworld.m[1][2] = dir.y;
+		cameratoworld.m[2][2] = dir.z;
+		cameratoworld.m[3][2] = 0.;
+
+		return Transform(cameratoworld.inverse(), cameratoworld);
 	}
 
 	auto orthographic(Float znear, Float zfar)->Transform
 	{
-		return Transform();
+		return scale(1, 1, 1 / (zfar - znear)) * translate(Vector3f(0, 0, -znear));
 	}
 
 	auto perspective(Float znear, Float zfar, Float fov)->Transform
 	{
-		return Transform();
+		// Perform projective divide for perspective projection
+		Matrix4f persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, zfar / (zfar - znear), -zfar * znear / (zfar - znear),
+			0, 0, 1, 0);
+
+		// Scale canonical perspective view to specified field of view
+		Float invTanAng = 1 / std::tan(radians(fov) / 2);
+		return scale(invTanAng, invTanAng, 1) * Transform(persp);
 	}
 }

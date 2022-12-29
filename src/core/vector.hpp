@@ -7,7 +7,6 @@
 
 namespace renderme
 {
-	//////Vectors//////
 	enum struct Category
 	{
 		vector,
@@ -37,17 +36,20 @@ namespace renderme
 			return *this;
 		}
 
-		auto operator-(Vec const& rhs) const noexcept->Vec
-		{
-			return Vec(x - rhs.x, y - rhs.y);
-		}
+		//operator- and operator-= between Points are different from Vectors and Normals
+		//Thus must be written separately
 
-		auto operator-=(Vec const& rhs)->Vec&
-		{
-			x -= rhs.x;
-			y -= rhs.y;
-			return *this;
-		}
+		//auto operator-(Vec const& rhs) const noexcept->Vec
+		//{
+		//	return Vec(x - rhs.x, y - rhs.y);
+		//}
+
+		//auto operator-=(Vec const& rhs)->Vec&
+		//{
+		//	x -= rhs.x;
+		//	y -= rhs.y;
+		//	return *this;
+		//}
 
 		auto operator==(Vec const& rhs) const noexcept ->bool
 		{
@@ -111,6 +113,20 @@ namespace renderme
 	using Vector2= Vec<2, Category::vector, T>;
 
 	template<typename T>
+	auto operator-(Vector2<T> const& lhs, Vector2<T> const& rhs) ->Vector2<T>
+	{
+		return Vector2<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+	}
+
+	template<typename T>
+	auto operator-=(Vector2<T>& lhs, Vector2<T> const& rhs) ->Vector2<T>&
+	{
+		lhs.x -= rhs.x;
+		lhs.y -= rhs.y;
+		return lhs;
+	}
+
+	template<typename T>
 	inline auto length_squared(Vector2<T> const& v)->Float
 	{
 		return v.x * v.x + v.y * v.y;
@@ -139,6 +155,50 @@ namespace renderme
 
 	template<typename T>
 	using Point2 = Vec<2, Category::point, T>;
+
+	//Minus between two Points yields a Vector
+	template<typename T>
+	auto operator-(Point2<T> const& lhs, Point2<T> const& rhs) ->Vector2<T>
+	{
+		return Vector2<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+	}
+
+	//No operator-= between Points
+	//template<typename T>
+	//auto operator-=(Vector2<T>& lhs, Vector2<T> const& rhs) ->Vector2<T>&
+	//{
+	//	lhs.x -= rhs.x;
+	//	lhs.y -= rhs.y;
+	//	return lhs;
+	//}
+
+	template<typename T, typename U>
+	auto operator+(Point2<T> const& p, Vector2<U> const& v)-> Point2<T>
+	{
+		return Point2<T>(p.x + v.x, p.y + v.y);
+	}
+
+	template<typename T, typename U>
+	auto operator+=(Point2<T>& p, Vector2<U> const& v)-> Point2<T>&
+	{
+		p.x += v.x;
+		p.y += v.y;
+		return p;
+	}
+
+	template<typename T, typename U>
+	auto operator-(Point2<T> const& p, Vector2<U> const& v)-> Point2<T>
+	{
+		return Point2<T>(p.x - v.x, p.y - v.y);
+	}
+
+	template<typename T, typename U>
+	auto operator-=(Point2<T>& p, Vector2<U> const& v)-> Point2<T>&
+	{
+		p.x -= v.x;
+		p.y -= v.y;
+		return p;
+	}
 
 	using Point2i = Point2<int>;
 	static_assert(std::is_standard_layout_v<Point2i>);
@@ -169,18 +229,21 @@ namespace renderme
 			return *this;
 		}
 
-		auto operator-(Vec const& rhs) const noexcept->Vec
-		{
-			return Vec(x - rhs.x, y - rhs.y, z - rhs.z);
-		}
+		//operator- and operator-= between Points are different from Vectors and Normals
+        //Thus must be written separately
 
-		auto operator-=(Vec const& rhs)->Vec&
-		{
-			x -= rhs.x;
-			y -= rhs.y;
-			z -= rhs.z;
-			return *this;
-		}
+		//auto operator-(Vec const& rhs) const noexcept->Vec
+		//{
+		//	return Vec(x - rhs.x, y - rhs.y, z - rhs.z);
+		//}
+
+		//auto operator-=(Vec const& rhs)->Vec&
+		//{
+		//	x -= rhs.x;
+		//	y -= rhs.y;
+		//	z -= rhs.z;
+		//	return *this;
+		//}
 
 		auto operator==(Vec const& rhs) const noexcept ->bool
 		{
@@ -250,6 +313,21 @@ namespace renderme
 	using Vector3 = Vec<3, Category::vector, T>;
 
 	template<typename T>
+	auto operator-(Vector3<T> const& lhs, Vector3<T> const& rhs) ->Vector3<T>
+	{
+		return Vector3<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+	}
+
+	template<typename T>
+	auto operator-=(Vector3<T>& lhs, Vector3<T> const& rhs) ->Vector3<T>&
+	{
+		lhs.x -= rhs.x;
+		lhs.y -= rhs.y;
+		lhs.z -= rhs.z;
+		return lhs;
+	}
+
+	template<typename T>
 	inline auto length_squared(Vector3<T> const& v)->Float
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
@@ -267,6 +345,18 @@ namespace renderme
 		return v / length(v);
 	}
 
+	template<typename T>
+	inline auto cross(Vector3<T> const& lhs, Vector3<T> const& rhs)->Vector3<T>
+	{
+		T v1x = lhs.x, v1y = lhs.y, v1z = lhs.z;
+		T v2x = rhs.x, v2y = rhs.y, v2z = rhs.z;
+		return Vector3<T>(
+			(v1y * v2z) - (v1z * v2y), 
+			(v1z * v2x) - (v1x * v2z),
+			(v1x * v2y) - (v1y * v2x)
+			);
+	}
+
 
 
 	using Vector3i = Vector3<int>;
@@ -282,6 +372,53 @@ namespace renderme
 	
 	template<typename T>
 	using Point3 = Vec<3, Category::point, T>;
+
+	//Minus between two Points yields a Vector
+	template<typename T>
+	auto operator-(Point3<T> const& lhs, Point3<T> const& rhs) ->Vector3<T>
+	{
+		return Vector3<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+	}
+
+	//No operator-= between Points
+	//template<typename T>
+	//auto operator-=(Vector3<T>& lhs, Vector3<T> const& rhs) ->Vector3<T>&
+	//{
+	//	lhs.x -= rhs.x;
+	//	lhs.y -= rhs.y;
+	//	lhs.z -= rhs.z;
+	//	return lhs;
+	//}
+
+	template<typename T, typename U>
+	auto operator+(Point3<T> const& p, Vector3<U> const& v)-> Point3<T>
+	{
+		return Point3<T>(p.x + v.x, p.y + v.y, p.z + v.z);
+	}
+
+	template<typename T, typename U>
+	auto operator+=(Point3<T>& p, Vector3<U> const& v)-> Point3<T>&
+	{
+		p.x += v.x;
+		p.y += v.y;
+		p.z += v.z;
+		return p;
+	}
+
+	template<typename T, typename U>
+	auto operator-(Point3<T> const& p, Vector3<U> const& v)-> Point3<T>
+	{
+		return Point3<T>(p.x - v.x, p.y - v.y, p.z - v.z);
+	}
+
+	template<typename T, typename U>
+	auto operator-=(Point3<T>& p, Vector3<U> const& v)-> Point3<T>&
+	{
+		p.x -= v.x;
+		p.y -= v.y;
+		p.z -= v.z;
+		return p;
+	}
 
 	using Point3ui = Point3<unsigned int>;
 	static_assert(std::is_standard_layout_v<Point3ui>);
@@ -301,6 +438,22 @@ namespace renderme
 
 	template<typename T>
 	using Normal3= Vec<3, Category::normal, T>;
+
+	template<typename T>
+	auto operator-(Normal3<T> const& lhs, Normal3<T> const& rhs) ->Normal3<T>
+	{
+		return Normal3<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+	}
+
+	template<typename T>
+	auto operator-=(Normal3<T>& lhs, Normal3<T> const& rhs) ->Normal3<T>&
+	{
+		lhs.x -= rhs.x;
+		lhs.y -= rhs.y;
+		lhs.z -= rhs.z;
+		return lhs;
+	}
+
 	template<typename T>
 	inline auto length_squared(Normal3<T> const& v)->Float
 	{
@@ -318,6 +471,31 @@ namespace renderme
 	{
 		return v / length(v);
 	}
+
+	template<typename T>
+	inline auto cross(Vector3<T> const& lhs, Normal3<T> const& rhs)->Vector3<T>
+	{
+		T v1x = lhs.x, v1y = lhs.y, v1z = lhs.z;
+		T v2x = rhs.x, v2y = rhs.y, v2z = rhs.z;
+		return Vector3<T>(
+			(v1y * v2z) - (v1z * v2y),
+			(v1z * v2x) - (v1x * v2z),
+			(v1x * v2y) - (v1y * v2x)
+			);
+	}
+
+	template<typename T>
+	inline auto cross(Normal3<T> const& lhs, Vector3<T> const& rhs)->Vector3<T>
+	{
+		T v1x = lhs.x, v1y = lhs.y, v1z = lhs.z;
+		T v2x = rhs.x, v2y = rhs.y, v2z = rhs.z;
+		return Vector3<T>(
+			(v1y * v2z) - (v1z * v2y),
+			(v1z * v2x) - (v1x * v2z),
+			(v1x * v2y) - (v1y * v2x)
+			);
+	}
+
 
 
 	using Normal3i = Normal3<int>;
