@@ -107,7 +107,6 @@ namespace renderme
 	{
 	}
 
-
 	auto Shader::id() const noexcept ->unsigned int
 	{
 		return _id;
@@ -122,37 +121,50 @@ namespace renderme
 	{
 		glUniform1i(glGetUniformLocation(_id, name.c_str()), static_cast<int>(value));
 	}
+	
 	auto Shader::set_uniform_int(std::string const& name, int value) const noexcept ->void
 	{
 		glUniform1i(glGetUniformLocation(_id, name.c_str()), value);
 	}
+	
 	auto Shader::set_uniform_float(std::string const& name, float value) const noexcept ->void
 	{
 		glUniform1f(glGetUniformLocation(_id, name.c_str()), value);
 	}
+	
 	auto Shader::set_uniform_vec2(std::string const& name, Vector2f value) const noexcept ->void
 	{
-		glUniform2f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y) );
+		glUniform2fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
 	}
+	
 	auto Shader::set_uniform_vec2(std::string const& name, float x, float y) const noexcept ->void
 	{
 		glUniform2f(glGetUniformLocation(_id, name.c_str()), x, y);
 	}
+	
 	auto Shader::set_uniform_vec3(std::string const& name, Vector3f value) const noexcept ->void
 	{
-		glUniform3f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y), static_cast<float>(value.z));
+		glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
 	}
+	
 	auto Shader::set_uniform_vec3(std::string const& name, float x, float y, float z) const noexcept ->void
 	{
 		glUniform3f(glGetUniformLocation(_id, name.c_str()), x, y, z);
 	}
-	auto Shader::set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void
-	{
-		glUniform4f(glGetUniformLocation(_id, name.c_str()), static_cast<float>(value.x), static_cast<float>(value.y), static_cast<float>(value.z), static_cast<float>(value.w));
-	}
+	
+	//auto Shader::set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void
+	//{
+	//	glUniform4fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
+	//}
+	//
 	auto Shader::set_uniform_vec4(std::string const& name, float x, float y, float z, float w) const noexcept ->void
 	{
 		glUniform4f(glGetUniformLocation(_id, name.c_str()), x, y, z, w);
+	}
+
+	auto Shader::set_uniform_mat4(std::string const& name, Matrix4f value) const noexcept ->void
+	{
+		glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, &value.m[0][0]);
 	}
 
 }

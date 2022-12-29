@@ -1,7 +1,6 @@
 #pragma once
-#include"type.hpp"
+#include "vector.hpp"
 #include <iostream>
-#include "log.hpp"
 
 namespace renderme
 {
@@ -216,4 +215,17 @@ namespace renderme
 		Matrix4f m;
 		Matrix4f m_inv;
 	};
+
+	auto translate(Vector3f const& delta)-> Transform;
+	auto translate(Float x, Float y, Float z)->Transform;
+	auto scale(Vector3f const& _scale)->Transform;
+	auto scale(Float x, Float y, Float z)->Transform;
+	auto rotate_x(Float theta)->Transform;
+	auto rotate_y(Float theta)->Transform;
+	auto rotate_z(Float theta)->Transform;
+	auto rotate(Vector3f const& axis, Float theta);
+	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up);
+	auto orthographic(Float znear, Float zfar)->Transform;
+	auto perspective(Float znear, Float zfar, Float fov)->Transform;
+
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.hpp"
+#include "transform.hpp"
 #include "file-system.hpp"
 
 #include <string>
@@ -29,11 +30,9 @@ namespace renderme
 		auto set_uniform_vec2(std::string const& name, float x, float y) const noexcept ->void;
 		auto set_uniform_vec3(std::string const& name, Vector3f value) const noexcept ->void;
 		auto set_uniform_vec3(std::string const& name, float x, float y, float z) const noexcept ->void;
-		auto set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void;
+		//auto set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void;
 		auto set_uniform_vec4(std::string const& name, float x, float y, float z, float w) const noexcept ->void;
-		//auto set_uniform_mat2(std::string const& name, bool value) const noexcept ->void;
-		//auto set_uniform_mat3(std::string const& name, bool value) const noexcept ->void;
-		//auto set_uniform_mat4(std::string const& name, bool value) const noexcept ->void;
+		auto set_uniform_mat4(std::string const& name, Matrix4f value) const noexcept ->void;
 
 	private:
 		unsigned int _id;

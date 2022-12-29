@@ -22,6 +22,7 @@ namespace renderme
 	{
 		//Be sure to enable shader before setting uniforms
 		shader->use();
+		camera->gl_draw(*shader);
 		scene.gl_draw(*shader);
 	}
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "util.hpp"
 #include "transform.hpp"
+#include "shader.hpp"
 
 namespace renderme
 {
@@ -14,6 +15,7 @@ namespace renderme
 
 	struct Camera: Only_Movable
 	{
+		virtual auto gl_draw(Shader const& shader) const noexcept -> void;
 		virtual auto generate_ray() const noexcept ->Float = 0;
 		virtual auto imgui_config() ->void = 0;
 		virtual auto process_keyboard_input(Camera_Movement move, float delta_time)->void = 0;

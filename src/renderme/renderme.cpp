@@ -3,7 +3,7 @@
 #include<core/log.hpp>
 
 #include <shapes/triangle.hpp>
-#include <cameras/perspective-camera.hpp>
+#include <cameras/perspective.hpp>
 
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>

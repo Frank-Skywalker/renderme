@@ -3,6 +3,7 @@
 #include "log.hpp"
 
 #include <cstring>
+#include <cmath>
 
 namespace renderme
 {
@@ -108,6 +109,24 @@ namespace renderme
 
 	template<typename T>
 	using Vector2= Vec<2, Category::vector, T>;
+
+	template<typename T>
+	inline auto length_squared(Vector2<T> const& v)->Float
+	{
+		return v.x * v.x + v.y * v.y;
+	}
+
+	template<typename T>
+	inline auto length(Vector2<T> const& v)->Float
+	{
+		return std::sqrt(length_squared(v));
+	}
+
+	template<typename T>
+	inline auto normalize(Vector2<T> const& v)->Vector2<T>
+	{
+		return v / length(v);
+	}
 	
 	using Vector2i = Vector2<int>;
 	static_assert(std::is_standard_layout_v<Vector2i>);
@@ -230,6 +249,26 @@ namespace renderme
 	template<typename T>
 	using Vector3 = Vec<3, Category::vector, T>;
 
+	template<typename T>
+	inline auto length_squared(Vector3<T> const& v)->Float
+	{
+		return v.x * v.x + v.y * v.y + v.z * v.z;
+	}
+
+	template<typename T>
+	inline auto length(Vector3<T> const& v)->Float
+	{
+		return std::sqrt(length_squared(v));
+	}
+
+	template<typename T>
+	inline auto normalize(Vector3<T> const& v)->Vector3<T>
+	{
+		return v / length(v);
+	}
+
+
+
 	using Vector3i = Vector3<int>;
 	static_assert(std::is_standard_layout_v<Vector3i>);
 	static_assert(offsetof(Vector3i, y) == sizeof(int));
@@ -262,6 +301,24 @@ namespace renderme
 
 	template<typename T>
 	using Normal3= Vec<3, Category::normal, T>;
+	template<typename T>
+	inline auto length_squared(Normal3<T> const& v)->Float
+	{
+		return v.x * v.x + v.y * v.y + v.z * v.z;
+	}
+
+	template<typename T>
+	inline auto length(Normal3<T> const& v)->Float
+	{
+		return std::sqrt(length_squared(v));
+	}
+
+	template<typename T>
+	inline auto normalize(Normal3<T> const& v)->Normal3<T>
+	{
+		return v / length(v);
+	}
+
 
 	using Normal3i = Normal3<int>;
 	static_assert(std::is_standard_layout_v<Normal3i>);
@@ -276,125 +333,144 @@ namespace renderme
 
 
 
-	template<Category category, typename T>
-	struct Vec<4, category, T> final
-	{
-		Vec():x{0}, y{0}, z{0}, w{0} {}
-		Vec(T x, T y, T z, T w):x{x}, y{y}, z{z}, w{w} {}
+	//template<Category category, typename T>
+	//struct Vec<4, category, T> final
+	//{
+	//	Vec():x{0}, y{0}, z{0}, w{0} {}
+	//	Vec(T x, T y, T z, T w):x{x}, y{y}, z{z}, w{w} {}
 
-		auto operator+(Vec const& rhs) const noexcept->Vec
-		{
-			return Vec(x + rhs.x, y + rhs.y, z + rhs.z, w+ rhs.w);
-		}
+	//	auto operator+(Vec const& rhs) const noexcept->Vec
+	//	{
+	//		return Vec(x + rhs.x, y + rhs.y, z + rhs.z, w+ rhs.w);
+	//	}
 
-		auto operator+=(Vec const& rhs) -> Vec&
-		{
-			x += rhs.x;
-			y += rhs.y;
-			z += rhs.z;
-			w += rhs.w;
-			return *this;
-		}
+	//	auto operator+=(Vec const& rhs) -> Vec&
+	//	{
+	//		x += rhs.x;
+	//		y += rhs.y;
+	//		z += rhs.z;
+	//		w += rhs.w;
+	//		return *this;
+	//	}
 
-		auto operator-(Vec const& rhs) const noexcept->Vec
-		{
-			return Vec(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
-		}
+	//	auto operator-(Vec const& rhs) const noexcept->Vec
+	//	{
+	//		return Vec(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
+	//	}
 
-		auto operator-=(Vec const& rhs)->Vec&
-		{
-			x -= rhs.x;
-			y -= rhs.y;
-			z -= rhs.z;
-			w -= rhs.w;
-			return *this;
-		}
+	//	auto operator-=(Vec const& rhs)->Vec&
+	//	{
+	//		x -= rhs.x;
+	//		y -= rhs.y;
+	//		z -= rhs.z;
+	//		w -= rhs.w;
+	//		return *this;
+	//	}
 
-		auto operator==(Vec const& rhs) const noexcept ->bool
-		{
-			return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;
-		}
+	//	auto operator==(Vec const& rhs) const noexcept ->bool
+	//	{
+	//		return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;
+	//	}
 
-		auto operator!=(Vec const& rhs) const noexcept ->bool
-		{
-			return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w;
-		}
+	//	auto operator!=(Vec const& rhs) const noexcept ->bool
+	//	{
+	//		return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w;
+	//	}
 
-		template<typename U>
-		auto operator*(U const& rhs) const noexcept->Vec
-		{
-			return Vec(x * rhs, y * rhs, z * rhs, w * rhs);
-		}
+	//	template<typename U>
+	//	auto operator*(U const& rhs) const noexcept->Vec
+	//	{
+	//		return Vec(x * rhs, y * rhs, z * rhs, w * rhs);
+	//	}
 
-		template<typename U>
-		auto operator*=(U const& rhs) ->Vec&
-		{
-			x *= rhs;
-			y *= rhs;
-			z *= rhs;
-			w *= rhs;
-			return *this;
-		}
+	//	template<typename U>
+	//	auto operator*=(U const& rhs) ->Vec&
+	//	{
+	//		x *= rhs;
+	//		y *= rhs;
+	//		z *= rhs;
+	//		w *= rhs;
+	//		return *this;
+	//	}
 
-		template<typename U>
-		auto operator/(U const& rhs) const noexcept->Vec
-		{
-			return Vec(x / rhs, y / rhs, z / rhs, w / rhs);
-		}
+	//	template<typename U>
+	//	auto operator/(U const& rhs) const noexcept->Vec
+	//	{
+	//		return Vec(x / rhs, y / rhs, z / rhs, w / rhs);
+	//	}
 
-		template<typename U>
-		auto operator/=(U const& rhs) ->Vec&
-		{
-			x /= rhs;
-			y /= rhs;
-			z /= rhs;
-			w /= rhs;
-			return *this;
-		}
+	//	template<typename U>
+	//	auto operator/=(U const& rhs) ->Vec&
+	//	{
+	//		x /= rhs;
+	//		y /= rhs;
+	//		z /= rhs;
+	//		w /= rhs;
+	//		return *this;
+	//	}
 
-		auto operator-() const noexcept->Vec
-		{
-			return Vec(-x, -y, -z, -w);
-		}
+	//	auto operator-() const noexcept->Vec
+	//	{
+	//		return Vec(-x, -y, -z, -w);
+	//	}
 
-		auto operator[](int i) -> T&
-		{
-			if (i < 0 || i >= 3) {
-				log(Status::fatal, "Vec: index out of range");
-			}
-			if (i == 0) {
-				return x;
-			} 
-			else if (i == 1) {
-				return y;
-			}
-			else if (i == 2) {
-				return z;
-			}
-			return w;
-		}
+	//	auto operator[](int i) -> T&
+	//	{
+	//		if (i < 0 || i >= 3) {
+	//			log(Status::fatal, "Vec: index out of range");
+	//		}
+	//		if (i == 0) {
+	//			return x;
+	//		} 
+	//		else if (i == 1) {
+	//			return y;
+	//		}
+	//		else if (i == 2) {
+	//			return z;
+	//		}
+	//		return w;
+	//	}
 
 
-		T x;
-		T y;
-		T z;
-		T w;
-	};
+	//	T x;
+	//	T y;
+	//	T z;
+	//	T w;
+	//};
 
-	template<typename T>
-	using Vector4 = Vec<4, Category::vector, T>;
+	//template<typename T>
+	//using Vector4 = Vec<4, Category::vector, T>;
+	//template<typename T>
+	//inline auto length_squared(Vector4<T> const& v)->Float
+	//{
+	//	return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
+	//}
 
-	using Vector4i = Vector4<int>;
-	static_assert(std::is_standard_layout_v<Vector4i>);
-	static_assert(offsetof(Vector4i, y) == sizeof(int));
-	static_assert(offsetof(Vector4i, z) == sizeof(int) * 2);
-	static_assert(offsetof(Vector4i, w) == sizeof(int) * 3);
+	//template<typename T>
+	//inline auto length(Vector4<T> const& v)->Float
+	//{
+	//	return std::sqrt(length_squared(v));
+	//}
 
-	using Vector4f = Vector4<Float>;
-	static_assert(std::is_standard_layout_v<Vector4f>);
-	static_assert(offsetof(Vector4f, y) == sizeof(Float));
-	static_assert(offsetof(Vector4f, z) == sizeof(Float) * 2);
-	static_assert(offsetof(Vector4f, w) == sizeof(Float) * 3);
+	//template<typename T>
+	//inline auto normalize(Vector4<T> const& v)->Vector4<T>
+	//{
+	//	return v / length(v);
+	//}
+
+
+	//using Vector4i = Vector4<int>;
+	//static_assert(std::is_standard_layout_v<Vector4i>);
+	//static_assert(offsetof(Vector4i, y) == sizeof(int));
+	//static_assert(offsetof(Vector4i, z) == sizeof(int) * 2);
+	//static_assert(offsetof(Vector4i, w) == sizeof(int) * 3);
+
+	//using Vector4f = Vector4<Float>;
+	//static_assert(std::is_standard_layout_v<Vector4f>);
+	//static_assert(offsetof(Vector4f, y) == sizeof(Float));
+	//static_assert(offsetof(Vector4f, z) == sizeof(Float) * 2);
+	//static_assert(offsetof(Vector4f, w) == sizeof(Float) * 3);
+
 }
 
 #include "vector.inl"

@@ -59,6 +59,7 @@ namespace renderme
 
 	auto Triangle_Mesh::gl_draw(Shader const& shader) const noexcept -> void
 	{
+		shader.set_uniform_mat4("model", Matrix4f());
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, num_faces*3 , GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
