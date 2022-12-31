@@ -37,7 +37,7 @@ namespace renderme
 
 	auto Orthographic_Camera::process_scroll(Float offset)->void
 	{
-
+		//Empty, no zoom
 	}
 
 

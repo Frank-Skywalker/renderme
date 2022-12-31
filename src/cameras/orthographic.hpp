@@ -19,8 +19,8 @@ namespace renderme
 		auto imgui_config() ->void;
 
 		auto process_keyboard(Camera_Movement move, Float delta_time)->void;
-		auto process_cursor(Float xoffset, Float yoffset)->void;
-		auto process_scroll(Float offset)->void;
+		auto process_cursor(Float xdelta, Float ydelta)->void;
+		auto process_scroll(Float delta)->void;
 
 	private:
 		auto update_camera_transforms() ->void;

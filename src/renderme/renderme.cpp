@@ -17,6 +17,7 @@ namespace renderme
     //Believe me I don't wanna do this.
     //GLFW doesn't have a function to query scroll pos.
     //Only scroll callback is provided and it cannot access Renderme private data.
+    bool scroll{false};
     double scroll_xdelta;
     double scroll_ydelta;
 
@@ -62,6 +63,7 @@ namespace renderme
             });
 
         glfwSetScrollCallback(window, [] (GLFWwindow* window, double xdelta, double ydelta) {
+            scroll = true;
             scroll_xdelta = xdelta;
             scroll_ydelta = ydelta;
             });
@@ -163,8 +165,15 @@ namespace renderme
         info.cursor_ypos = ypos;
 
         //Update cursor scroll
-        info.scroll_xdelta = scroll_xdelta;
-        info.scroll_xdelta = scroll_ydelta;
+        if (scroll) {
+            info.scroll_xdelta = scroll_xdelta;
+            info.scroll_ydelta = scroll_ydelta;
+            scroll = false;
+        }
+        else {
+            info.scroll_xdelta = 0;
+            info.scroll_ydelta = 0;
+        }
     }
 
 
@@ -173,6 +182,10 @@ namespace renderme
         //Close
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
+        }
+
+        if (state != Renderme::State::ready) {
+            return;
         }
 
         //Camera position movement
@@ -272,14 +285,14 @@ namespace renderme
     auto Renderme::imgui_config()->void
     {
         ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
-        ImGui::ColorEdit4("Clear color", &config.clear_color.x);
-        if (ImGui::Button("load")) {
+        ImGui::ColorEdit4("Clear Color", &config.clear_color.x);
+        if (ImGui::Button("Load")) {
             parse_file(config.file_path);
         }
         ImGui::SameLine();
-        ImGui::InputText("load path", config.file_path, MAX_FILE_NAME_LENGTH);
+        ImGui::InputText("Load Path", config.file_path, MAX_FILE_NAME_LENGTH);
 
-        ImGui::Checkbox("raytrace", &config.raytrace);
+        ImGui::Checkbox("Raytrace", &config.raytrace);
         if (scenes.size() > 0) {
             ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
         }
@@ -324,7 +337,7 @@ namespace renderme
         };
 
         auto create_new_integrator = [&] () {
-            auto camera = std::make_unique<Orthographic_Camera>();
+            auto camera = std::make_unique<Perspective_Camera>();
             auto shader = std::make_unique<Shader>("src/shaders/temp.vert.glsl", "src/shaders/temp.frag.glsl");
             integrators.push_back(
                 std::make_unique<Sample_Integrator>(

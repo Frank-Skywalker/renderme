@@ -1,5 +1,8 @@
 #include "perspective.hpp"
 
+#include <core/math.hpp>
+
+#include <cmath>
 #include <imgui/imgui.h>
 
 namespace renderme
@@ -10,34 +13,91 @@ namespace renderme
 	}
 	auto Perspective_Camera::imgui_config() ->void
 	{
-		ImGui::DragFloat3("Position", (float*)&config.position.x);
-		ImGui::DragFloat3("Direction", (float*)&config.direction.x);
-		ImGui::DragFloat3("Up", (float*)&config.up.x);
+		auto modified=false;
+		modified |= ImGui::DragFloat3("Position", &config.position[0]);
+		modified |= ImGui::DragFloat3("World Up", &config.world_up[0]);
+		modified |= ImGui::DragFloat("Yaw", &config.yaw);
+		modified |= ImGui::DragFloat("Pitch", &config.pitch);
+		modified |= ImGui::DragFloat("Zoom", &config.zoom);
+
+		if (modified) {
+			update_camera_transforms();
+		}
+
+		ImGui::Separator();
+		auto front = config.front;
+		ImGui::DragFloat3("Front", &front[0]);
+		auto up = config.up;
+		ImGui::DragFloat3("Up", &up[0]);
+		auto right = config.right;
+		ImGui::DragFloat3("Right", &right[0]);
+
+
+		ImGui::Separator();
+		ImGui::DragFloat("Move Speed", &config.move_speed);
+		ImGui::DragFloat("Cursor Speed", &config.cursor_speed);
 	}
 
 	auto Perspective_Camera::process_keyboard(Camera_Movement move, Float delta_time)->void
 	{
 		switch (move) {
 			case Camera_Movement::forward:
-				//config.position += delta_time * config.speed
+				config.position += config.front * delta_time * config.move_speed;
 				break;
 			case Camera_Movement::backward:
+				config.position -= config.front * delta_time * config.move_speed;
 				break;
 			case Camera_Movement::left:
+				config.position -= config.right * delta_time * config.move_speed;
 				break;
 			case Camera_Movement::right:
+				config.position += config.right * delta_time * config.move_speed;
 				break;
 		}
+
+		update_camera_transforms();
 	}
 
-	auto Perspective_Camera::process_cursor(Float xoffset, Float yoffset)->void
+	auto Perspective_Camera::process_cursor(Float xdelta, Float ydelta)->void
 	{
+		config.yaw += xdelta * config.cursor_speed;
+		config.pitch += ydelta * config.cursor_speed;
 
+		if (config.pitch > 89) {
+			config.pitch = 89;
+		}
+		if (config.pitch < -89) {
+			config.pitch = -89;
+		}
+		update_camera_transforms();
 	}
 
-	auto Perspective_Camera::process_scroll(Float offset)->void
+	auto Perspective_Camera::process_scroll(Float delta)->void
 	{
+		config.zoom -= delta;
 
+		if (config.zoom < 1) {
+			config.zoom = 1;
+		}
+		if (config.zoom > 45) {
+			config.zoom = 45;
+		}
+		update_camera_transforms();
 	}
+
+	auto Perspective_Camera::update_camera_transforms() ->void
+	{
+		//Calculate the new front vector
+		config.front.x = std::cos(radians(config.yaw)) * std::cos(radians(config.pitch));
+		config.front.y = std::sin(radians(config.pitch));
+		config.front.z = std::sin(radians(config.yaw)) * std::cos(radians(config.pitch));
+		config.front = normalize(config.front);
+
+		//Re-calculate the Right and Up vector
+		//Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+		config.right= normalize(cross(config.front, config.world_up));  
+		config.up = normalize(cross(config.right, config.front));
+	}
+
 
 }

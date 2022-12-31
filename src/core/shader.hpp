@@ -15,6 +15,14 @@ namespace renderme
 
 	struct Shader final
 	{
+		struct Config
+		{
+			std::string vertex_path;
+			std::string frag_path;
+		};
+
+
+
 		Shader(Runtime_Path vertex_path, Runtime_Path fragment_path);
 		~Shader();
 
@@ -36,5 +44,6 @@ namespace renderme
 
 	private:
 		unsigned int _id;
+		Config config;
 	};
 }
