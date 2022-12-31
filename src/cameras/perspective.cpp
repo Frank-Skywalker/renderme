@@ -7,6 +7,12 @@
 
 namespace renderme
 {
+
+	Perspective_Camera::Perspective_Camera()
+	{
+		update_camera_transforms();
+	}
+
 	auto Perspective_Camera::gl_draw(Shader const& shader) const noexcept -> void
 	{
 		shader.set_uniform_mat4("view", config.view.matrix());
@@ -106,9 +112,9 @@ namespace renderme
 		config.up = normalize(cross(config.right, config.front));
 
 		//Recalculate Transforms
-		//config.view = translate(Vector3f(config.position.x, config.position.y, config.position.z));
-		config.view = lookat(config.position, config.position + config.front, config.up);
-		config.projection = perspective(config.zoom, 0.1f, 100.0f);
+		//config.view = translate(Vector3f(-config.position.x, -config.position.y, -config.position.z));
+		//config.view = lookat(config.position, config.position + config.front, config.up).inverse(;
+		//config.projection = perspective(config.zoom, 0.1f, 100.0f).inverse();
 
 		world_to_camera = config.projection * config.view;
 		camera_to_world = world_to_camera.inverse();

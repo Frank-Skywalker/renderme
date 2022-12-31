@@ -2,7 +2,7 @@
 
 #include "vector.hpp"
 #include "transform.hpp"
-#include "file-system.hpp"
+#include "runtime-path.hpp"
 
 #include <string>
 namespace renderme
@@ -20,7 +20,6 @@ namespace renderme
 			std::string vertex_path;
 			std::string frag_path;
 		};
-
 
 
 		Shader(Runtime_Path vertex_path, Runtime_Path fragment_path);

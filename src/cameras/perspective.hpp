@@ -5,12 +5,13 @@ namespace renderme
 {
 	struct Perspective_Camera final: Camera
 	{
+		Perspective_Camera();
 		struct Config
 		{
 			//Can be set
 			Point3f position{0, 0, 0};
 			Vector3f world_up{0, 1, 0};
-			Float yaw{0};
+			Float yaw{-90};
 			Float pitch{0};
 			Float zoom{45.f};
 

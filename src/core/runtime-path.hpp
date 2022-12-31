@@ -11,7 +11,8 @@ namespace renderme
 		Runtime_Path();
 		Runtime_Path(char const* relative_path);
 		Runtime_Path(std::string relative_path);
-		auto path()->std::string const&;
+		auto path() const noexcept ->std::string const&;
+		auto empty() const noexcept ->bool;
 		static auto renderme_root_path()->std::string;
 
 	private:

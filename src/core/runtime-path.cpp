@@ -1,4 +1,4 @@
-#include "file-system.hpp"
+#include "runtime-path.hpp"
 
 namespace renderme
 {
@@ -25,9 +25,14 @@ namespace renderme
 		}
 	}
 
-	auto Runtime_Path::path()->std::string const&
+	auto Runtime_Path::path() const noexcept ->std::string const&
 	{
 		return _path;
+	}
+
+	auto Runtime_Path::empty() const noexcept ->bool
+	{
+		return _path == RENDERME_ROOT_PATH;
 	}
 
 	auto Runtime_Path::renderme_root_path()->std::string

@@ -2,14 +2,12 @@
 #include<core/util.hpp>
 #include<core/scene.hpp>
 #include<core/integrator.hpp>
-#include<core/file-system.hpp>
 
 //explicitly disable inclusion of the development environment header of glfw
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
-#include <assimp/scene.h>
 
 #include<string>
 #include<memory>
@@ -29,9 +27,11 @@ namespace renderme
 
 		struct Config
 		{
-			char file_path[MAX_FILE_NAME_LENGTH];
+			char scene_path[MAX_FILE_NAME_LENGTH];
+			char integrator_path[MAX_FILE_NAME_LENGTH];
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
+			bool enable_io{false};
 			unsigned int scene_index;
 			unsigned int integrator_index;
 
@@ -81,24 +81,9 @@ namespace renderme
 		auto imgui_config()->void;
 	private:
 		State state{State::uninit};
-		std::vector<Scene> scenes;
+		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;
 
-		
-		//////Parsing//////
-	private:
-		auto parse_file(Runtime_Path path)->void;
-		auto parse_obj(Runtime_Path path)->bool;
-		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> bool;
-		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> bool;
-		auto parse_aimaterial(aiScene const* aiscene, aiMaterial const* aimaterial) -> bool;
-
-	private:
-		//Transform must not move in memory, so use unique_ptr to store Transforms on stack
-		std::vector<std::unique_ptr<Transform>> parsing_transforms;
-		std::vector<std::unique_ptr<Primitive>> parsing_primitives;
-		std::vector<std::unique_ptr<Light>> parsing_lights;
-		std::vector<std::unique_ptr<Camera>> parsing_cameras;
 	};
 
 }
