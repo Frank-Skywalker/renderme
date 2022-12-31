@@ -19,14 +19,18 @@ namespace renderme
 			Vector3f front;
 			Vector3f right;
 
+			Transform view;
+			Transform projection;
+
+			//Speed metadatas
 			Float move_speed{1.0f};
 			Float cursor_speed{0.1f};
-
-
+			Float scroll_speed{1.0f};
 		};
 
 
 		//Perspective_Camera(Point3f pos, );
+		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto generate_ray() const noexcept ->Float;
 		auto imgui_config() ->void;
 		auto process_keyboard(Camera_Movement move, Float delta_time)->void;

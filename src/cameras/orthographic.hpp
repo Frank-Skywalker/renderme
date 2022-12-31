@@ -15,6 +15,7 @@ namespace renderme
 			Float speed{1.0f};
 		};
 
+		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto generate_ray() const noexcept ->Float;
 		auto imgui_config() ->void;
 

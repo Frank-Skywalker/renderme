@@ -1,6 +1,7 @@
 #pragma once
 #include "util.hpp"
 #include "shape.hpp"
+#include "material.hpp"
 
 #include<memory>
 namespace renderme
@@ -14,13 +15,14 @@ namespace renderme
 
 	struct Shape_Primitive final: Primitive
 	{
-		Shape_Primitive(std::unique_ptr<Shape> shape);
+		Shape_Primitive(std::unique_ptr<Shape> shape, std::unique_ptr<Material> material);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto intersect() const noexcept ->bool;
 		auto intersect_shadow() const noexcept ->bool;
 
 	private:
 		std::unique_ptr<Shape> shape;
+		std::unique_ptr<Material> material;
 	};
 
 

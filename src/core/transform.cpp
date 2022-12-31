@@ -177,7 +177,7 @@ namespace renderme
 		return Transform(m, m.transpose());
 	}
 
-	auto rotate(Vector3f const& axis, Float theta)
+	auto rotate(Vector3f const& axis, Float theta)->Transform
 	{
 		Vector3f a = normalize(axis);
 		Float sintheta = std::sin(radians(theta));
@@ -203,7 +203,7 @@ namespace renderme
 	}
 
 
-	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up)
+	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up) -> Transform
 	{
 		Matrix4f cameratoworld;
 		// Initialize fourth column of viewing matrix
@@ -242,14 +242,14 @@ namespace renderme
 		return scale(1, 1, 1 / (zfar - znear)) * translate(Vector3f(0, 0, -znear));
 	}
 
-	auto perspective(Float znear, Float zfar, Float fov)->Transform
+	auto perspective(Float fov, Float znear, Float zfar)->Transform
 	{
 		// Perform projective divide for perspective projection
 		Matrix4f persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, zfar / (zfar - znear), -zfar * znear / (zfar - znear),
 			0, 0, 1, 0);
 
 		// Scale canonical perspective view to specified field of view
-		Float invTanAng = 1 / std::tan(radians(fov) / 2);
-		return scale(invTanAng, invTanAng, 1) * Transform(persp);
+		Float inv_tan_ang = 1 / std::tan(radians(fov) / 2);
+		return scale(inv_tan_ang, inv_tan_ang, 1) * Transform(persp);
 	}
 }

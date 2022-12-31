@@ -15,7 +15,7 @@ namespace renderme
 
 	struct Camera: Only_Movable
 	{
-		virtual auto gl_draw(Shader const& shader) const noexcept -> void;
+		virtual auto gl_draw(Shader const& shader) const noexcept -> void = 0;
 		virtual auto generate_ray() const noexcept ->Float = 0;
 		virtual auto imgui_config() ->void = 0;
 		virtual auto process_keyboard(Camera_Movement move, Float delta_time)->void = 0;

@@ -4,6 +4,12 @@
 namespace renderme
 {
 
+	auto Orthographic_Camera::gl_draw(Shader const& shader) const noexcept -> void
+	{
+
+	}
+
+
 	auto Orthographic_Camera::generate_ray() const noexcept ->Float
 	{
 		return 0;

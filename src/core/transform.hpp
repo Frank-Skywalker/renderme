@@ -232,10 +232,10 @@ namespace renderme
 	auto rotate_x(Float theta)->Transform;
 	auto rotate_y(Float theta)->Transform;
 	auto rotate_z(Float theta)->Transform;
-	auto rotate(Vector3f const& axis, Float theta);
-	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up);
+	auto rotate(Vector3f const& axis, Float theta)->Transform;
+	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up)->Transform;
 	auto orthographic(Float znear, Float zfar)->Transform;
-	auto perspective(Float znear, Float zfar, Float fov)->Transform;
+	auto perspective(Float fov, Float znear, Float zfar)->Transform;
 
 }
 

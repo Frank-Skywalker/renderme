@@ -5,6 +5,7 @@
 #include <shapes/triangle.hpp>
 #include <cameras/perspective.hpp>
 #include <cameras/orthographic.hpp>
+#include <materials/phong.hpp>
 
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -338,7 +339,7 @@ namespace renderme
 
         auto create_new_integrator = [&] () {
             auto camera = std::make_unique<Perspective_Camera>();
-            auto shader = std::make_unique<Shader>("src/shaders/temp.vert.glsl", "src/shaders/temp.frag.glsl");
+            auto shader = std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl");
             integrators.push_back(
                 std::make_unique<Sample_Integrator>(
                     std::move(camera),
@@ -466,12 +467,7 @@ namespace renderme
 
         //process materials
         auto aimaterial = aiscene->mMaterials[aimesh->mMaterialIndex];
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
+        parse_aimaterial(aiscene, aimaterial);
 
 
         //Store mesh back to primitives
@@ -481,16 +477,29 @@ namespace renderme
             std::move(uvs), std::move(tangents), std::move(bitangents)
             );
         auto triangles =triangle_mesh->create_triangles();
-        auto triangle_mesh_primitive = std::make_unique<Shape_Primitive>(std::move(triangle_mesh));
+        auto triangle_mesh_primitive = std::make_unique<Shape_Primitive>(std::move(triangle_mesh), std::make_unique<Phong_Material>());
         parsing_primitives.push_back(std::move(triangle_mesh_primitive));
 
         for (auto& tri : triangles) {
             auto triangle = std::make_unique<Triangle>(std::move(tri));
-            auto triangle_primitive = std::make_unique<Shape_Primitive>(std::move(triangle));
+            auto triangle_primitive = std::make_unique<Shape_Primitive>(std::move(triangle), std::make_unique<Phong_Material>());
             parsing_primitives.push_back(std::move(triangle_primitive));
         }
 
         return true;
     }
+
+
+    auto Renderme::parse_aimaterial(aiScene const* aiscene, aiMaterial const* aimaterial) -> bool
+    {
+        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
+        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+        // Same applies to other texture as the following list summarizes:
+        // diffuse: texture_diffuseN
+        // specular: texture_specularN
+        // normal: texture_normalN
+        return true;
+    }
+
 
 }

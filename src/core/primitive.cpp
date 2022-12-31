@@ -2,13 +2,18 @@
 
 namespace renderme
 {
-	Shape_Primitive::Shape_Primitive(std::unique_ptr<Shape> shape)
-		:shape{std::move(shape)}
+	Shape_Primitive::Shape_Primitive(
+		std::unique_ptr<Shape> shape,
+		std::unique_ptr<Material> material
+		)
+		:shape{std::move(shape)},
+		material{std::move(material)}
 	{
 	}
 
 	auto Shape_Primitive::gl_draw(Shader const& shader) const noexcept -> void
 	{
+		material->gl_draw();
 		shape->gl_draw(shader);
 	}
 

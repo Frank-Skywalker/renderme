@@ -3,10 +3,10 @@
 #include <string>
 namespace renderme
 {
-	struct Texture: Only_Movable
+	struct Texture final
 	{
 		unsinged int id;
-		std::string type;
-		std::string path;
+		//std::string type;
+		//std::string path;
 	};
 }

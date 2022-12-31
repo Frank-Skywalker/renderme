@@ -91,6 +91,7 @@ namespace renderme
 		auto parse_obj(Runtime_Path path)->bool;
 		auto parse_ainode(aiScene const* aiscene, aiNode const* ainode) -> bool;
 		auto parse_aimesh(aiScene const* aiscene, aiMesh const* aimesh) -> bool;
+		auto parse_aimaterial(aiScene const* aiscene, aiMaterial const* aimaterial) -> bool;
 
 	private:
 		//Transform must not move in memory, so use unique_ptr to store Transforms on stack
