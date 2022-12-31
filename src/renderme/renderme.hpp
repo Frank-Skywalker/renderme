@@ -36,8 +36,23 @@ namespace renderme
 			unsigned int integrator_index;
 
 			//Metadata
-			const ImVec2 window_size{1280, 720};
-			const ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+			ImVec2 window_size{1280, 720};
+			ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+		};
+
+		struct Info
+		{
+			bool first_frame{true};
+			double time{0};
+			double delta_time{0};
+
+			double cursor_xpos{0};
+			double cursor_ypos{0};
+			double cursor_xdelta{0};
+			double cursor_ydelta{0};
+
+			double scroll_xdelta{0};
+			double scroll_ydelta{0};
 		};
 
 		Renderme();
@@ -48,12 +63,15 @@ namespace renderme
 	public:
 		auto main_loop()->void;
 	private:
+		auto update()->void;
+		auto process_io()->void;
 		auto show_imgui_menu()->void;
 		auto show_scene()->void;
 	private:
 		GLFWwindow* window;
 		ImGuiIO* io;
 		Config config;
+		Info info;
 
 
 		//////Backend//////

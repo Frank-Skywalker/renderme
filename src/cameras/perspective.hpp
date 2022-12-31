@@ -17,8 +17,9 @@ namespace renderme
 
 		auto generate_ray() const noexcept ->Float;
 		auto imgui_config() ->void;
-		auto process_keyboard_input(Camera_Movement move, float delta_time)->void;
-		auto process_mouse_input(Float xoffset, Float yoffset)->void;
+		auto process_keyboard(Camera_Movement move, Float delta_time)->void;
+		auto process_cursor(Float xoffset, Float yoffset)->void;
+		auto process_scroll(Float offset)->void;
 
 		Config config;
 	};

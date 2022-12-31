@@ -71,6 +71,9 @@ namespace renderme
 		return Transform{m_inv, m};
 	}
 
+
+
+
 	auto Transform::operator*(Transform const& rhs) const noexcept -> Transform
 	{
 		return Transform{m * rhs.m, rhs.m_inv * m_inv};

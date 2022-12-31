@@ -205,6 +205,15 @@ namespace renderme
 		auto is_identity() const noexcept -> bool;
 		auto transpose() const noexcept->Transform;
 		auto inverse() const noexcept->Transform;
+
+		template<typename T>
+		auto operator()(Point3<T> const& p) const noexcept -> Point3<T>;
+		template<typename T>
+		auto operator()(Vector3<T> const& p) const noexcept -> Vector3<T>;
+		template<typename T>
+		auto operator()(Normal3<T> const& p) const noexcept -> Normal3<T>;
+
+
 		auto operator*(Transform const& rhs) const noexcept -> Transform;
 		auto operator==(Transform const& rhs) const noexcept->bool;
 		auto operator!=(Transform const& rhs) const noexcept->bool;
@@ -229,3 +238,5 @@ namespace renderme
 	auto perspective(Float znear, Float zfar, Float fov)->Transform;
 
 }
+
+#include "transform.inl"

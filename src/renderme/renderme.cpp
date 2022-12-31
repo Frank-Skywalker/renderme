@@ -4,6 +4,7 @@
 
 #include <shapes/triangle.hpp>
 #include <cameras/perspective.hpp>
+#include <cameras/orthographic.hpp>
 
 #include <GL/glew.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -13,6 +14,12 @@
 #include <assimp/postprocess.h>
 namespace renderme
 {
+    //Believe me I don't wanna do this.
+    //GLFW doesn't have a function to query scroll pos.
+    //Only scroll callback is provided and it cannot access Renderme private data.
+    double scroll_xdelta;
+    double scroll_ydelta;
+
     Renderme::Renderme()
     {
         ///////////////GLFW Init//////////////////////////
@@ -47,31 +54,18 @@ namespace renderme
         }
         //Make the window and OpenGL's context current
         glfwMakeContextCurrent(window);
+        glfwSwapInterval(1); // Enable vsync
+        
+        //Callbacks
         glfwSetFramebufferSizeCallback(window, [] (GLFWwindow* window, int width, int height) {
             glViewport(0, 0, width, height);
             });
-        glfwSetCursorPosCallback(window, [] (GLFWwindow* window, double xpos_in, double ypos_in) {
-            float xpos = static_cast<float>(xpos_in);
-            float ypos = static_cast<float>(ypos_in);
 
-            //if (firstMouse) {
-            //    lastX = xpos;
-            //    lastY = ypos;
-            //    firstMouse = false;
-            //}
-
-            //float xoffset = xpos - lastX;
-            //float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-            //lastX = xpos;
-            //lastY = ypos;
-
-            //camera.ProcessMouseMovement(xoffset, yoffset);
+        glfwSetScrollCallback(window, [] (GLFWwindow* window, double xdelta, double ydelta) {
+            scroll_xdelta = xdelta;
+            scroll_ydelta = ydelta;
             });
-        glfwSetScrollCallback(window, [] (GLFWwindow* window, double xoffset, double yoffset) {
-            
-            });
-        glfwSwapInterval(1); // Enable vsync
+
 
         /////////////GLEW Init///////////////
         auto err = glewInit();
@@ -129,17 +123,15 @@ namespace renderme
             // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
             // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
             // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+            //Poll for and process events
             glfwPollEvents();
             //glfwWaitEvents();
-            //Poll for and process events
 
-            //int display_w, display_h;
-            //glfwGetFramebufferSize(window, &display_w, &display_h);
-            //glViewport(0, 0, display_w, display_h);
+            update();
+            process_io();
+
             glClearColor(config.clear_color.x * config.clear_color.w, config.clear_color.y * config.clear_color.w, config.clear_color.z * config.clear_color.w, config.clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
-
-            double time = glfwGetTime();
 
             show_scene();
             show_imgui_menu();
@@ -147,6 +139,66 @@ namespace renderme
             //Swap front and back buffers
             glfwSwapBuffers(window);
         }
+    }
+
+    auto Renderme::update()->void
+    {
+        //Update time
+        double now_time = glfwGetTime();
+        info.delta_time = now_time - info.time;
+        info.time = now_time;
+
+        //Update cursor position
+        double xpos;
+        double ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        if (info.first_frame) {
+            info.cursor_xpos = xpos;
+            info.cursor_ypos = ypos;
+            info.first_frame = false;
+        }
+        info.cursor_xdelta = xpos - info.cursor_xpos;
+        info.cursor_ydelta = ypos - info.cursor_ypos;
+        info.cursor_xpos= xpos;
+        info.cursor_ypos = ypos;
+
+        //Update cursor scroll
+        info.scroll_xdelta = scroll_xdelta;
+        info.scroll_xdelta = scroll_ydelta;
+    }
+
+
+    auto Renderme::process_io()->void
+    {
+        //Close
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, true);
+        }
+
+        //Camera position movement
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::forward, info.delta_time);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::backward, info.delta_time);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::left, info.delta_time);
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::right, info.delta_time);
+        }
+
+        //Caemra facing movement
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_cursor(info.cursor_xdelta, info.cursor_ydelta);
+        }
+
+        //Camera zoom in/out
+        if (info.scroll_ydelta != 0) {
+            integrators[config.integrator_index]->camera->process_scroll(info.scroll_ydelta);
+        }
+
     }
 
     auto Renderme::show_imgui_menu()->void
@@ -201,6 +253,9 @@ namespace renderme
 
     }
 
+
+
+
     //////Backend//////
 	auto Renderme::gl_draw() const noexcept->void
 	{
@@ -217,6 +272,7 @@ namespace renderme
     auto Renderme::imgui_config()->void
     {
         ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
+        ImGui::ColorEdit4("Clear color", &config.clear_color.x);
         if (ImGui::Button("load")) {
             parse_file(config.file_path);
         }
@@ -268,7 +324,7 @@ namespace renderme
         };
 
         auto create_new_integrator = [&] () {
-            auto camera = std::make_unique<Perspective_Camera>();
+            auto camera = std::make_unique<Orthographic_Camera>();
             auto shader = std::make_unique<Shader>("src/shaders/temp.vert.glsl", "src/shaders/temp.frag.glsl");
             integrators.push_back(
                 std::make_unique<Sample_Integrator>(

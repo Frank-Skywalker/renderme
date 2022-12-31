@@ -15,7 +15,7 @@ namespace renderme
 		ImGui::DragFloat3("Up", (float*)&config.up.x);
 	}
 
-	auto Perspective_Camera::process_keyboard_input(Camera_Movement move, float delta_time)->void
+	auto Perspective_Camera::process_keyboard(Camera_Movement move, Float delta_time)->void
 	{
 		switch (move) {
 			case Camera_Movement::forward:
@@ -30,10 +30,14 @@ namespace renderme
 		}
 	}
 
-	auto Perspective_Camera::process_mouse_input(Float xoffset, Float yoffset)->void
+	auto Perspective_Camera::process_cursor(Float xoffset, Float yoffset)->void
 	{
 
 	}
 
+	auto Perspective_Camera::process_scroll(Float offset)->void
+	{
+
+	}
 
 }
