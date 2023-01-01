@@ -11,7 +11,7 @@ namespace renderme
 		diffuse,
 		specular,
 		normal,
-		ao,
+		ambient,
 	};
 	struct Texture final
 	{

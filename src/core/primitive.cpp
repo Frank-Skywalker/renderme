@@ -4,7 +4,7 @@ namespace renderme
 {
 	Shape_Primitive::Shape_Primitive(
 		std::unique_ptr<Shape> shape,
-		std::unique_ptr<Material> material
+		std::shared_ptr<Material> material
 		)
 		:shape{std::move(shape)},
 		material{std::move(material)}

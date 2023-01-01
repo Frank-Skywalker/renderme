@@ -10,7 +10,7 @@ namespace renderme
 		:type{type}
 	{
 		//Texture loading
-		auto data = stbi_load(path.path().c_str(), &width, &height, &num_components, 0);
+		auto data = stbi_load(path.full_path().c_str(), &width, &height, &num_components, 0);
 		if (!data) {
 			stbi_image_free(data);
 			log(Status::fatal, "texture load error");
@@ -59,8 +59,8 @@ namespace renderme
 		else if (type == Texture_Type::normal) {
 			name = "texture_normal";
 		}
-		else if (type == Texture_Type::ao) {
-			name = "texture_ao";
+		else if (type == Texture_Type::ambient) {
+			name = "texture_ambient";
 		}
 
 		// now set the sampler to the correct texture unit

@@ -3,8 +3,8 @@
 namespace renderme
 {
 	Runtime_Path::Runtime_Path()
-		:_path(RENDERME_ROOT_PATH)
 	{
+		path = "/";
 	}
 
 	Runtime_Path::Runtime_Path(char const* relative_path)
@@ -15,25 +15,42 @@ namespace renderme
 	Runtime_Path::Runtime_Path(std::string relative_path)
 		:Runtime_Path()
 	{
-		if (relative_path.size() > 0) {
-			if (relative_path[0] == '/' || relative_path[0] == '\\') {
-				_path += std::move(relative_path);
-			}
-			else {
-				_path += '/' + std::move(relative_path);
-			}
+		//remove head '/'
+		while ( 
+			(!relative_path.empty()) && 
+			(*relative_path.begin() == '/' || *relative_path.begin() == '\\')
+			) {
+			relative_path = relative_path.substr(1);
 		}
+
+		//remove tail '/'
+		while (
+			(!relative_path.empty()) &&
+			( *(--relative_path.end()) == '/' || *(--relative_path.end()) == '\\')
+			) {
+			relative_path = relative_path.substr(0, relative_path.size() - 1);
+		}
+		path += relative_path;
 	}
 
-	auto Runtime_Path::path() const noexcept ->std::string const&
+	auto Runtime_Path::full_path() const noexcept ->std::string
 	{
-		return _path;
+		return RENDERME_ROOT_PATH + path;
 	}
 
-	auto Runtime_Path::empty() const noexcept ->bool
+	auto Runtime_Path::relative_path() const noexcept ->std::string
 	{
-		return _path == RENDERME_ROOT_PATH;
+		return path;
 	}
+
+	auto Runtime_Path::upper_directory() const noexcept -> Runtime_Path
+	{
+		auto new_path = relative_path();
+		//ensure no head '/' or tail '/'
+		new_path = new_path.substr(1, new_path.rfind('/') - 1);
+		return Runtime_Path(new_path);
+	}
+
 
 	auto Runtime_Path::renderme_root_path()->std::string
 	{

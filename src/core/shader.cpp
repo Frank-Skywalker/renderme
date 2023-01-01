@@ -31,8 +31,8 @@ namespace renderme
 		};
 
 		// retrieve the shader source code from file
-		auto vshader_code=read_shader_from_file(vertex_path.path());
-		auto fshader_code=read_shader_from_file(fragment_path.path());
+		auto vshader_code=read_shader_from_file(vertex_path.full_path());
+		auto fshader_code=read_shader_from_file(fragment_path.full_path());
 		
 		auto compile_shader = [] (Shader_Type type, std::string shader_code) -> unsigned int {
 
