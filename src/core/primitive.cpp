@@ -13,7 +13,7 @@ namespace renderme
 
 	auto Shape_Primitive::gl_draw(Shader const& shader) const noexcept -> void
 	{
-		material->gl_draw();
+		material->gl_draw(shader);
 		shape->gl_draw(shader);
 	}
 
