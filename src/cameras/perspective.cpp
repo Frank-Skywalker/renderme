@@ -1,9 +1,11 @@
 #include "perspective.hpp"
 
 #include <core/math.hpp>
+#include <core/to-glm.hpp>
 
 #include <cmath>
 #include <imgui/imgui.h>
+
 
 namespace renderme
 {
@@ -112,12 +114,16 @@ namespace renderme
 		config.up = normalize(cross(config.right, config.front));
 
 		//Recalculate Transforms
+		auto glm_view=glm::lookAt(to_glm(config.position), to_glm(config.position) + to_glm(config.front), to_glm(config.up));
+		config.view = from_glm(glm_view);
+		auto glm_projection = glm::perspective(glm::radians(config.zoom), 1.0f, 0.1f, 100.0f);
+		config.projection = from_glm(glm_projection);
 		//config.view = translate(Vector3f(-config.position.x, -config.position.y, -config.position.z));
 		//config.view = lookat(config.position, config.position + config.front, config.up).inverse(;
 		//config.projection = perspective(config.zoom, 0.1f, 100.0f).inverse();
 
-		world_to_camera = config.projection * config.view;
-		camera_to_world = world_to_camera.inverse();
+		//world_to_camera = config.projection * config.view;
+		//camera_to_world = world_to_camera.inverse();
 	}
 
 
