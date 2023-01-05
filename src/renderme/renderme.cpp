@@ -295,6 +295,7 @@ namespace renderme
 	{
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
         integrators[config.integrator_index]->render(*scenes[config.scene_index]);
+        film.gl_display();
 	}
 
     auto Renderme::imgui_config()->void

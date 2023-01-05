@@ -22,7 +22,8 @@ namespace renderme
 
 	auto ZBuffer_Integrator::render(Scene const& scene) const noexcept -> void
 	{
-
+		//build data structures
+		//perform zbuffer
 	}
 
 	auto ZBuffer_Integrator::imgui_config() ->void

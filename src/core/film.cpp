@@ -3,6 +3,8 @@
 #include"film.hpp"
 #include"log.hpp"
 
+#include<gl/glew.h>
+
 namespace renderme
 {
 
@@ -35,6 +37,12 @@ namespace renderme
 	{
 		_resolution = res;
 		pixels = std::make_unique<Pixel[]>(_resolution.x *_resolution.y);
+	}
+
+
+	auto Film::gl_display() const noexcept ->void
+	{
+		glDrawPixels(_resolution.x, _resolution.y, GL_RGB, GL_FLOAT, pixels.get());
 	}
 
 }
