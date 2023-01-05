@@ -7,6 +7,7 @@
 #include<core/camera.hpp>
 #include<core/light.hpp>
 #include<core/texture.hpp>
+#include<core/film.hpp>
 
 
 #include <assimp/scene.h>
@@ -20,7 +21,7 @@ namespace renderme
 	{
 		//////Parsing//////
 		//auto parse_file(Runtime_Path path)->void;
-		auto parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>;
+		auto parse_integrator(Runtime_Path const& path, Film* film)->std::unique_ptr<Integrator>;
 		auto parse_scene(Runtime_Path const& path)->std::unique_ptr<Scene>;
 
 	private:

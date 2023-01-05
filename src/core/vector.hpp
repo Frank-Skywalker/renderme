@@ -204,6 +204,10 @@ namespace renderme
 	static_assert(std::is_standard_layout_v<Point2i>);
 	static_assert(offsetof(Point2i, y) == sizeof(int));
 
+	using Point2ui = Point2<unsigned int>;
+	static_assert(std::is_standard_layout_v<Point2ui>);
+	static_assert(offsetof(Point2ui, y) == sizeof(unsigned int));
+
 	using Point2f = Point2<Float>;
 	static_assert(std::is_standard_layout_v<Point2f>);
 	static_assert(offsetof(Point2f, y) == sizeof(Float));

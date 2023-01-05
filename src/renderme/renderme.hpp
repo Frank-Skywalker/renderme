@@ -2,6 +2,7 @@
 #include<core/util.hpp>
 #include<core/scene.hpp>
 #include<core/integrator.hpp>
+#include<core/film.hpp>
 
 //explicitly disable inclusion of the development environment header of glfw
 #define GLFW_INCLUDE_NONE
@@ -17,7 +18,7 @@
 
 namespace renderme
 {
-	struct Renderme: Singleton<Renderme>
+	struct Renderme: Singleton<Renderme>, Non_Transferable
 	{
 		enum struct State
 		{
@@ -36,7 +37,7 @@ namespace renderme
 			unsigned int integrator_index;
 
 			//Metadata
-			ImVec2 window_size{1280, 720};
+			Point2i framebuffer_size{1280, 720};
 			ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
 		};
 
@@ -83,6 +84,7 @@ namespace renderme
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;
+		Film film;
 
 	};
 

@@ -17,6 +17,7 @@ namespace renderme
     double scroll_ydelta;
 
     Renderme::Renderme()
+        :film(config.framebuffer_size)
     {
         ///////////////GLFW Init//////////////////////////
         // Setup window
@@ -43,7 +44,7 @@ namespace renderme
         //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
         //Create a windowed mode window and its OpenGL context
-        window = glfwCreateWindow(config.window_size.x, config.window_size.y, "renderme", NULL, NULL);
+        window = glfwCreateWindow(config.framebuffer_size.x, config.framebuffer_size.y, "renderme", NULL, NULL);
         if (window == nullptr) {
             glfwTerminate();
             return;
@@ -156,6 +157,14 @@ namespace renderme
         info.delta_time = now_time - info.time;
         info.time = now_time;
 
+        //Update film size with framebuffer size
+        Point2i new_size;
+        glfwGetFramebufferSize(window, &new_size.x, &new_size.y);
+        if (new_size != config.framebuffer_size) {
+            config.framebuffer_size = new_size;
+            film.reset_resolution(config.framebuffer_size);
+        }
+
         //Update cursor position
         double xpos;
         double ypos;
@@ -233,7 +242,9 @@ namespace renderme
         }
 
         if (ImGui::Begin("CONFIG")) {
-            
+            auto& io = ImGui::GetIO();
+            ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
+            ImGui::Separator();
             if (ImGui::CollapsingHeader("Renderme Config")) {
                 imgui_config();
             }
@@ -301,7 +312,7 @@ namespace renderme
         ImGui::InputText("Scene Path", config.scene_path, MAX_FILE_NAME_LENGTH);
 
         if (ImGui::Button("Parse Integrator")) {
-            auto integrator=Parser::instance().parse_integrator(config.integrator_path);
+            auto integrator=Parser::instance().parse_integrator(config.integrator_path, &film);
             if (integrator != nullptr) {
                 integrators.push_back(std::move(integrator));
             }

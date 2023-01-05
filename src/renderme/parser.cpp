@@ -3,6 +3,7 @@
 #include<shapes/triangle.hpp>
 #include<cameras/perspective.hpp>
 #include<materials/phong.hpp>
+#include<integrators/zbuffer.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -11,7 +12,7 @@
 namespace renderme
 {
 
-    auto Parser::parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>
+    auto Parser::parse_integrator(Runtime_Path const& path, Film* film)->std::unique_ptr<Integrator>
     {
         if (path.full_path() == Runtime_Path::renderme_root_path()) {
             log(Status::error, "empty path");
@@ -19,13 +20,14 @@ namespace renderme
             return nullptr;
         }
 
-        auto create_new_integrator = [&] () -> std::unique_ptr<Sample_Integrator> {
-            auto camera = std::make_unique<Perspective_Camera>();
-            auto shader = std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl");
-            return std::make_unique<Sample_Integrator>(
-                    std::move(camera),
-                    std::move(shader)
-                    );
+        auto create_new_integrator = [&] () -> std::unique_ptr<Integrator> {
+            //auto camera = std::make_unique<Perspective_Camera>();
+            //auto shader = std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl");
+            //return std::make_unique<Sample_Integrator>(
+            //        std::move(camera),
+            //        std::move(shader)
+            //        );
+            return std::make_unique<ZBuffer_Integrator>(film);
         };
 
         auto integrator = create_new_integrator();
