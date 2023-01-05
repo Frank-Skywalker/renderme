@@ -18,6 +18,12 @@
 
 禁掉CMake对dll/lib输出位置的修改
 
+##### glm/CMakeLists.txt
+
+将glm文件夹放入include文件夹
+
+修改add_subdirectory(glm)为add_subdirectory(include/glm)
+
 ```cmake
 #set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 #set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
