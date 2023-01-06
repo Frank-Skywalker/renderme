@@ -94,6 +94,10 @@ namespace renderme
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+        ////////////OpengGL Configuration//////////////
+        glEnable(GL_DEPTH_TEST);
     }
 
 
@@ -132,7 +136,7 @@ namespace renderme
             }
 
             glClearColor(config.clear_color.x * config.clear_color.w, config.clear_color.y * config.clear_color.w, config.clear_color.z * config.clear_color.w, config.clear_color.w);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             show_scene();
             show_imgui_menu();
