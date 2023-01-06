@@ -63,16 +63,12 @@ namespace renderme
 	struct ZBuffer_Integrator final : Integrator
 	{
 
-		ZBuffer_Integrator(Film* film);
+		ZBuffer_Integrator();
 
-		auto gl_draw(Scene const& scene) const noexcept -> void;
-		auto render(Scene const& scene) const noexcept -> void;
+		auto gl_draw(Camera const* camera, Scene const& scene) const noexcept -> void;
+		auto render(Camera const* camera, Scene const& scene, Film* film) const noexcept -> void;
 		auto imgui_config() ->void;
 
-	private:
-
-
-		Film* film;
 	};
 
 }

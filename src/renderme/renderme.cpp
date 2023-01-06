@@ -17,7 +17,6 @@ namespace renderme
     double scroll_ydelta;
 
     Renderme::Renderme()
-        :film(config.framebuffer_size)
     {
         ///////////////GLFW Init//////////////////////////
         // Setup window
@@ -98,6 +97,16 @@ namespace renderme
 
         ////////////OpengGL Configuration//////////////
         glEnable(GL_DEPTH_TEST);
+
+
+        ///////////Data Members Init/////////////////
+        film = Parser::instance().parse_film(Runtime_Path());
+        film->reset_resolution(config.framebuffer_size);
+
+        cameras.push_back(Parser::instance().parse_camera(Runtime_Path()));
+        for (auto& camera : cameras) {
+            camera->reset_aspect(config.framebuffer_size.x / config.framebuffer_size.y);
+        }
     }
 
 
@@ -149,7 +158,7 @@ namespace renderme
     auto Renderme::update()->void
     {
         //Update renderme state
-        if (integrators.size() > 0 && scenes.size() > 0) {
+        if (integrators.size() > 0 && scenes.size() > 0 && cameras.size() > 0) {
             state = State::ready;
         }
         else {
@@ -161,12 +170,15 @@ namespace renderme
         info.delta_time = now_time - info.time;
         info.time = now_time;
 
-        //Update film size with framebuffer size
+        //Update film size and camera aspect with framebuffer size
         glm::ivec2 new_size;
         glfwGetFramebufferSize(window, &new_size.x, &new_size.y);
         if (new_size != config.framebuffer_size) {
             config.framebuffer_size = new_size;
-            film.reset_resolution(config.framebuffer_size);
+            film->reset_resolution(config.framebuffer_size);
+            for (auto& camera : cameras) {
+                camera->reset_aspect(config.framebuffer_size.x / config.framebuffer_size.y);
+            }
         }
 
         //Update cursor position
@@ -209,32 +221,32 @@ namespace renderme
 
         //Camera position movement
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::forward, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::forward, info.delta_time);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::backward, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::backward, info.delta_time);
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::left, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::left, info.delta_time);
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::right, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::right, info.delta_time);
         }
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::up, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::up, info.delta_time);
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::down, info.delta_time);
+            cameras[config.camera_index]->process_keyboard(Camera_Movement::down, info.delta_time);
         }
 
         //Caemra facing movement
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            integrators[config.integrator_index]->camera->process_cursor(info.cursor_xdelta, info.cursor_ydelta);
+            cameras[config.camera_index]->process_cursor(info.cursor_xdelta, info.cursor_ydelta);
         }
 
         //Camera zoom in/out
         if (info.scroll_ydelta != 0) {
-            integrators[config.integrator_index]->camera->process_scroll(info.scroll_ydelta);
+            cameras[config.camera_index]->process_scroll(info.scroll_ydelta);
         }
 
     }
@@ -259,15 +271,21 @@ namespace renderme
                 imgui_config();
             }
 
-            if (ImGui::CollapsingHeader("Integrator Config")) {
-                if (config.integrator_index < integrators.size()) {
-                    integrators[config.integrator_index]->imgui_config();
+            if (ImGui::CollapsingHeader("Cameras Config")) {
+                for (auto i = 0u; i < cameras.size(); ++i) {
+                    cameras[i]->imgui_config();
                 }
             }
 
-            if (ImGui::CollapsingHeader("Scene Config")) {
-                if (config.scene_index < scenes.size()) {
-                    scenes[config.scene_index]->imgui_config();
+            if (ImGui::CollapsingHeader("Integrators Config")) {
+                for (auto i = 0u; i < integrators.size(); ++i) {
+                    integrators[i]->imgui_config();
+                }
+            }
+
+            if (ImGui::CollapsingHeader("Scenes Config")) {
+                for (auto i = 0u; i < scenes.size(); ++i) {
+                    scenes[i]->imgui_config();
                 }
             }
         }
@@ -298,14 +316,14 @@ namespace renderme
 	auto Renderme::gl_draw() const noexcept->void
 	{
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-		integrators[config.integrator_index]->gl_draw(*scenes[config.scene_index]);
+		integrators[config.integrator_index]->gl_draw(cameras[config.camera_index].get(), *scenes[config.scene_index]);
 	}
 
 	auto Renderme::render() const noexcept->void
 	{
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-        integrators[config.integrator_index]->render(*scenes[config.scene_index]);
-        film.gl_display();
+        integrators[config.integrator_index]->render(cameras[config.camera_index].get(), *scenes[config.scene_index], film.get());
+        film->gl_display();
 	}
 
     auto Renderme::imgui_config()->void
@@ -323,7 +341,7 @@ namespace renderme
         ImGui::InputText("Scene Path", config.scene_path, MAX_FILE_NAME_LENGTH);
 
         if (ImGui::Button("Parse Integrator")) {
-            auto integrator=Parser::instance().parse_integrator(config.integrator_path, &film);
+            auto integrator=Parser::instance().parse_integrator(config.integrator_path);
             if (integrator != nullptr) {
                 integrators.push_back(std::move(integrator));
             }
@@ -338,6 +356,9 @@ namespace renderme
         }
         if (integrators.size() > 0) {
             ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size() - 1);
+        }
+        if (cameras.size() > 0) {
+            ImGui::SliderInt("Camera", (int*)&config.integrator_index, 0, cameras.size() - 1);
         }
     }
 

@@ -43,6 +43,9 @@ namespace renderme
 		auto right = config.right;
 		ImGui::DragFloat3("Right", glm::value_ptr(right));
 
+		ImGui::Separator();
+		auto aspect = config.aspect;
+		ImGui::DragFloat("Aspect", &aspect);
 
 		ImGui::Separator();
 		ImGui::DragFloat("Move Speed", &config.move_speed);
@@ -50,7 +53,7 @@ namespace renderme
 		ImGui::DragFloat("Scroll Speed", &config.scroll_speed);
 	}
 
-	auto Perspective_Camera::process_keyboard(Camera_Movement move, Float delta_time)->void
+	auto Perspective_Camera::process_keyboard(Camera_Movement move, float delta_time)->void
 	{
 		switch (move) {
 			case Camera_Movement::forward:
@@ -76,7 +79,7 @@ namespace renderme
 		update_camera_transforms();
 	}
 
-	auto Perspective_Camera::process_cursor(Float xdelta, Float ydelta)->void
+	auto Perspective_Camera::process_cursor(float xdelta, float ydelta)->void
 	{
 		config.yaw += xdelta * config.cursor_speed;
 		
@@ -86,7 +89,7 @@ namespace renderme
 		update_camera_transforms();
 	}
 
-	auto Perspective_Camera::process_scroll(Float delta)->void
+	auto Perspective_Camera::process_scroll(float delta)->void
 	{
 		config.fov -= config.scroll_speed * delta;
 
@@ -113,6 +116,13 @@ namespace renderme
 		}
 	}
 
+	auto Perspective_Camera::reset_aspect(float aspect)->void
+	{
+		config.aspect = aspect;
+		update_camera_transforms();
+	}
+
+
 	auto Perspective_Camera::update_camera_transforms() ->void
 	{
 		check_config();
@@ -130,7 +140,7 @@ namespace renderme
 
 		//Recalculate Transforms
 		config.view = glm::lookAt(config.position, config.position + config.front, config.up);
-		config.projection = glm::perspective(glm::radians(config.fov),1.0f, 0.1f, 100.0f);
+		config.projection = glm::perspective(glm::radians(config.fov), config.aspect, 0.1f, 100.0f);
 
 		// Recalculate camera transforms
 		world_to_camera = config.projection * config.view;

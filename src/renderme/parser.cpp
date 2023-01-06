@@ -13,7 +13,20 @@
 namespace renderme
 {
 
-    auto Parser::parse_integrator(Runtime_Path const& path, Film* film)->std::unique_ptr<Integrator>
+    auto Parser::parse_film(Runtime_Path const& path)->std::unique_ptr<Film>
+    {
+        clean_parsing_cache();
+        return std::make_unique<Film>();
+    }
+
+
+    auto Parser::parse_camera(Runtime_Path const& path)->std::unique_ptr<Camera>
+    {
+        clean_parsing_cache();
+        return std::make_unique<Perspective_Camera>();
+    }
+
+    auto Parser::parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>
     {
         if (path.full_path() == Runtime_Path::renderme_root_path()) {
             log(Status::error, "empty path");
@@ -28,7 +41,7 @@ namespace renderme
             //        std::move(camera),
             //        std::move(shader)
             //        );
-            return std::make_unique<ZBuffer_Integrator>(film);
+            return std::make_unique<ZBuffer_Integrator>();
         };
 
         auto integrator = create_new_integrator();

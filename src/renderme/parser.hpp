@@ -21,7 +21,9 @@ namespace renderme
 	{
 		//////Parsing//////
 		//auto parse_file(Runtime_Path path)->void;
-		auto parse_integrator(Runtime_Path const& path, Film* film)->std::unique_ptr<Integrator>;
+		auto parse_film(Runtime_Path const& path)->std::unique_ptr<Film>;
+		auto parse_camera(Runtime_Path const& path)->std::unique_ptr<Camera>;
+		auto parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>;
 		auto parse_scene(Runtime_Path const& path)->std::unique_ptr<Scene>;
 
 	private:

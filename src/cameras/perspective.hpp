@@ -25,6 +25,9 @@ namespace renderme
 			Transform view;
 			Transform projection;
 
+			// Fed in
+			float aspect{1.0f};
+
 			//Speed metadatas
 			float move_speed{1.0f};
 			float cursor_speed{0.1f};
@@ -36,9 +39,10 @@ namespace renderme
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto generate_ray() const noexcept ->Float;
 		auto imgui_config() ->void;
-		auto process_keyboard(Camera_Movement move, Float delta_time)->void;
-		auto process_cursor(Float xdelta, Float ydelta)->void;
-		auto process_scroll(Float delta)->void;
+		auto process_keyboard(Camera_Movement move, float delta_time)->void;
+		auto process_cursor(float xdelta, float ydelta)->void;
+		auto process_scroll(float delta)->void;
+		auto reset_aspect(float aspect)->void;
 
 
 	private:

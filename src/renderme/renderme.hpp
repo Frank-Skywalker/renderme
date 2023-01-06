@@ -33,8 +33,9 @@ namespace renderme
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
 			bool enable_io{false};
-			unsigned int scene_index;
-			unsigned int integrator_index;
+			unsigned int scene_index{0};
+			unsigned int integrator_index{0};
+			unsigned int camera_index{0};
 
 			//Metadata
 			glm::ivec2 framebuffer_size{1280, 720};
@@ -84,8 +85,8 @@ namespace renderme
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;
-		Film film;
-
+		std::vector<std::unique_ptr<Camera>> cameras;
+		std::unique_ptr<Film> film;
 	};
 
 }

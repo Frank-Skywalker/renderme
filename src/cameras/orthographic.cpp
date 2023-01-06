@@ -21,7 +21,7 @@ namespace renderme
 		ImGui::DragFloat3("Up", glm::value_ptr(config.up));
 	}
 
-	auto Orthographic_Camera::process_keyboard(Camera_Movement move, Float delta_time)->void
+	auto Orthographic_Camera::process_keyboard(Camera_Movement move, float delta_time)->void
 	{
 		switch (move) {
 			case Camera_Movement::forward:
@@ -35,14 +35,20 @@ namespace renderme
 		}
 	}
 
-	auto Orthographic_Camera::process_cursor(Float xoffset, Float yoffset)->void
+	auto Orthographic_Camera::process_cursor(float xoffset, float yoffset)->void
 	{
 
 	}
 
-	auto Orthographic_Camera::process_scroll(Float offset)->void
+	auto Orthographic_Camera::process_scroll(float offset)->void
 	{
 		//Empty, no zoom
+	}
+
+
+	auto Orthographic_Camera::reset_aspect(float aspect)->void
+	{
+
 	}
 
 
