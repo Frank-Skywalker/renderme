@@ -164,7 +164,8 @@ namespace renderme
 
 	auto Shader::set_uniform_mat4(std::string const& name, Matrix4f value) const noexcept ->void
 	{
-		glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, &value.m[0][0]);
+		//Mat is row major, OpenGL is column major, needs to transpose
+		glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_TRUE, &value.m[0][0]);
 	}
 
 }
