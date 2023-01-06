@@ -162,7 +162,7 @@ namespace renderme
         info.time = now_time;
 
         //Update film size with framebuffer size
-        Point2i new_size;
+        glm::ivec2 new_size;
         glfwGetFramebufferSize(window, &new_size.x, &new_size.y);
         if (new_size != config.framebuffer_size) {
             config.framebuffer_size = new_size;
@@ -219,6 +219,12 @@ namespace renderme
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
             integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::right, info.delta_time);
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::up, info.delta_time);
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            integrators[config.integrator_index]->camera->process_keyboard(Camera_Movement::down, info.delta_time);
         }
 
         //Caemra facing movement
@@ -305,7 +311,7 @@ namespace renderme
     auto Renderme::imgui_config()->void
     {
         ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
-        ImGui::ColorEdit4("Clear Color", &config.clear_color.x);
+        ImGui::ColorEdit4("Clear Color", glm::value_ptr(config.clear_color));
         
         if (ImGui::Button("Parse Scene")) {
             auto scene=Parser::instance().parse_scene(config.scene_path);

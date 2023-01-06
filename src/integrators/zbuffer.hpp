@@ -12,7 +12,7 @@ namespace renderme
 		Float a, b, c, d;
 		unsigned int index;
 		unsigned int yspan;
-		Vector3f color;
+		glm::vec3 color;
 	};
 
 
@@ -35,7 +35,7 @@ namespace renderme
 		Float a, b, c, d;
 		unsigned int index;
 		unsigned int yspan;
-		Vector3f color;
+		glm::vec3 color;
 	};
 
 	using Active_Polygon_Table = std::vector<Active_Polygon>;

@@ -1,12 +1,14 @@
 #pragma once
-#include"type.hpp"
-#include "log.hpp"
+#include <core/type.hpp>
+#include <core/log.hpp>
 
 #include <cstring>
 #include <cmath>
 
-namespace renderme
+namespace deprecated
 {
+	using namespace renderme;
+
 	enum struct Category
 	{
 		vector,

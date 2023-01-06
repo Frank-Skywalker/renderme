@@ -6,8 +6,10 @@
 #include<glm/glm.hpp>
 #include<glm/ext.hpp>
 
-namespace renderme
+namespace deprecated
 {
+	using namespace renderme;
+
 	template<Category category, typename T>
 	inline auto to_glm(Vec<3,category, T> v)->glm::vec3
 	{

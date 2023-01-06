@@ -7,8 +7,8 @@
 namespace renderme
 {
 	Triangle_Mesh::Triangle_Mesh(Transform const* _object_to_world, Transform const* _world_to_object,
-		std::vector<Point3ui> _faces, std::vector<Point3f> _positions, std::vector<Normal3f> _normals,
-		std::vector<Point2f> _uvs, std::vector<Vector3f> _tangents, std::vector<Vector3f> _bitangents)
+		std::vector<glm::uvec3> _faces, std::vector<glm::vec3> _positions, std::vector<glm::vec3> _normals,
+		std::vector<glm::vec2> _uvs, std::vector<glm::vec3> _tangents, std::vector<glm::vec3> _bitangents)
 		:Shape(_object_to_world, _world_to_object),
 		faces{std::move(_faces)}, positions{std::move(_positions)}, normals{std::move(_normals)},
 		uvs{std::move(_uvs)}, tangents{std::move(_tangents)}, bitangents{std::move(_bitangents)}
@@ -24,32 +24,32 @@ namespace renderme
 		/////Vertex/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(Point3f), positions.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Point3f), nullptr);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 
 		/////Normal/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Normal3f), normals.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), normals.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Normal3f), nullptr);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 
 		/////UV/////
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(Point2f), uvs.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Point2f), nullptr);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), nullptr);
 
 		/////EBO/////
 		unsigned int ebo;
 		glGenBuffers(1, &ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.size() * sizeof(Point3ui), faces.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, faces.size() * sizeof(glm::uvec3), faces.data(), GL_STATIC_DRAW);
 
 		//Unbind vao
 		glBindVertexArray(0);
@@ -59,7 +59,7 @@ namespace renderme
 
 	auto Triangle_Mesh::gl_draw(Shader const& shader) const noexcept -> void
 	{
-		shader.set_uniform_mat4("model", Matrix4f());
+		shader.set_uniform_mat4("model", glm::identity<glm::mat4>());
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, num_faces*3 , GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);

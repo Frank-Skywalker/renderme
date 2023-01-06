@@ -10,7 +10,9 @@ namespace renderme
 		forward,
 		backward,
 		left,
-		right
+		right,
+		up,
+		down
 	};
 
 	struct Camera: Only_Movable

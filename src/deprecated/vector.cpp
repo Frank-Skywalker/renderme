@@ -1,6 +1,7 @@
 #include "vector.hpp"
 
-namespace renderme
+namespace deprecated
+
 {
 
 }

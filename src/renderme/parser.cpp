@@ -1,5 +1,6 @@
 #include "parser.hpp"
 
+#include<core/log.hpp>
 #include<shapes/triangle.hpp>
 #include<cameras/perspective.hpp>
 #include<materials/phong.hpp>
@@ -129,21 +130,21 @@ namespace renderme
     auto Parser::parse_aimesh(Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool
     {
         // data to fill
-        std::vector<Point3f> positions;
-        std::vector<Normal3f> normals;
-        std::vector<Point2f> uvs;
-        std::vector<Vector3f> tangents;
-        std::vector<Vector3f> bitangents;
-        std::vector<Point3ui> faces;
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uvs;
+        std::vector<glm::vec3> tangents;
+        std::vector<glm::vec3> bitangents;
+        std::vector<glm::uvec3> faces;
 
 
         // walk through each of the mesh's vertices
         for (auto i = 0u; i < aimesh->mNumVertices; ++i) {
             //positions
-            positions.push_back(Point3f(aimesh->mVertices[i].x, aimesh->mVertices[i].y, aimesh->mVertices[i].z));
+            positions.push_back(glm::vec3(aimesh->mVertices[i].x, aimesh->mVertices[i].y, aimesh->mVertices[i].z));
             //normals
             if (aimesh->HasNormals()) {
-                normals.push_back(Normal3f(aimesh->mNormals[i].x, aimesh->mNormals[i].y, aimesh->mNormals[i].z));
+                normals.push_back(glm::vec3(aimesh->mNormals[i].x, aimesh->mNormals[i].y, aimesh->mNormals[i].z));
             } else {
                 //normals.push_back(Normal3f());
                 log(Status::error, "obj has no normal");
@@ -152,11 +153,11 @@ namespace renderme
             //texture coordinates
             if (aimesh->mTextureCoords[0]) {
                 //uv
-                uvs.push_back(Point2f(aimesh->mTextureCoords[0][i].x, aimesh->mTextureCoords[0][i].y));
+                uvs.push_back(glm::vec2(aimesh->mTextureCoords[0][i].x, aimesh->mTextureCoords[0][i].y));
                 //tangent
-                tangents.push_back(Vector3f(aimesh->mTangents[i].x, aimesh->mTangents[i].y, aimesh->mTangents[i].z));
+                tangents.push_back(glm::vec3(aimesh->mTangents[i].x, aimesh->mTangents[i].y, aimesh->mTangents[i].z));
                 //bitangent
-                bitangents.push_back(Vector3f(aimesh->mBitangents[i].x, aimesh->mBitangents[i].y, aimesh->mBitangents[i].z));
+                bitangents.push_back(glm::vec3(aimesh->mBitangents[i].x, aimesh->mBitangents[i].y, aimesh->mBitangents[i].z));
             } else {
                 //uvs.push_back(Point2f());
                 //tangents.push_back(Vector3f());
@@ -173,7 +174,7 @@ namespace renderme
                 log(Status::error, "obj face is not triangle");
                 return false;
             }
-            faces.push_back(Point3ui(aiface.mIndices[0], aiface.mIndices[1], aiface.mIndices[2]));
+            faces.push_back(glm::uvec3(aiface.mIndices[0], aiface.mIndices[1], aiface.mIndices[2]));
         }
 
         //Process materials

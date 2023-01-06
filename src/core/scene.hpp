@@ -1,5 +1,4 @@
 #pragma once
-
 #include "shader.hpp"
 #include "primitive.hpp"
 #include "camera.hpp"

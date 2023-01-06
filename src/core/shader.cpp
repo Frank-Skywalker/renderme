@@ -1,10 +1,10 @@
 #include "shader.hpp"
 
+#include<GL/glew.h>
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
-
-#include<GL/glew.h>
 
 namespace renderme
 {
@@ -132,9 +132,9 @@ namespace renderme
 		glUniform1f(glGetUniformLocation(_id, name.c_str()), value);
 	}
 	
-	auto Shader::set_uniform_vec2(std::string const& name, Vector2f value) const noexcept ->void
+	auto Shader::set_uniform_vec2(std::string const& name, glm::vec2 value) const noexcept ->void
 	{
-		glUniform2fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
+		glUniform4fv(glGetUniformLocation(_id, name.c_str()), 1, glm::value_ptr(value));
 	}
 	
 	auto Shader::set_uniform_vec2(std::string const& name, float x, float y) const noexcept ->void
@@ -142,9 +142,9 @@ namespace renderme
 		glUniform2f(glGetUniformLocation(_id, name.c_str()), x, y);
 	}
 	
-	auto Shader::set_uniform_vec3(std::string const& name, Vector3f value) const noexcept ->void
+	auto Shader::set_uniform_vec3(std::string const& name, glm::vec3 value) const noexcept ->void
 	{
-		glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
+		glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, glm::value_ptr(value));
 	}
 	
 	auto Shader::set_uniform_vec3(std::string const& name, float x, float y, float z) const noexcept ->void
@@ -152,20 +152,20 @@ namespace renderme
 		glUniform3f(glGetUniformLocation(_id, name.c_str()), x, y, z);
 	}
 	
-	//auto Shader::set_uniform_vec4(std::string const& name, float x, Vector4f value) const noexcept ->void
-	//{
-	//	glUniform4fv(glGetUniformLocation(_id, name.c_str()), 1, &value[0]);
-	//}
-	//
+	auto Shader::set_uniform_vec4(std::string const& name, float x, glm::vec4 value) const noexcept ->void
+	{
+		glUniform4fv(glGetUniformLocation(_id, name.c_str()), 1, glm::value_ptr(value));
+	}
+	
 	auto Shader::set_uniform_vec4(std::string const& name, float x, float y, float z, float w) const noexcept ->void
 	{
 		glUniform4f(glGetUniformLocation(_id, name.c_str()), x, y, z, w);
 	}
 
-	auto Shader::set_uniform_mat4(std::string const& name, Matrix4f value) const noexcept ->void
+	auto Shader::set_uniform_mat4(std::string const& name, glm::mat4 value) const noexcept ->void
 	{
-		//Mat is row major, OpenGL is column major, needs to transpose
-		glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_TRUE, &value.m[0][0]);
+		//OpenGL is column major
+		glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 	}
 
 }

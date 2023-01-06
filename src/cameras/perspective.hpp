@@ -1,6 +1,7 @@
 #pragma once
 #include <core/camera.hpp>
-#include <core/vector.hpp>
+
+#include <glm/glm-all.hpp>
 
 namespace renderme
 {
@@ -10,24 +11,24 @@ namespace renderme
 		struct Config
 		{
 			//Can be set
-			Point3f position{0, 0, 0};
-			Vector3f world_up{0, 1, 0};
-			Float yaw{-90};
-			Float pitch{0};
-			Float zoom{45.f};
+			glm::vec3 position{0, 0, 0};
+			glm::vec3 world_up{0, 1, 0};
+			float yaw{-90};
+			float pitch{0};
+			float fov{45.f};
 
 			//Calculated from above
-			Vector3f up;
-			Vector3f front;
-			Vector3f right;
+			glm::vec3 up;
+			glm::vec3 front;
+			glm::vec3 right;
 
 			Transform view;
 			Transform projection;
 
 			//Speed metadatas
-			Float move_speed{1.0f};
-			Float cursor_speed{0.1f};
-			Float scroll_speed{1.0f};
+			float move_speed{1.0f};
+			float cursor_speed{0.1f};
+			float scroll_speed{1.0f};
 		};
 
 
@@ -42,6 +43,7 @@ namespace renderme
 
 	private:
 		auto update_camera_transforms() ->void;
+		auto check_config() -> void;
 		Config config;
 
 	};

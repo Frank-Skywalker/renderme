@@ -16,16 +16,15 @@ namespace renderme
 	}
 	auto Orthographic_Camera::imgui_config() ->void
 	{
-		ImGui::DragFloat3("Position", (float*)&config.position.x);
-		ImGui::DragFloat3("Direction", (float*)&config.direction.x);
-		ImGui::DragFloat3("Up", (float*)&config.up.x);
+		ImGui::DragFloat3("Position", glm::value_ptr(config.position));
+		ImGui::DragFloat3("Direction", glm::value_ptr(config.direction));
+		ImGui::DragFloat3("Up", glm::value_ptr(config.up));
 	}
 
 	auto Orthographic_Camera::process_keyboard(Camera_Movement move, Float delta_time)->void
 	{
 		switch (move) {
 			case Camera_Movement::forward:
-				//config.position += delta_time * config.speed
 				break;
 			case Camera_Movement::backward:
 				break;

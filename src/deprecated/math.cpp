@@ -1,7 +1,7 @@
 #include "math.hpp"
 #include <numbers>
 
-namespace renderme
+namespace deprecated
 {
 	auto radians(Float deg)->Float
 	{

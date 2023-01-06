@@ -37,8 +37,8 @@ namespace renderme
 			unsigned int integrator_index;
 
 			//Metadata
-			Point2i framebuffer_size{1280, 720};
-			ImVec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+			glm::ivec2 framebuffer_size{1280, 720};
+			glm::vec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
 		};
 
 		struct Info

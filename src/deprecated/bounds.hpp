@@ -1,11 +1,8 @@
 #pragma once
-#include "type.hpp"
-
-#include <glm/glm-all.hpp>
-
+#include "vector.hpp"
 #include <limits>
 
-namespace renderme
+namespace deprecated
 {
 	template<unsigned int dim, typename T>
 	struct Bounds;
@@ -21,18 +18,14 @@ namespace renderme
 			pmax = Point2<T>(max, max);
 		}
 
-		glm::tvec2<T> pmin, pmax;
+		Point2<T> pmin, pmax;
 	};
-
-	template<typename T>
-	using Bounds2 = Bounds<2, T>;
 
 	using Bounds2i = Bounds<2, int>;
 	static_assert(std::is_standard_layout_v<Bounds2i>);
 
 	using Bounds2f = Bounds<2, Float>;
 	static_assert(std::is_standard_layout_v<Bounds2f>);
-
 
 	template<typename T>
 	struct Bounds<3, T>
@@ -45,15 +38,13 @@ namespace renderme
 			pmax = Point3<T>(max, max, max);
 		}
 
-		glm::tvec3<T> pmin, pmax;
+		Point3<T> pmin, pmax;
 	};
-
-	template<typename T>
-	using Bounds3 = Bounds<3, T>;
 
 	using Bounds3i = Bounds<3, int>;
 	static_assert(std::is_standard_layout_v<Bounds3i>);
 
 	using Bounds3f = Bounds<3, Float>;
 	static_assert(std::is_standard_layout_v<Bounds3f>);
+
 }

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <core/shape.hpp>
-#include <core/vector.hpp>
 #include <core/primitive.hpp>
+
+#include <glm/glm-all.hpp>
 
 #include<vector>
 
@@ -14,8 +15,8 @@ namespace renderme
 	struct Triangle_Mesh final: Shape
 	{
 		Triangle_Mesh(Transform const* _object_to_world, Transform const* _world_to_object,
-			std::vector<Point3ui> _faces, std::vector<Point3f> _positions, std::vector<Normal3f> _normals,
-			std::vector<Point2f> _uvs, std::vector<Vector3f> _tangents, std::vector<Vector3f> _bitangents);
+			std::vector<glm::uvec3> _faces, std::vector<glm::vec3> _positions, std::vector<glm::vec3> _normals,
+			std::vector<glm::vec2> _uvs, std::vector<glm::vec3> _tangents, std::vector<glm::vec3> _bitangents);
 		~Triangle_Mesh() = default;
 		Triangle_Mesh(Triangle_Mesh const&) = default;
 		auto operator=(Triangle_Mesh const&)->Triangle_Mesh & = default;
@@ -29,12 +30,12 @@ namespace renderme
 		auto create_triangles() const noexcept->std::vector<Triangle>;
 
 		unsigned int num_faces;
-		std::vector<Point3ui> faces;
-		std::vector<Point3f> positions;
-		std::vector<Normal3f> normals;
-		std::vector<Point2f> uvs;
-		std::vector<Vector3f> tangents;
-		std::vector<Vector3f> bitangents;
+		std::vector<glm::uvec3> faces;
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> uvs;
+		std::vector<glm::vec3> tangents;
+		std::vector<glm::vec3> bitangents;
 
 	private:
 		unsigned int vao;

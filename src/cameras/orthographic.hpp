@@ -1,5 +1,8 @@
 #pragma once 
 #include <core/camera.hpp>
+
+#include <glm/glm-all.hpp>
+
 namespace renderme
 {
 
@@ -8,11 +11,11 @@ namespace renderme
 
 		struct Config
 		{
-			Point3f position;
-			Vector3f direction;
-			Vector3f up;
+			glm::vec3 position;
+			glm::vec3 direction;
+			glm::vec3 up;
 
-			Float speed{1.0f};
+			float speed{1.0f};
 		};
 
 		auto gl_draw(Shader const& shader) const noexcept -> void;

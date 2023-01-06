@@ -2,9 +2,8 @@
 #include "transform.hpp"
 
 
-namespace renderme
+namespace deprecated
 {
-
 	template<typename T>
 	auto Transform::operator()(Point3<T> const& p) const noexcept -> Point3<T>
 	{
