@@ -5,3 +5,5 @@
 #define RENDERME_ROOT_PATH "@PROJECT_SOURCE_DIR@"
 #cmakedefine USE_DOUBLE
 #cmakedefine USE_CUDA
+
+#define EPSILON 1e-10

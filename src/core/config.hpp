@@ -5,3 +5,5 @@
 #define RENDERME_ROOT_PATH "C:/Frank/Codes/renderme"
 /* #undef USE_DOUBLE */
 /* #undef USE_CUDA */
+
+#define EPSILON 1e-10

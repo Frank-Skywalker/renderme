@@ -9,7 +9,7 @@ namespace renderme
 	//Classified using ymax
 	struct Classified_Polygon
 	{
-		Float a, b, c, d;
+		glm::vec4 equation;
 		unsigned int index;
 		unsigned int yspan;
 		glm::vec3 color;
@@ -32,7 +32,7 @@ namespace renderme
 	
 	struct Active_Polygon
 	{
-		Float a, b, c, d;
+		glm::vec4 equation;
 		unsigned int index;
 		unsigned int yspan;
 		glm::vec3 color;
@@ -65,13 +65,17 @@ namespace renderme
 
 		ZBuffer_Integrator();
 
-		auto gl_draw(Camera const* camera, Scene const& scene) const noexcept -> void;
-		auto render(Camera const* camera, Scene const& scene, Film* film) const noexcept -> void;
+		auto gl_draw(Camera const* camera, Scene const& scene) -> void;
+		auto render(Camera const* camera, Scene const& scene, Film* film)  -> void;
 		auto imgui_config() ->void;
 
 	private:
+		auto build_data_structures(Camera const* camera, Scene const& scene)->void;
+		auto perform_zbuffer(Film* film)->void;
+		auto clean_data_structures()->void;
 
 
+		unsigned int polygon_id;
 	};
 
 }
