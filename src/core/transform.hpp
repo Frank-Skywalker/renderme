@@ -24,6 +24,14 @@ namespace renderme
 
 		friend auto operator<<(std::ostream& os, Transform const& transform)->std::ostream&;
 
+		template<typename T>
+		auto transform_point(glm::tvec3<T> const& point) const noexcept ->glm::tvec3<T>;
+		template<typename T>
+		auto transform_vector(glm::tvec3<T> const& vector) const noexcept ->glm::tvec3<T>;
+		template<typename T>
+		auto transform_normal(glm::tvec3<T> const& normal) const noexcept ->glm::tvec3<T>;
+
+
 		glm::mat4 m;
 		glm::mat4 minv;
 	};
@@ -40,3 +48,5 @@ namespace renderme
 	//auto orthographic(Float znear, Float zfar)->Transform;
 	//auto perspective(Float fov, Float znear, Float zfar)->Transform;
 }
+
+#include "transform.inl"

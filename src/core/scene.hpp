@@ -21,7 +21,7 @@ namespace renderme
 		auto intersect() const noexcept->bool;
 		auto intersect_shadow() const noexcept->bool;
 
-	private:
+
 		std::string name;
 		std::vector<std::unique_ptr<Transform>> transforms;
 		std::vector<std::unique_ptr<Primitive>> gl_draw_primitives;

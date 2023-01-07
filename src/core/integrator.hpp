@@ -11,8 +11,8 @@ namespace renderme
 	struct Integrator : Only_Movable
 	{
 		Integrator(std::unique_ptr<Shader> shader);
-		virtual auto gl_draw(Camera const* camera, Scene const& scene) const noexcept -> void = 0;
-		virtual auto render(Camera const* camera, Scene const& scene, Film* film) const noexcept -> void = 0;
+		virtual auto gl_draw(Camera const* camera, Scene const& scene) -> void = 0;
+		virtual auto render(Camera const* camera, Scene const& scene, Film* film) -> void = 0;
 		virtual auto imgui_config() ->void = 0;
 
 		std::unique_ptr<Shader> shader;
