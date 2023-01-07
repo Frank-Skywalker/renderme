@@ -105,7 +105,7 @@ namespace renderme
 
         cameras.push_back(Parser::instance().parse_camera(Runtime_Path()));
         for (auto& camera : cameras) {
-            camera->reset_aspect(config.framebuffer_size.x / config.framebuffer_size.y);
+            camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
         }
     }
 
@@ -177,7 +177,7 @@ namespace renderme
             config.framebuffer_size = new_size;
             film->reset_resolution(config.framebuffer_size);
             for (auto& camera : cameras) {
-                camera->reset_aspect(config.framebuffer_size.x / config.framebuffer_size.y);
+                camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
             }
         }
 
@@ -273,19 +273,31 @@ namespace renderme
 
             if (ImGui::CollapsingHeader("Cameras Config")) {
                 for (auto i = 0u; i < cameras.size(); ++i) {
-                    cameras[i]->imgui_config();
+                    std::string id = "Camera" + std::to_string(i);
+                    if (ImGui::TreeNode(id.c_str())) {
+                        cameras[i]->imgui_config();
+                        ImGui::TreePop();
+                    }
                 }
             }
 
             if (ImGui::CollapsingHeader("Integrators Config")) {
                 for (auto i = 0u; i < integrators.size(); ++i) {
-                    integrators[i]->imgui_config();
+                    std::string id = "Integrator" + std::to_string(i);
+                    if (ImGui::TreeNode(id.c_str())) {
+                        integrators[i]->imgui_config();
+                        ImGui::TreePop();
+                    }
                 }
             }
 
             if (ImGui::CollapsingHeader("Scenes Config")) {
                 for (auto i = 0u; i < scenes.size(); ++i) {
-                    scenes[i]->imgui_config();
+                    std::string id = "Scene" + std::to_string(i);
+                    if (ImGui::TreeNode(id.c_str())) {
+                        scenes[i]->imgui_config();
+                        ImGui::TreePop();
+                    }
                 }
             }
         }

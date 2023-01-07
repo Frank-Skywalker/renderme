@@ -29,7 +29,7 @@ namespace renderme
 			float aspect{1.0f};
 
 			//Speed metadatas
-			float move_speed{1.0f};
+			float move_speed{10.0f};
 			float cursor_speed{0.1f};
 			float scroll_speed{1.0f};
 		};

@@ -111,8 +111,8 @@ namespace renderme
 		if (config.fov < 1) {
 			config.fov = 1;
 		}
-		if (config.fov > 45) {
-			config.fov = 45;
+		if (config.fov > 180) {
+			config.fov = 180;
 		}
 	}
 
