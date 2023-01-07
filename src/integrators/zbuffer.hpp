@@ -69,6 +69,9 @@ namespace renderme
 		auto render(Camera const* camera, Scene const& scene, Film* film) const noexcept -> void;
 		auto imgui_config() ->void;
 
+	private:
+
+
 	};
 
 }

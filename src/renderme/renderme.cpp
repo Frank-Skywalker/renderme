@@ -333,6 +333,7 @@ namespace renderme
 
 	auto Renderme::render() const noexcept->void
 	{
+        film->clear(glm::vec3(config.clear_color.x/config.clear_color.w, config.clear_color.y / config.clear_color.w, config.clear_color.z / config.clear_color.w));
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
         integrators[config.integrator_index]->render(cameras[config.camera_index].get(), *scenes[config.scene_index], film.get());
         film->gl_display();
