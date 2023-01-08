@@ -88,8 +88,8 @@ namespace renderme
 		Polygon_Table polygon_table;
 		Edge_Table edge_table;
 
-		Active_Polygon_Table active_polygon_table;
-		Active_Edge_Pair_Table active_edge_pair_table;
+		//Active_Polygon_Table active_polygon_table;
+		//Active_Edge_Pair_Table active_edge_pair_table;
 
 	};
 
