@@ -7,59 +7,65 @@
 namespace renderme
 {
 
-	//Classified using ymax
-	struct Classified_Polygon final
+	struct Polygon final
 	{
+		unsigned int id;
 		glm::vec4 equation;
-		unsigned int index;
-		unsigned int yspan;
+		int dy;
 		glm::vec3 color;
 	};
+	//Sorted using ymax
+	using Polygon_Table = std::map<int, std::vector<Polygon>>;
 
-
-	using Classified_Polygon_Table = std::map<unsigned int, std::vector<Classified_Polygon>>;
-
-	//Classified using ymax
-	struct Classified_Edge final
+	struct Edge final
 	{
-		Float ymax_x;
-		Float dx;           //Direction: from ymax to ymin
-		unsigned int yspan;
-		unsigned int polygon_index;
+		unsigned int polygon_id;
+		int dy;
+		Float x;              // Uppder x
+		Float dxdy;           // Direction: from ymax to ymin
 	};
+	//Sorted using ymax
+	using Edge_Table = std::map<int, std::vector<Edge>>;
 
-	using Classified_Edge_Table = std::map<unsigned int, std::vector<Classified_Edge>>;
 
-	
-	struct Active_Polygon final
-	{
-		glm::vec4 equation;
-		unsigned int index;
-		unsigned int yspan;
-		glm::vec3 color;
-	};
+	//struct Active_Polygon final
+	//{
+	//	unsigned int id;
+	//	glm::vec4 equation;
+	//	int dy;
+	//	glm::vec3 color;
+	//};
 
-	using Active_Polygon_Table = std::vector<Active_Polygon>;
-	
+	using Active_Polygon_Table = std::vector<Polygon*>;
+
+	//struct Active_Edge_Pair final
+	//{
+	//	unsigned int polygon_id;
+	//	Float dzdx;
+	//	Float dzdy;
+
+	//	Float z_left;
+
+	//	Float x_left;
+	//	Float dxdy_left;
+	//	int dy_left;
+
+	//	Float x_right;
+	//	Float dxdy_right;
+	//	int dy_right;
+	//};
+
 	struct Active_Edge_Pair final
 	{
-		Float x_left;
-		Float dx_left;
-		Float yspan_left;
-
-
-		Float x_right;
-		Float dx_right;
-		Float yspan_right;
-
+		Float dzdx;
+		Float dzdy;
 		Float z_left;
-		Float dzx;
-		Float dzy;
-		unsigned int polygon_index;
+
+		Edge* left;
+		Edge* right;
 	};
 
 	using Active_Edge_Pair_Table = std::vector<Active_Edge_Pair>;
-
 
 	struct ZBuffer_Integrator final : Integrator
 	{
@@ -71,12 +77,19 @@ namespace renderme
 		auto imgui_config() ->void;
 
 	private:
+		//Build the polygon table and edge table
 		auto build_data_structures(Camera const* camera, Scene const& scene, Film* film)->void;
 		auto perform_zbuffer(Film* film)->void;
 		auto clean_data_structures()->void;
 
 
 		unsigned int polygon_id;
+
+		Polygon_Table polygon_table;
+		Edge_Table edge_table;
+
+		Active_Polygon_Table active_polygon_table;
+		Active_Edge_Pair_Table active_edge_pair_table;
 
 	};
 

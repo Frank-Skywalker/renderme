@@ -102,8 +102,8 @@ namespace renderme
 							// No Clip at all
 							// Discard the face that is not in the Screen space (0,0,0) -> (resolution.x, resolution.y, 1)
 							for (auto i = 0u; i < face.length(); ++i) {
-								int x = positions[face[i]].x;
-								int y = positions[face[i]].y;
+								auto x = static_cast<int>(positions[face[i]].x);
+								auto y = static_cast<int>(positions[face[i]].y);
 								auto z = positions[face[i]].z;
 								if (
 									x < 0 || x >= static_cast<int>(film->resolution().x) ||
@@ -126,33 +126,53 @@ namespace renderme
 							continue;
 						}
 
-						polygon_id++;
+						int polygon_maxy = std::numeric_limits<int>::min();
+						int polygon_miny = std::numeric_limits<int>::max();
+						Float sum_z = 0;
 
 						// Deal with each edge
 						for (auto i = 0u; i < face.length(); ++i) {
+
 							// Convert to integer based screen point
-							auto point0 = glm::ivec2(positions[face[i]]);
-							auto point1 = glm::ivec2(positions[face[(i + 1) % face.length()]]);
-							auto z0 = positions[face[i]].z;
-							auto z1 = positions[face[(i + 1) % face.length()]].z;
+							auto point0 = positions[face[i]];
+							auto point1 = positions[face[(i + 1) % face.length()]];
 
-							if (point0.y < point1.y) {
-								std::swap(point0, point1);
-								std::swap(z0, z1);
-							}
-
-							// Discard horizontal edges 
+							// Discard horizontal edges
+							// Horizontal edges are already draw when dealing with non-horizontal edges
 							if (point0.y == point1.y) {
 								continue;
 							}
+
+							// Make sure that point0.y > point1.y
+							if (point0.y < point1.y) {
+								std::swap(point0, point1);
+							}
+
+							// Build an edge and push into edge table
+							Edge edge;
+							edge.dy = static_cast<int>(point0.y) - static_cast<int>(point1.y);
+							edge.x = point0.x;
+							edge.dxdy = -(point0.x - point1.x) / (point0.y - point1.y);
+
+							edge_table[point0.y].push_back(std::move(edge));
+
+							// Update polygon y
+							polygon_maxy = std::max(polygon_maxy, static_cast<int>(point0.y));
+							polygon_miny = std::min(polygon_miny, static_cast<int>(point1.y));
+							sum_z += point0.z;
 						}
 
+						// Build a polygon and push into polygon table
+						assert(polygon_maxy > polygon_miny);
+						Polygon polygon;
+						polygon.id = polygon_id++;
+						polygon.equation = equation;
+						polygon.dy = polygon_maxy - polygon_miny;
+						polygon.color = glm::vec3(sum_z / static_cast<float>(face.length()));
 
+						polygon_table[polygon_maxy].push_back(std::move(polygon));
 					}
 
-					// 5. Transform all vertices of all projected and clipped polygons to PDC.
-
-					// 6. Put all Polygons (in PDC) into a data structure (array or linked list).
 				}
 			}
 		}
@@ -162,11 +182,17 @@ namespace renderme
 	{
 		// 7. Find the largest and smallest Y values for the vertices of each polygon
 		// 8. Sort on Ymax to create a table with the following entries:
+
+
 	}
 
 	auto ZBuffer_Integrator::clean_data_structures()->void
 	{
-
+		polygon_id = 0;
+		polygon_table.clear();
+		edge_table.clear();
+		active_polygon_table.clear();
+		active_edge_pair_table.clear();
 	}
 
 }
