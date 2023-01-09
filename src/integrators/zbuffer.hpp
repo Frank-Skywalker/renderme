@@ -3,69 +3,45 @@
 #include <core/film.hpp>
 
 #include<map>;
+#include<list>;
+#include<set>
+#include<algorithm>
 
 namespace renderme
 {
 
-	struct Polygon final
-	{
-		unsigned int id;
-		glm::vec4 equation;
-		int dy;
-		glm::vec3 color;
-	};
-	//Sorted using ymax
-	using Polygon_Table = std::map<int, std::vector<Polygon>>;
-
 	struct Edge final
 	{
-		unsigned int polygon_id;
+		// Not changed during zbuffer
+		int ymax;
+		Float dxdy;
+
+		// Changed during zbuffer
 		int dy;
-		Float x;              // Uppder x
-		Float dxdy;           // Direction: from ymax to ymin
+		Float x;
+		Float z;
 	};
-	//Sorted using ymax
-	using Edge_Table = std::map<int, std::vector<Edge>>;
 
+	using Active_Edge_List = std::list<Edge*>;
 
-	//struct Active_Polygon final
-	//{
-	//	unsigned int id;
-	//	glm::vec4 equation;
-	//	int dy;
-	//	glm::vec3 color;
-	//};
-
-	using Active_Polygon_Table = std::vector<Polygon*>;
-
-	//struct Active_Edge_Pair final
-	//{
-	//	unsigned int polygon_id;
-	//	Float dzdx;
-	//	Float dzdy;
-
-	//	Float z_left;
-
-	//	Float x_left;
-	//	Float dxdy_left;
-	//	int dy_left;
-
-	//	Float x_right;
-	//	Float dxdy_right;
-	//	int dy_right;
-	//};
-
-	struct Active_Edge_Pair final
+	struct Polygon final
 	{
+		// Not changed during zbuffer
+		glm::vec4 equation;
 		Float dzdx;
 		Float dzdy;
-		Float z_left;
+		glm::vec3 color;
+		
+		// Changed during zbuffer
+		int dy;
+		std::vector<Edge> edges;
+		Active_Edge_List active_edge_list;
 
-		Edge* left;
-		Edge* right;
 	};
 
-	using Active_Edge_Pair_Table = std::vector<Active_Edge_Pair>;
+	using Polygon_Table = std::vector<std::vector<Polygon>>;
+	using Active_Polygon_List = std::list<Polygon*>;
+
 
 	struct ZBuffer_Integrator final : Integrator
 	{
@@ -78,19 +54,11 @@ namespace renderme
 
 	private:
 		//Build the polygon table and edge table
-		auto build_data_structures(Camera const* camera, Scene const& scene, Film* film)->void;
+		auto build_polygon_table(Camera const* camera, Scene const& scene, Film* film)->void;
 		auto perform_zbuffer(Film* film)->void;
-		auto clean_data_structures()->void;
-
-
-		unsigned int polygon_id;
+		auto clean_polygon_table()->void;
 
 		Polygon_Table polygon_table;
-		Edge_Table edge_table;
-
-		//Active_Polygon_Table active_polygon_table;
-		//Active_Edge_Pair_Table active_edge_pair_table;
-
 	};
 
 }

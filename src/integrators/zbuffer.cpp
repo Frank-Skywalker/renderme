@@ -6,9 +6,10 @@
 
 #include <imgui/imgui.h>
 
+#include <algorithm>
+
 namespace renderme
 {
-
 	ZBuffer_Integrator::ZBuffer_Integrator()
 		:Integrator(std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl"))
 	{}
@@ -23,9 +24,9 @@ namespace renderme
 
 	auto ZBuffer_Integrator::render(Camera const* camera, Scene const& scene, Film* film) -> void
 	{
-		build_data_structures(camera, scene, film);
+		build_polygon_table(camera, scene, film);
 		perform_zbuffer(film);
-		clean_data_structures();
+		clean_polygon_table();
 	}
 
 	auto ZBuffer_Integrator::imgui_config() ->void
@@ -37,12 +38,18 @@ namespace renderme
 	}
 
 
-
-
-	auto ZBuffer_Integrator::build_data_structures(Camera const* camera, Scene const& scene, Film* film)->void
+	auto solve_equation_for_z(glm::vec4 const& equation, Float x, Float y) -> Float
 	{
-		for (auto& primitive: scene.gl_draw_primitives) {
+		//ax+by+cz+d=0
+		return (-equation.w - equation.x * x - equation.y * y) / equation.z;
+	}
 
+	auto ZBuffer_Integrator::build_polygon_table(Camera const* camera, Scene const& scene, Film* film)->void
+	{
+		//Resize polygon table
+		polygon_table.resize(film->resolution().y);
+
+		for (auto& primitive: scene.gl_draw_primitives) {
 			//Get Triangle_Mesh
 			if (typeid(*primitive) == typeid(Shape_Primitive)){
 				auto shape_primitive = dynamic_cast<Shape_Primitive const*>(primitive.get());
@@ -55,6 +62,7 @@ namespace renderme
 					std::vector<glm::vec3> positions;
 					for (auto const& model_pos : triangle_mesh->positions) {
 
+						// From Model Space to NDC
 						auto model_space_to_ndc = [&] (glm::vec3 const& model)->glm::vec3 {
 							auto ndc = model;
 							// From Model Space to World Space
@@ -66,6 +74,7 @@ namespace renderme
 							return ndc;
 						};
 
+						// From NDC to Screen Space
 						auto ndc_to_screen_space = [] (glm::vec3 const& ndc, glm::uvec2 const& resolution)->glm::vec3 {
 							auto x = (ndc.x + 1.0f) / 2.0f * static_cast<float>(resolution.x);
 							auto y = (ndc.y + 1.0f) / 2.0f * static_cast<float>(resolution.y);
@@ -122,19 +131,17 @@ namespace renderme
 						};
 						
 						if (discard_face(face)) {
-							std::cout << "danger" << std::endl;
 							continue;
 						}
-
-						++polygon_id;
-						int polygon_maxy = std::numeric_limits<int>::min();
-						int polygon_miny = std::numeric_limits<int>::max();
+						
+						// Start building polygon
+						int polygon_ymax = std::numeric_limits<int>::min();
+						int polygon_ymin = std::numeric_limits<int>::max();
 						Float sum_z = 0;
+						std::vector<Edge> edges;
 
 						// Deal with each edge
 						for (auto i = 0u; i < face.length(); ++i) {
-
-							// Convert to integer based screen point
 							auto point0 = positions[face[i]];
 							auto point1 = positions[face[(i + 1) % face.length()]];
 
@@ -149,30 +156,50 @@ namespace renderme
 								std::swap(point0, point1);
 							}
 
-							// Build an edge and push into edge table
+							// Build an edge
 							Edge edge;
+							edge.ymax = static_cast<int>(point0.y);
+							edge.dxdy = -(point0.x - point1.x) / (point0.y - point1.y);
 							edge.dy = static_cast<int>(point0.y) - static_cast<int>(point1.y);
 							edge.x = point0.x;
-							edge.dxdy = -(point0.x - point1.x) / (point0.y - point1.y);
-							edge.polygon_id = polygon_id;
+							edge.z = solve_equation_for_z(equation, point0.x, point0.y);
 
-							edge_table[point0.y].push_back(std::move(edge));
+							edges.push_back(std::move(edge));
 
 							// Update polygon y
-							polygon_maxy = std::max(polygon_maxy, static_cast<int>(point0.y));
-							polygon_miny = std::min(polygon_miny, static_cast<int>(point1.y));
+							polygon_ymax = std::max(polygon_ymax, static_cast<int>(point0.y));
+							polygon_ymin = std::min(polygon_ymin, static_cast<int>(point1.y));
 							sum_z += point0.z;
 						}
 
-						// Build a polygon and push into polygon table
-						assert(polygon_maxy > polygon_miny);
-						Polygon polygon;
-						polygon.id = polygon_id;
-						polygon.equation = equation;
-						polygon.dy = polygon_maxy - polygon_miny;
-						polygon.color = glm::vec3(sum_z / static_cast<float>(face.length()));
+						assert(polygon_ymax > polygon_ymin);
+						auto color = glm::vec3(sum_z / static_cast<Float>(face.length()));
 
-						polygon_table[polygon_maxy].push_back(std::move(polygon));
+						// First compares ymax
+                        // Then compares x
+                        // Last compares dxdy
+						auto edge_comparator = [] (Edge const& lhs, Edge const& rhs)->bool {
+							if (lhs.ymax == rhs.ymax) {
+								if (lhs.x == rhs.x) {
+									return lhs.dxdy < rhs.dxdy;
+								}
+								return lhs.x < rhs.x;
+							}
+							return lhs.ymax > rhs.ymax;
+						};
+						// Sort edges
+						std::sort(edges.begin(), edges.end(), edge_comparator);
+
+						// Build a polygon and push into polygon table
+						Polygon polygon;
+						polygon.equation = equation;
+						polygon.dzdx = -equation.x / equation.z;
+						polygon.dzdy = -equation.y / equation.z;
+						polygon.color = color;
+						polygon.dy = polygon_ymax - polygon_ymin;
+						polygon.edges = std::move(edges);
+
+						polygon_table[polygon_ymax].push_back(std::move(polygon));
 					}
 
 				}
@@ -180,177 +207,92 @@ namespace renderme
 		}
 	}
 
-
-	auto solve_equation_for_z(glm::vec4 const& equation, Float x, Float y) -> Float
-	{
-		//ax+by+cz+d=0
-		return (-equation.w - equation.x * x - equation.y * y) / equation.z;
-
-	}
 
 	auto ZBuffer_Integrator::perform_zbuffer(Film* film)->void
 	{
 		// Scan line
 		auto zbuffer = std::make_unique<Float[]>(film->resolution().x);
-		Active_Polygon_Table active_polygons;
-		Active_Edge_Pair_Table active_edge_pairs;
-
-		for (auto& [ymax, polygon] : polygon_table) {
-			std::cout << ymax << std::endl;
-		}
+		Active_Polygon_List active_polygon_list;
 
 		for (auto scany = static_cast<int>(film->resolution().y) - 1 ; scany >= 0; --scany) {
 
-			// Clean zbuffer
+			// Clear zbuffer
 			std::fill(zbuffer.get(), zbuffer.get() + film->resolution().x, std::numeric_limits<Float>::min());
 
 			// Add first-time scanned polygons (polygon_ymax == yscan) to active polygon table
-			for (auto iter = polygon_table.rbegin(); iter != polygon_table.rend(); ++iter) {
-				auto polygon_ymax = iter->first;
-				auto& polygons = iter->second;
+			for(auto &polygon :polygon_table[scany]) {
+				active_polygon_list.push_back(&polygon);
+			}
 
-				if (polygon_ymax == scany) {
-					for (auto& polygon : polygons) {
-						active_polygons.push_back(&polygon);
-						
-						// Find active edges for this polygon
-						std::vector<Edge*> aedges;
-						for (auto jter = edge_table.rbegin(); jter != edge_table.rend(); ++jter) {
-							auto edge_ymax = jter->first;
-							auto& edges = jter->second;
-							for (auto& edge : edges) {
-								if (edge.polygon_id == polygon.id && edge_ymax == scany) {
-									aedges.push_back(&edge);
-								}
-							}
-
-							if (edge_ymax < scany) {
-								break;
-							}
-						}
-						assert(aedges.size() == 2);
-						Active_Edge_Pair active_edge_pair;
-						active_edge_pair.left = aedges[0];
-						active_edge_pair.right = aedges[1];
-
-						// Make sure that left is real left
-						if (active_edge_pair.left->x > active_edge_pair.right->x) {
-							std::swap(active_edge_pair.left, active_edge_pair.right);
-						}
-
-						active_edge_pair.z_left = solve_equation_for_z(polygon.equation, active_edge_pair.left->x, polygon_ymax);
-						// dzdx = -a/c
-						active_edge_pair.dzdx = -polygon.equation.x / polygon.equation.z;
-						// dzdy = -b/c
-						active_edge_pair.dzdy = -polygon.equation.y / polygon.equation.z;
-						active_edge_pairs.push_back(active_edge_pair);
-
+			// Scan through each polygon
+			for (auto polygon : active_polygon_list) {
+				
+				// Add new edges
+				for (auto &edge : polygon->edges) {
+					if (edge.ymax == scany) {
+						polygon->active_edge_list.push_back(&edge);
 					}
-					break;
 				}
 
-				if (polygon_ymax < scany) {
-					break;
+				for (auto iter = polygon->active_edge_list.begin(); iter != polygon->active_edge_list.end();) {
+
+					// Get edge pair
+					auto left = *iter;
+					++iter;
+					auto right = *iter;
+					++iter;
+					
+					// Update zbuffer and frame buffer
+					auto z = left->z;
+					for (auto x = static_cast<int>(left->x);x <= static_cast<int>(right->x);++x) {
+						if (z >= zbuffer[x]) {
+							zbuffer[x] = z;
+							film->set_pixel(glm::uvec2(x, scany), polygon->color);
+						}
+						z += polygon->dzdx;
+					}
+
+					// Update active edges
+					--left->dy;
+					left->x += left->dxdy;
+					left->z += polygon->dzdx * left->dxdy + polygon->dzdy;
+
+					--right->dy;
+					right->x += right->dxdy;
+					right->z += polygon->dzdx * right->dxdy + polygon->dzdy;
+				}
+
+				// Remove active edges if dy==0
+				for (auto iter = polygon->active_edge_list.begin(); iter != polygon->active_edge_list.end(); ) {
+					if ((*iter)->dy == 0) {
+						iter=polygon->active_edge_list.erase(iter);
+					} else {
+						++iter;
+					}
+				}
+
+				// Update active polygon
+				--polygon->dy;
+
+			}// End of polygon
+
+			// Remove active polygons if dy==0
+			for (auto iter = active_polygon_list.begin(); iter != active_polygon_list.end(); ) {
+				if ((*iter)->dy == 0) {
+					iter = active_polygon_list.erase(iter);
+				}
+				else {
+					++iter;
 				}
 			}
 
-
-			// Scan each active edge pair
-			Active_Edge_Pair_Table new_edge_table;
-			Active_Polygon_Table new_polygon_table;
-
-			for (auto& active_edge_pair : active_edge_pairs) {
-				auto z = active_edge_pair.z_left;
-				// Scan for zbuffer
-
-				// Make sure that left is real left
-				if (active_edge_pair.left->x > active_edge_pair.right->x) {
-					std::swap(active_edge_pair.left, active_edge_pair.right);
-				}
-
-
-				for (
-					auto x = static_cast<int>(active_edge_pair.left->x); 
-					x <= static_cast<int>(active_edge_pair.right->x); 
-					++x
-					) {
-					if (z >= zbuffer[x]) {
-						zbuffer[x] = z;
-						film->set_pixel(glm::uvec2(x, scany), glm::vec3());
-					}
-					z += active_edge_pair.dzdx;
-				}
-
-
-				auto find_next_edge = [&] (unsigned int polygon_id, int scany)->Edge* {
-					for (auto jter = edge_table.rbegin(); jter != edge_table.rend(); ++jter) {
-						auto edge_ymax = jter->first;
-						auto& edges = jter->second;
-						for (auto& edge : edges) {
-							if (edge.polygon_id == polygon_id && edge_ymax == scany) {
-								return &edge;
-							}
-						}
-
-						if (edge_ymax < scany) {
-							break;
-						}
-					}
-					return nullptr;
-				};
-
-				auto find_polygon = [&] (unsigned int polygon_id) -> Polygon* {
-					for (auto& polygon : active_polygons) {
-						if (polygon->id == polygon_id) {
-							return polygon;
-						}
-					}
-					return nullptr;
-				};
-
-				active_edge_pair.left->x += active_edge_pair.left->dxdy;
-				active_edge_pair.right->x += active_edge_pair.right->dxdy;
-				auto polygon = find_polygon(active_edge_pair.left->polygon_id);
-				active_edge_pair.z_left = solve_equation_for_z(polygon->equation, active_edge_pair.left->x, scany);
-
-				// Upadate active edge pair
-				if (--active_edge_pair.left->dy == 0) {
-					// Find active edges for this polygon
-					active_edge_pair.left = find_next_edge(active_edge_pair.left->polygon_id, scany);
-				}
-				
-				if (--active_edge_pair.right->dy == 0) {
-					active_edge_pair.right = find_next_edge(active_edge_pair.right->polygon_id, scany);
-				} 
-				
-				if (active_edge_pair.left != nullptr && active_edge_pair.right != nullptr) {
-					new_edge_table.push_back(active_edge_pair);
-					new_polygon_table.push_back(polygon);
-				}
-				else if (
-					(active_edge_pair.left == nullptr && active_edge_pair.right != nullptr) ||
-					(active_edge_pair.left != nullptr && active_edge_pair.right == nullptr)
-					) {
-					log(Status::fatal, "What????");
-				}
-
-			}
-
-			//Delete edge pairs
-			active_edge_pairs = new_edge_table;
-			active_polygons = new_polygon_table;
-
-		}
+		}// End of scany
 
 	}
 
-	auto ZBuffer_Integrator::clean_data_structures()->void
+	auto ZBuffer_Integrator::clean_polygon_table()->void
 	{
-		polygon_id = 0;
 		polygon_table.clear();
-		edge_table.clear();
-		//active_polygon_table.clear();
-		//active_edge_pair_table.clear();
 	}
 
 }
