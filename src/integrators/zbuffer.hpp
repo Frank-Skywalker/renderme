@@ -14,7 +14,7 @@ namespace renderme
 	{
 		// Not changed during zbuffer
 		int ymax;
-		Float dxdy;
+		Float dxdl;
 
 		// Changed during zbuffer
 		int dy;

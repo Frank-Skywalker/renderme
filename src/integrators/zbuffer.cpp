@@ -173,7 +173,7 @@ namespace renderme
 							// Build an edge
 							Edge edge;
 							edge.ymax = static_cast<int>(point0.y);
-							edge.dxdy = -(point0.x - point1.x) / (point0.y - point1.y);
+							edge.dxdl = -(point0.x - point1.x) / (point0.y - point1.y);
 							edge.dy = static_cast<int>(point0.y) - static_cast<int>(point1.y);
 							edge.x = point0.x;
 							edge.z = solve_equation_for_z(equation, point0.x, point0.y);
@@ -251,7 +251,7 @@ namespace renderme
                     // Then compares dxdy
 					auto edge_comparator = [] (Edge* const& lhs, Edge* const& rhs)->bool {
 						if (lhs->x == rhs->x) {
-							return lhs->dxdy < rhs->dxdy;
+							return lhs->dxdl < rhs->dxdl;
 						}
 						return lhs->x < rhs->x;
 					};
@@ -288,12 +288,14 @@ namespace renderme
 
 					// Update active edges
 					--left->dy;
-					left->x += left->dxdy;
+					left->x += left->dxdl;
+					// CAUTION!!!: the belowing equation is wrong
 					//left->z += polygon->dzdx * left->dxdy + polygon->dzdy;
 					left->z = solve_equation_for_z(polygon->equation, left->x, scany);
 
 					--right->dy;
-					right->x += right->dxdy;
+					right->x += right->dxdl;
+					// CAUTION!!!: the belowing equation is wrong
 					//right->z += polygon->dzdx * right->dxdy + polygon->dzdy;
 					right->z = solve_equation_for_z(polygon->equation, right->x, scany);
 				}
