@@ -289,11 +289,13 @@ namespace renderme
 					// Update active edges
 					--left->dy;
 					left->x += left->dxdy;
-					left->z += polygon->dzdx * left->dxdy + polygon->dzdy;
+					//left->z += polygon->dzdx * left->dxdy + polygon->dzdy;
+					left->z = solve_equation_for_z(polygon->equation, left->x, scany);
 
 					--right->dy;
 					right->x += right->dxdy;
-					right->z += polygon->dzdx * right->dxdy + polygon->dzdy;
+					//right->z += polygon->dzdx * right->dxdy + polygon->dzdy;
+					right->z = solve_equation_for_z(polygon->equation, right->x, scany);
 				}
 
 				// Remove active edges if dy==0
