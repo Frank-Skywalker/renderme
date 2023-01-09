@@ -107,6 +107,11 @@ namespace renderme
         for (auto& camera : cameras) {
             camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
         }
+
+        integrators.push_back(Parser::instance().parse_integrator(Runtime_Path()));
+        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/cube/cube.obj")));
+        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/nanosuit/nanosuit.obj")));
+        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/backpack/backpack.obj")));
     }
 
 
