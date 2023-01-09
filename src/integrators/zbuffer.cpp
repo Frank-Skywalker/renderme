@@ -20,6 +20,10 @@ namespace renderme
 		shader->use();
 		camera->gl_draw(*shader);
 		scene.gl_draw(*shader);
+
+		// CAUTION!!!:
+		// Be sure to UNUSE shader after rendering
+		// Or there may be bugs in afterwards rendering
 		shader->unuse();
 	}
 
@@ -181,7 +185,6 @@ namespace renderme
 
 						assert(polygon_ymax >= polygon_ymin);
 						auto color = (triangle_mesh->normals[face[0]] + triangle_mesh->normals[face[1]] + triangle_mesh->normals[face[2]]) / 3.0f;
-						//auto color = glm::linearRand(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 
 						// First compares ymax
                         // Then compares x
