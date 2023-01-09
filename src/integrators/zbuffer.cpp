@@ -148,7 +148,6 @@ namespace renderme
 						// Start building polygon
 						int polygon_ymax = std::numeric_limits<int>::min();
 						int polygon_ymin = std::numeric_limits<int>::max();
-						Float sum_z = 0;
 						std::vector<Edge> edges;
 
 						// Deal with each edge
@@ -164,7 +163,6 @@ namespace renderme
 							// Update polygon y
 							polygon_ymax = std::max(polygon_ymax, static_cast<int>(point0.y));
 							polygon_ymin = std::min(polygon_ymin, static_cast<int>(point1.y));
-							sum_z += point0.z;
 
 							// Discard horizontal edges
 							// Horizontal edges are already draw when dealing with non-horizontal edges
@@ -186,20 +184,14 @@ namespace renderme
 						assert(polygon_ymax >= polygon_ymin);
 						auto color = (triangle_mesh->normals[face[0]] + triangle_mesh->normals[face[1]] + triangle_mesh->normals[face[2]]) / 3.0f;
 
-						// First compares ymax
-                        // Then compares x
-                        // Last compares dxdy
-						auto edge_comparator = [] (Edge const& lhs, Edge const& rhs)->bool {
-							if (lhs.ymax == rhs.ymax) {
-								if (lhs.x == rhs.x) {
-									return lhs.dxdy < rhs.dxdy;
-								}
-								return lhs.x < rhs.x;
-							}
-							return lhs.ymax > rhs.ymax;
-						};
-						// Sort edges
-						std::sort(edges.begin(), edges.end(), edge_comparator);
+
+
+						//std::cerr << "Original edges: " << std::endl;
+						//std::cerr << "ymax" << " " << "x" << "     " << "dxdy" << std::endl;
+						//for (auto &edge : edges) {
+						//	std::cerr << edge.ymax << " " << edge.x << " " << edge.dxdy << std::endl;
+						//}
+						//std::cerr << std::endl;
 
 						// Build a polygon and push into polygon table
 						Polygon polygon;
@@ -209,6 +201,12 @@ namespace renderme
 						polygon.color = color;
 						polygon.dy = polygon_ymax - polygon_ymin;
 						polygon.edges = std::move(edges);
+
+
+						//std::cerr << "Polygon: " << std::endl;
+						//std::cerr << "dy" << " " << "edges"<< std::endl;
+						//std::cerr << polygon.dy << " " << polygon.edges.size();
+						//std::cerr << std::endl;
 
 						polygon_table[polygon_ymax].push_back(std::move(polygon));
 					}
@@ -239,11 +237,30 @@ namespace renderme
 			for (auto polygon : active_polygon_list) {
 				
 				// Add new edges
+				auto modified = false;
 				for (auto &edge : polygon->edges) {
 					if (edge.ymax == scany) {
 						polygon->active_edge_list.push_back(&edge);
+						modified = true;
 					}
 				}
+
+				//Sort active edge list
+				if (modified) {
+                    // First compares x
+                    // Then compares dxdy
+					auto edge_comparator = [] (Edge* const& lhs, Edge* const& rhs)->bool {
+						if (lhs->x == rhs->x) {
+							return lhs->dxdy < rhs->dxdy;
+						}
+						return lhs->x < rhs->x;
+					};
+					// Sort edges
+					// std::list cannot use std::sort()
+					//std::sort(polygon->active_edge_list.begin(), polygon->active_edge_list.end(), edge_comparator);
+					polygon->active_edge_list.sort(edge_comparator);
+				}
+
 
 				for (auto iter = polygon->active_edge_list.begin(); iter != polygon->active_edge_list.end();) {
 
@@ -253,9 +270,15 @@ namespace renderme
 					auto right = *iter;
 					++iter;
 					
+					//if (left->x > right->x) {
+					//	std::cerr << std::endl;
+					//	std::cerr << "danger" << std::endl;
+					//	std::cerr << left->x << " " << right->x << std::endl;
+					//}
+
 					// Update zbuffer and frame buffer
 					auto z = left->z;
-					for (auto x = static_cast<int>(left->x);x <= static_cast<int>(right->x);++x) {
+					for (auto x = static_cast<int>(left->x); x < static_cast<int>(right->x); ++x) {
 						if (z >= zbuffer[x]) {
 							zbuffer[x] = z;
 							film->set_pixel(glm::uvec2(x, scany), polygon->color);
