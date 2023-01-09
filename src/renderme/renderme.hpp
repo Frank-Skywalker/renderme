@@ -42,7 +42,7 @@ namespace renderme
 			char integrator_path[MAX_FILE_NAME_LENGTH];
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
-			bool enable_io{false};
+			bool enable_io{true};
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
 			unsigned int camera_index{0};

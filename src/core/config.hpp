@@ -6,4 +6,4 @@
 /* #undef USE_DOUBLE */
 /* #undef USE_CUDA */
 
-#define EPSILON 1e-10
+#define EPSILON 1e-8
