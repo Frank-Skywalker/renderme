@@ -79,7 +79,13 @@ namespace renderme
 						auto ndc_to_screen_space = [] (glm::vec3 const& ndc, glm::uvec2 const& resolution)->glm::vec3 {
 							auto x = (ndc.x + 1.0f) / 2.0f * static_cast<float>(resolution.x);
 							auto y = (ndc.y + 1.0f) / 2.0f * static_cast<float>(resolution.y);
-							auto z = (ndc.z + 1.0f) / 2.0f;
+
+							// CAUTION!!!: Flip z here
+							// Projection matrix will transfer from right-handed World Space to left-handed NDC
+							// But we want to stay in right-handed coordinate space
+							// So we should flip z back
+							auto z = ( - ndc.z + 1.0f) / 2.0f;
+
 							return glm::vec3(x, y, z);
 						};
 
@@ -174,7 +180,8 @@ namespace renderme
 						}
 
 						assert(polygon_ymax >= polygon_ymin);
-						auto color = glm::linearRand(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+						auto color = (triangle_mesh->normals[face[0]] + triangle_mesh->normals[face[1]] + triangle_mesh->normals[face[2]]) / 3.0f;
+						//auto color = glm::linearRand(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 
 						// First compares ymax
                         // Then compares x
