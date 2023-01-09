@@ -69,10 +69,10 @@ namespace renderme
 				config.position -= config.right * delta_time * config.move_speed;
 				break;
 			case Camera_Movement::up:
-				config.position += config.up * delta_time * config.move_speed;
+				config.position += config.world_up * delta_time * config.move_speed;
 				break;
 			case Camera_Movement::down:
-				config.position -= config.up * delta_time * config.move_speed;
+				config.position -= config.world_up * delta_time * config.move_speed;
 				break;
 		}
 
