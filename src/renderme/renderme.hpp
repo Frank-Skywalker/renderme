@@ -26,8 +26,18 @@ namespace renderme
 			ready
 		};
 
+		enum GL_Draw_Mode
+		{
+			fill = 0,
+			line,
+			point
+		};
+
 		struct Config
 		{
+			GL_Draw_Mode gl_draw_mode{GL_Draw_Mode::fill};
+			float line_width_point_size;
+
 			char scene_path[MAX_FILE_NAME_LENGTH];
 			char integrator_path[MAX_FILE_NAME_LENGTH];
 			bool raytrace{false};
@@ -36,7 +46,7 @@ namespace renderme
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
 			unsigned int camera_index{0};
-
+			
 			//Metadata
 			glm::ivec2 framebuffer_size{1280, 720};
 			glm::vec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};

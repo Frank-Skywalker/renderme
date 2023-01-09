@@ -152,6 +152,18 @@ namespace renderme
             glClearColor(config.clear_color.x * config.clear_color.w, config.clear_color.y * config.clear_color.w, config.clear_color.z * config.clear_color.w, config.clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            if (config.gl_draw_mode == fill) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+            else if (config.gl_draw_mode == line) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                glLineWidth(config.line_width_point_size);
+            }
+            else if (config.gl_draw_mode == point) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+                glPointSize(config.line_width_point_size);
+            }
+
             show_scene();
             show_imgui_menu();
 
@@ -366,6 +378,19 @@ namespace renderme
         }
         ImGui::SameLine();
         ImGui::InputText("Integrator Path", config.integrator_path, MAX_FILE_NAME_LENGTH);
+
+        if (ImGui::BeginCombo("GL Draw Mode", std::to_string(config.gl_draw_mode).c_str())) {
+            for (auto mode = GL_Draw_Mode::fill; mode <= GL_Draw_Mode::point; mode=(GL_Draw_Mode)(mode+1)){
+                const bool is_selected = (mode == config.gl_draw_mode);
+                if (ImGui::Selectable(std::to_string(mode).c_str(), is_selected)) {
+                    config.gl_draw_mode = mode;
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SliderFloat("Line Width/Point Size", &config.line_width_point_size, 0.0f, 10.0f);
 
         ImGui::Checkbox("Enable IO", &config.enable_io);
         ImGui::Checkbox("Raytrace", &config.raytrace);
