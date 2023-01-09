@@ -103,6 +103,12 @@ namespace renderme
 		glUseProgram(_id);
 	}
 
+	auto Shader::unuse() const noexcept -> void
+	{
+		glUseProgram(0);
+	}
+
+
 	auto Shader::imgui_config()->void
 	{
 	}

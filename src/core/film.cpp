@@ -48,7 +48,7 @@ namespace renderme
 	auto Film::gl_display() const noexcept ->void
 	{
 		//Be sure to set the raster position back to (0,0) before glDrawPixels
-		glRasterPos2i(0, 0);
+		glRasterPos4i(0, 0, 0, 1);
 		glDrawPixels(_resolution.x, _resolution.y, GL_RGB, GL_FLOAT, pixels.get());
 	}
 

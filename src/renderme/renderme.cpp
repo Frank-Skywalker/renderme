@@ -74,8 +74,8 @@ namespace renderme
             return;
         }
         //fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-        std::string info{(const char*)glewGetString(GLEW_VERSION)};
-        log(Status::log, info);
+        //std::string info{(const char*)glewGetString(GLEW_VERSION)};
+        //log(Status::log, info);
 
         ///////////ImGui Init//////////////
 

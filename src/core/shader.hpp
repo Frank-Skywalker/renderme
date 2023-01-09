@@ -29,6 +29,7 @@ namespace renderme
 
 		auto id() const noexcept ->unsigned int;
 		auto use() const noexcept -> void;
+		auto unuse() const noexcept -> void;
 		auto set_uniform_bool(std::string const& name, bool value) const noexcept ->void;
 		auto set_uniform_int(std::string const& name, int value) const noexcept ->void;
 		auto set_uniform_float(std::string const& name, float value) const noexcept ->void;
