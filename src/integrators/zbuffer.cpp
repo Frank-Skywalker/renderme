@@ -20,6 +20,7 @@ namespace renderme
 		shader->use();
 		camera->gl_draw(*shader);
 		scene.gl_draw(*shader);
+		shader->unuse();
 	}
 
 	auto ZBuffer_Integrator::render(Camera const* camera, Scene const& scene, Film* film) -> void
@@ -145,15 +146,20 @@ namespace renderme
 							auto point0 = positions[face[i]];
 							auto point1 = positions[face[(i + 1) % face.length()]];
 
-							// Discard horizontal edges
-							// Horizontal edges are already draw when dealing with non-horizontal edges
-							if (point0.y == point1.y) {
-								continue;
-							}
-
 							// Make sure that point0.y > point1.y
 							if (point0.y < point1.y) {
 								std::swap(point0, point1);
+							}
+
+							// Update polygon y
+							polygon_ymax = std::max(polygon_ymax, static_cast<int>(point0.y));
+							polygon_ymin = std::min(polygon_ymin, static_cast<int>(point1.y));
+							sum_z += point0.z;
+
+							// Discard horizontal edges
+							// Horizontal edges are already draw when dealing with non-horizontal edges
+							if (static_cast<int>(point0.y) == static_cast<int>(point1.y)) {
+								continue;
 							}
 
 							// Build an edge
@@ -165,15 +171,10 @@ namespace renderme
 							edge.z = solve_equation_for_z(equation, point0.x, point0.y);
 
 							edges.push_back(std::move(edge));
-
-							// Update polygon y
-							polygon_ymax = std::max(polygon_ymax, static_cast<int>(point0.y));
-							polygon_ymin = std::min(polygon_ymin, static_cast<int>(point1.y));
-							sum_z += point0.z;
 						}
 
-						assert(polygon_ymax > polygon_ymin);
-						auto color = glm::vec3(sum_z / static_cast<Float>(face.length()));
+						assert(polygon_ymax >= polygon_ymin);
+						auto color = glm::linearRand(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 
 						// First compares ymax
                         // Then compares x
@@ -264,7 +265,7 @@ namespace renderme
 
 				// Remove active edges if dy==0
 				for (auto iter = polygon->active_edge_list.begin(); iter != polygon->active_edge_list.end(); ) {
-					if ((*iter)->dy == 0) {
+					if ((*iter)->dy <= 0) {
 						iter=polygon->active_edge_list.erase(iter);
 					} else {
 						++iter;
@@ -278,7 +279,7 @@ namespace renderme
 
 			// Remove active polygons if dy==0
 			for (auto iter = active_polygon_list.begin(); iter != active_polygon_list.end(); ) {
-				if ((*iter)->dy == 0) {
+				if ((*iter)->dy <= 0) {
 					iter = active_polygon_list.erase(iter);
 				}
 				else {
