@@ -1,5 +1,5 @@
 #include "scene.hpp"
-
+#include <imgui/imgui.h>
 namespace renderme
 {
 
@@ -43,5 +43,12 @@ namespace renderme
 
 	auto Scene::imgui_config()->void
 	{
+		auto i = 0;
+		for (auto& primitive : gl_draw_primitives) {
+			if (ImGui::TreeNode(("Primitive"+std::to_string(i++)).c_str())) {
+				primitive->imgui_config();
+				ImGui::TreePop();
+			}
+		}
 	}
 }

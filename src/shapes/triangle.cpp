@@ -3,6 +3,7 @@
 #include <core/log.hpp>
 
 #include <GL/glew.h>
+#include <imgui/imgui.h>
 
 namespace renderme
 {
@@ -77,6 +78,13 @@ namespace renderme
 		return false;
 	}
 
+	auto Triangle_Mesh::imgui_config() const noexcept ->void
+	{
+		ImGui::Text("Number of vertices: %d", positions.size());
+		ImGui::Text("Number of faces: %d", faces.size());
+	}
+
+
 
 	auto Triangle_Mesh::create_triangles() const noexcept->std::vector<Triangle>
 	{
@@ -106,6 +114,11 @@ namespace renderme
 	auto Triangle::intersect_shadow() const noexcept ->bool
 	{
 		return true;
+	}
+
+	auto Triangle::imgui_config() const noexcept ->void
+	{
+		
 	}
 
 

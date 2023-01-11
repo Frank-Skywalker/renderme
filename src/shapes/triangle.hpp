@@ -26,6 +26,7 @@ namespace renderme
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto intersect() const noexcept ->bool;
 		auto intersect_shadow() const noexcept ->bool;
+		auto imgui_config() const noexcept ->void;
 
 		auto create_triangles() const noexcept->std::vector<Triangle>;
 
@@ -48,6 +49,8 @@ namespace renderme
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto intersect() const noexcept ->bool;
 		auto intersect_shadow() const noexcept ->bool;
+		auto imgui_config() const noexcept ->void;
+
 
 		Triangle_Mesh const* mesh;
 		unsigned int index;

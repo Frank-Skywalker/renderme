@@ -27,4 +27,10 @@ namespace renderme
 		return shape->intersect_shadow();
 	}
 
+	auto Shape_Primitive::imgui_config() const noexcept ->void
+	{
+		shape->imgui_config();
+	}
+
+
 }
