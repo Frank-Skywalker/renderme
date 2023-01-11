@@ -393,7 +393,7 @@ namespace renderme
         ImGui::SliderFloat("Line Width/Point Size", &config.line_width_point_size, 0.0f, 10.0f);
 
         ImGui::Checkbox("Enable IO", &config.enable_io);
-        ImGui::Checkbox("Raytrace", &config.raytrace);
+        ImGui::Checkbox("ZBuffer", &config.raytrace);
         if (scenes.size() > 0) {
             ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
         }

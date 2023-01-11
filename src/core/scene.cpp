@@ -1,5 +1,6 @@
 #include "scene.hpp"
 #include <imgui/imgui.h>
+#include <shapes/triangle.hpp>
 namespace renderme
 {
 
@@ -43,12 +44,27 @@ namespace renderme
 
 	auto Scene::imgui_config()->void
 	{
-		auto i = 0;
+		//auto i = 0;
+		auto face_count=0;
+		auto vertex_count = 0;
+
 		for (auto& primitive : gl_draw_primitives) {
-			if (ImGui::TreeNode(("Primitive"+std::to_string(i++)).c_str())) {
-				primitive->imgui_config();
-				ImGui::TreePop();
+			//Get Triangle_Mesh
+			if (typeid(*primitive) == typeid(Shape_Primitive)) {
+				auto shape_primitive = dynamic_cast<Shape_Primitive const*>(primitive.get());
+				if (typeid(*shape_primitive->shape) == typeid(Triangle_Mesh)) {
+					auto triangle_mesh = dynamic_cast<Triangle_Mesh const*>(shape_primitive->shape.get());
+
+					vertex_count += triangle_mesh->positions.size();
+					face_count += triangle_mesh->faces.size();
+				}
 			}
+			//if (ImGui::TreeNode(("Primitive"+std::to_string(i++)).c_str())) {
+			//	primitive->imgui_config();
+			//	ImGui::TreePop();
+			//}
 		}
+		ImGui::Text("Vertex Count: %d", vertex_count);
+		ImGui::Text("Face Count: %d", face_count);
 	}
 }
