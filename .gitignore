@@ -1,15 +1,9 @@
 # Be aware that we must add '/' ahead of each item
 # or it will also match subdirecories with the same name that are not in the root directory
+/*
 
-# IDE files
-/.vs/
-/.vscode/
-
-# build files
-/out/
-/build/
-/bin/
-/lib/
-
-# data is too big
-/data/
+!/src/
+!/external/
+!/doc/
+!/CMakeLists.txt
+!/README.md
