@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-PROJECT(renderme 
+PROJECT(renderme
         VERSION 0.0
         DESCRIPTION "a renderme"
         LANGUAGES CXX)
