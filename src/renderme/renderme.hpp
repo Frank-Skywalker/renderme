@@ -46,7 +46,7 @@ namespace renderme
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
 			unsigned int camera_index{0};
-			
+
 			//Metadata
 			glm::ivec2 framebuffer_size{1280, 720};
 			glm::vec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};

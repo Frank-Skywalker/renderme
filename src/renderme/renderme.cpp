@@ -51,7 +51,7 @@ namespace renderme
         //Make the window and OpenGL's context current
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
-        
+
         //Callbacks
         glfwSetFramebufferSizeCallback(window, [] (GLFWwindow* window, int width, int height) {
             glViewport(0, 0, width, height);
@@ -360,7 +360,7 @@ namespace renderme
     {
         ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
         ImGui::ColorEdit4("Clear Color", glm::value_ptr(config.clear_color));
-        
+
         if (ImGui::Button("Parse Scene")) {
             auto scene=Parser::instance().parse_scene(config.scene_path);
             if (scene != nullptr) {

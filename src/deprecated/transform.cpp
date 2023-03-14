@@ -4,17 +4,17 @@
 
 namespace deprecated
 {
-	Transform::Transform(Float const value[4][4])
+	Transform::Transform(float const value[4][4])
 		:m{value}
 	{
 		m_inv = m.inverse();
 	}
 
 	Transform::Transform(
-		Float t00, Float t01, Float t02, Float t03,
-		Float t10, Float t11, Float t12, Float t13, 
-		Float t20, Float t21, Float t22, Float t23, 
-		Float t30, Float t31, Float t32, Float t33)
+		float t00, float t01, float t02, float t03,
+		float t10, float t11, float t12, float t13,
+		float t20, float t21, float t22, float t23,
+		float t30, float t31, float t32, float t33)
 		:m{ t00,  t01,  t02,  t03,
 		 t10,  t11,  t12,  t13,
 		 t20,  t21,  t22,  t23,
@@ -28,7 +28,7 @@ namespace deprecated
 	{
 
 	}
-	
+
 	Transform::Transform(Matrix4f const& _m, Matrix4f const& _m_inv)
 		:m{_m},m_inv{_m_inv}
 	{
@@ -100,7 +100,7 @@ namespace deprecated
 		return translate(delta.x, delta.y, delta.z);
 	}
 
-	auto translate(Float x, Float y, Float z)->Transform
+	auto translate(float x, float y, float z)->Transform
 	{
 		Matrix4f m(
 			1, 0, 0, x,
@@ -109,7 +109,7 @@ namespace deprecated
 			0, 0, 0, 1
 		);
 		Matrix4f minv(
-			1, 0, 0, -x, 
+			1, 0, 0, -x,
 			0, 1, 0, -y,
 			0, 0, 1, -z,
 			0, 0, 0, 1
@@ -122,7 +122,7 @@ namespace deprecated
 		return scale(_scale.x, _scale.y, _scale.z);
 	}
 
-	auto scale(Float x, Float y, Float z)->Transform
+	auto scale(float x, float y, float z)->Transform
 	{
 		Matrix4f m(
 			x, 0, 0, 0,
@@ -131,16 +131,16 @@ namespace deprecated
 			0, 0, 0, 1);
 		Matrix4f minv(
 			1 / x, 0, 0, 0,
-			0, 1 / y, 0, 0, 
+			0, 1 / y, 0, 0,
 			0, 0, 1 / z, 0,
 			0, 0, 0, 1);
 		return Transform(m, minv);
 	}
 
-	auto rotate_x(Float theta)->Transform
+	auto rotate_x(float theta)->Transform
 	{
-		Float sintheta = std::sin(radians(theta));
-		Float costheta = std::cos(radians(theta));
+		float sintheta = std::sin(radians(theta));
+		float costheta = std::cos(radians(theta));
 		Matrix4f m(
 			1, 0, 0, 0,
 			0, costheta, -sintheta, 0,
@@ -150,23 +150,23 @@ namespace deprecated
 		return Transform(m, m.transpose());
 	}
 
-	auto rotate_y(Float theta)->Transform
+	auto rotate_y(float theta)->Transform
 	{
-		Float sintheta = std::sin(radians(theta));
-		Float costheta = std::cos(radians(theta));
+		float sintheta = std::sin(radians(theta));
+		float costheta = std::cos(radians(theta));
 		Matrix4f m(
 			costheta, 0, sintheta, 0,
-			0, 1, 0, 0, 
+			0, 1, 0, 0,
 			-sintheta, 0, costheta, 0,
 			0, 0, 0, 1
 		);
 		return Transform(m, m.transpose());
 	}
 
-	auto rotate_z(Float theta)->Transform
+	auto rotate_z(float theta)->Transform
 	{
-		Float sintheta = std::sin(radians(theta));
-		Float costheta = std::cos(radians(theta));
+		float sintheta = std::sin(radians(theta));
+		float costheta = std::cos(radians(theta));
 		Matrix4f m(
 			costheta, -sintheta, 0, 0,
 			sintheta, costheta, 0, 0,
@@ -176,11 +176,11 @@ namespace deprecated
 		return Transform(m, m.transpose());
 	}
 
-	auto rotate(Vector3f const& axis, Float theta)->Transform
+	auto rotate(Vector3f const& axis, float theta)->Transform
 	{
 		Vector3f a = normalize(axis);
-		Float sintheta = std::sin(radians(theta));
-		Float costheta = std::cos(radians(theta));
+		float sintheta = std::sin(radians(theta));
+		float costheta = std::cos(radians(theta));
 		Matrix4f m;
 		// Compute rotation of first basis vector
 		m.m[0][0] = a.x * a.x + (1 - a.x * a.x) * costheta;
@@ -236,19 +236,19 @@ namespace deprecated
 		return Transform(cameratoworld.inverse(), cameratoworld);
 	}
 
-	auto orthographic(Float znear, Float zfar)->Transform
+	auto orthographic(float znear, float zfar)->Transform
 	{
 		return scale(1, 1, 1 / (zfar - znear)) * translate(Vector3f(0, 0, -znear));
 	}
 
-	auto perspective(Float fov, Float znear, Float zfar)->Transform
+	auto perspective(float fov, float znear, float zfar)->Transform
 	{
 		// Perform projective divide for perspective projection
 		Matrix4f persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, zfar / (zfar - znear), -zfar * znear / (zfar - znear),
 			0, 0, 1, 0);
 
 		// Scale canonical perspective view to specified field of view
-		Float inv_tan_ang = 1 / std::tan(radians(fov) / 2);
+		float inv_tan_ang = 1 / std::tan(radians(fov) / 2);
 		return scale(inv_tan_ang, inv_tan_ang, 1) * Transform(persp);
 	}
 }

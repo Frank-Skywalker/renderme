@@ -6,7 +6,7 @@ namespace deprecated
 {
 	using namespace renderme;
 
-	template<unsigned int xdim, unsigned int ydim, typename T> 
+	template<unsigned int xdim, unsigned int ydim, typename T>
 	struct Mat;
 
 	template<typename T>
@@ -52,7 +52,7 @@ namespace deprecated
 			m[3][2] = t32;
 			m[3][3] = t33;
 		}
-		
+
 		auto print() const noexcept -> void
 		{
 			std::cout << "[" << std::endl;
@@ -187,17 +187,17 @@ namespace deprecated
 
 	template<typename T>
 	using Matrix4 = Mat<4, 4, T>;
-	using Matrix4f = Matrix4<Float>;
+	using Matrix4f = Matrix4<float>;
 	static_assert(std::is_standard_layout_v<Matrix4f>);
 
 	struct Transform final
 	{
 		Transform() = default;
-		Transform(Float const value[4][4]);
-		Transform(Float t00, Float t01, Float t02, Float t03,
-			Float t10, Float t11, Float t12, Float t13,
-			Float t20, Float t21, Float t22, Float t23,
-			Float t30, Float t31, Float t32, Float t33);
+		Transform(float const value[4][4]);
+		Transform(float t00, float t01, float t02, float t03,
+			float t10, float t11, float t12, float t13,
+			float t20, float t21, float t22, float t23,
+			float t30, float t31, float t32, float t33);
 		Transform(Matrix4f const& _m);
 		Transform(Matrix4f const& _m, Matrix4f const& _m_inv);
 
@@ -228,16 +228,16 @@ namespace deprecated
 	};
 
 	auto translate(Vector3f const& delta)-> Transform;
-	auto translate(Float x, Float y, Float z)->Transform;
+	auto translate(float x, float y, float z)->Transform;
 	auto scale(Vector3f const& _scale)->Transform;
-	auto scale(Float x, Float y, Float z)->Transform;
-	auto rotate_x(Float theta)->Transform;
-	auto rotate_y(Float theta)->Transform;
-	auto rotate_z(Float theta)->Transform;
-	auto rotate(Vector3f const& axis, Float theta)->Transform;
+	auto scale(float x, float y, float z)->Transform;
+	auto rotate_x(float theta)->Transform;
+	auto rotate_y(float theta)->Transform;
+	auto rotate_z(float theta)->Transform;
+	auto rotate(Vector3f const& axis, float theta)->Transform;
 	auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up)->Transform;
-	auto orthographic(Float znear, Float zfar)->Transform;
-	auto perspective(Float fov, Float znear, Float zfar)->Transform;
+	auto orthographic(float znear, float zfar)->Transform;
+	auto perspective(float fov, float znear, float zfar)->Transform;
 
 }
 

@@ -14,12 +14,12 @@ namespace renderme
 	{
 		// Not changed during zbuffer
 		int ymax;
-		Float dxdl;
+		float dxdl;
 
 		// Changed during zbuffer
 		int dy;
-		Float x;
-		Float z;
+		float x;
+		float z;
 	};
 
 	using Active_Edge_List = std::list<Edge*>;
@@ -28,10 +28,10 @@ namespace renderme
 	{
 		// Not changed during zbuffer
 		glm::vec4 equation;
-		Float dzdx;
-		Float dzdy;
+		float dzdx;
+		float dzdy;
 		glm::vec3 color;
-		
+
 		// Changed during zbuffer
 		int dy;
 		std::vector<Edge> edges;

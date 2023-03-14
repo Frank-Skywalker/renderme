@@ -3,12 +3,12 @@
 
 namespace deprecated
 {
-	auto radians(Float deg)->Float
+	auto radians(float deg)->float
 	{
 		return  (std::numbers::pi / 180) * deg;
 	}
 
-	auto degrees(Float rad)->Float
+	auto degrees(float rad)->float
 	{
 		return (180 / std::numbers::pi) * rad;
 	}

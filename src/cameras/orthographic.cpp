@@ -10,7 +10,7 @@ namespace renderme
 	}
 
 
-	auto Orthographic_Camera::generate_ray() const noexcept ->Float
+	auto Orthographic_Camera::generate_ray() const noexcept ->float
 	{
 		return 0;
 	}

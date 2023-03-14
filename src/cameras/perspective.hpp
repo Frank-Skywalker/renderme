@@ -37,7 +37,7 @@ namespace renderme
 
 		//Perspective_Camera(Point3f pos, );
 		auto gl_draw(Shader const& shader) const noexcept -> void;
-		auto generate_ray() const noexcept ->Float;
+		auto generate_ray() const noexcept ->float;
 		auto imgui_config() ->void;
 		auto process_keyboard(Camera_Movement move, float delta_time)->void;
 		auto process_cursor(float xdelta, float ydelta)->void;

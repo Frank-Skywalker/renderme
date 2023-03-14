@@ -1,5 +1,4 @@
 #pragma once
-#include "type.hpp"
 
 #include <glm/glm-all.hpp>
 
@@ -30,7 +29,7 @@ namespace renderme
 	using Bounds2i = Bounds<2, int>;
 	static_assert(std::is_standard_layout_v<Bounds2i>);
 
-	using Bounds2f = Bounds<2, Float>;
+	using Bounds2f = Bounds<2, float>;
 	static_assert(std::is_standard_layout_v<Bounds2f>);
 
 
@@ -54,6 +53,6 @@ namespace renderme
 	using Bounds3i = Bounds<3, int>;
 	static_assert(std::is_standard_layout_v<Bounds3i>);
 
-	using Bounds3f = Bounds<3, Float>;
+	using Bounds3f = Bounds<3, float>;
 	static_assert(std::is_standard_layout_v<Bounds3f>);
 }

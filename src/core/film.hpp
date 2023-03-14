@@ -1,5 +1,4 @@
 #pragma once
-#include "type.hpp"
 #include "util.hpp"
 #include<glm/glm-all.hpp>
 #include<memory>
@@ -18,7 +17,7 @@ namespace renderme
 
 		auto gl_display() const noexcept ->void;
 		auto clear(glm::vec3 const& color) ->void;
-		
+
 	private:
 		std::unique_ptr<glm::vec3[]> pixels;
 		glm::uvec2 _resolution;

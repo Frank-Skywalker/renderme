@@ -1,5 +1,4 @@
 #pragma once
-#include <core/type.hpp>
 #include <core/log.hpp>
 
 #include <cstring>
@@ -129,13 +128,13 @@ namespace deprecated
 	}
 
 	template<typename T>
-	inline auto length_squared(Vector2<T> const& v)->Float
+	inline auto length_squared(Vector2<T> const& v)->float
 	{
 		return v.x * v.x + v.y * v.y;
 	}
 
 	template<typename T>
-	inline auto length(Vector2<T> const& v)->Float
+	inline auto length(Vector2<T> const& v)->float
 	{
 		return std::sqrt(length_squared(v));
 	}
@@ -145,14 +144,14 @@ namespace deprecated
 	{
 		return v / length(v);
 	}
-	
+
 	using Vector2i = Vector2<int>;
 	static_assert(std::is_standard_layout_v<Vector2i>);
 	static_assert(offsetof(Vector2i, y) == sizeof(int));
 
-	using Vector2f = Vector2<Float>;
+	using Vector2f = Vector2<float>;
 	static_assert(std::is_standard_layout_v<Vector2f>);
-	static_assert(offsetof(Vector2f, y) == sizeof(Float));
+	static_assert(offsetof(Vector2f, y) == sizeof(float));
 
 
 	template<typename T>
@@ -210,9 +209,9 @@ namespace deprecated
 	static_assert(std::is_standard_layout_v<Point2ui>);
 	static_assert(offsetof(Point2ui, y) == sizeof(unsigned int));
 
-	using Point2f = Point2<Float>;
+	using Point2f = Point2<float>;
 	static_assert(std::is_standard_layout_v<Point2f>);
-	static_assert(offsetof(Point2f, y) == sizeof(Float));
+	static_assert(offsetof(Point2f, y) == sizeof(float));
 
 
 
@@ -334,13 +333,13 @@ namespace deprecated
 	}
 
 	template<typename T>
-	inline auto length_squared(Vector3<T> const& v)->Float
+	inline auto length_squared(Vector3<T> const& v)->float
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
 	}
 
 	template<typename T>
-	inline auto length(Vector3<T> const& v)->Float
+	inline auto length(Vector3<T> const& v)->float
 	{
 		return std::sqrt(length_squared(v));
 	}
@@ -357,7 +356,7 @@ namespace deprecated
 		T v1x = lhs.x, v1y = lhs.y, v1z = lhs.z;
 		T v2x = rhs.x, v2y = rhs.y, v2z = rhs.z;
 		return Vector3<T>(
-			(v1y * v2z) - (v1z * v2y), 
+			(v1y * v2z) - (v1z * v2y),
 			(v1z * v2x) - (v1x * v2z),
 			(v1x * v2y) - (v1y * v2x)
 			);
@@ -370,12 +369,12 @@ namespace deprecated
 	static_assert(offsetof(Vector3i, y) == sizeof(int));
 	static_assert(offsetof(Vector3i, z) == sizeof(int) * 2);
 
-	using Vector3f = Vector3<Float>;
+	using Vector3f = Vector3<float>;
 	static_assert(std::is_standard_layout_v<Vector3f>);
-	static_assert(offsetof(Vector3f, y) == sizeof(Float));
-	static_assert(offsetof(Vector3f, z) == sizeof(Float) * 2);
+	static_assert(offsetof(Vector3f, y) == sizeof(float));
+	static_assert(offsetof(Vector3f, z) == sizeof(float) * 2);
 
-	
+
 	template<typename T>
 	using Point3 = Vec<3, Category::point, T>;
 
@@ -436,10 +435,10 @@ namespace deprecated
 	static_assert(offsetof(Point3i, y) == sizeof(int));
 	static_assert(offsetof(Point3i, z) == sizeof(int) * 2);
 
-	using Point3f = Point3<Float>;
+	using Point3f = Point3<float>;
 	static_assert(std::is_standard_layout_v<Point3f>);
-	static_assert(offsetof(Point3f, y) == sizeof(Float));
-	static_assert(offsetof(Point3f, z) == sizeof(Float) * 2);
+	static_assert(offsetof(Point3f, y) == sizeof(float));
+	static_assert(offsetof(Point3f, z) == sizeof(float) * 2);
 
 
 	template<typename T>
@@ -461,13 +460,13 @@ namespace deprecated
 	}
 
 	template<typename T>
-	inline auto length_squared(Normal3<T> const& v)->Float
+	inline auto length_squared(Normal3<T> const& v)->float
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
 	}
 
 	template<typename T>
-	inline auto length(Normal3<T> const& v)->Float
+	inline auto length(Normal3<T> const& v)->float
 	{
 		return std::sqrt(length_squared(v));
 	}
@@ -509,10 +508,10 @@ namespace deprecated
 	static_assert(offsetof(Normal3i, y) == sizeof(int));
 	static_assert(offsetof(Normal3i, z) == sizeof(int) * 2);
 
-	using Normal3f = Normal3<Float>;
+	using Normal3f = Normal3<float>;
 	static_assert(std::is_standard_layout_v<Normal3f>);
-	static_assert(offsetof(Normal3f, y) == sizeof(Float));
-	static_assert(offsetof(Normal3f, z) == sizeof(Float) * 2);
+	static_assert(offsetof(Normal3f, y) == sizeof(float));
+	static_assert(offsetof(Normal3f, z) == sizeof(float) * 2);
 
 
 
@@ -605,7 +604,7 @@ namespace deprecated
 	//		}
 	//		if (i == 0) {
 	//			return x;
-	//		} 
+	//		}
 	//		else if (i == 1) {
 	//			return y;
 	//		}
@@ -625,13 +624,13 @@ namespace deprecated
 	//template<typename T>
 	//using Vector4 = Vec<4, Category::vector, T>;
 	//template<typename T>
-	//inline auto length_squared(Vector4<T> const& v)->Float
+	//inline auto length_squared(Vector4<T> const& v)->float
 	//{
 	//	return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
 	//}
 
 	//template<typename T>
-	//inline auto length(Vector4<T> const& v)->Float
+	//inline auto length(Vector4<T> const& v)->float
 	//{
 	//	return std::sqrt(length_squared(v));
 	//}
@@ -649,11 +648,11 @@ namespace deprecated
 	//static_assert(offsetof(Vector4i, z) == sizeof(int) * 2);
 	//static_assert(offsetof(Vector4i, w) == sizeof(int) * 3);
 
-	//using Vector4f = Vector4<Float>;
+	//using Vector4f = Vector4<float>;
 	//static_assert(std::is_standard_layout_v<Vector4f>);
-	//static_assert(offsetof(Vector4f, y) == sizeof(Float));
-	//static_assert(offsetof(Vector4f, z) == sizeof(Float) * 2);
-	//static_assert(offsetof(Vector4f, w) == sizeof(Float) * 3);
+	//static_assert(offsetof(Vector4f, y) == sizeof(float));
+	//static_assert(offsetof(Vector4f, z) == sizeof(float) * 2);
+	//static_assert(offsetof(Vector4f, w) == sizeof(float) * 3);
 
 }
 

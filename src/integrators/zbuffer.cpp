@@ -43,7 +43,7 @@ namespace renderme
 	}
 
 
-	auto solve_equation_for_z(glm::vec4 const& equation, Float x, Float y) -> Float
+	auto solve_equation_for_z(glm::vec4 const& equation, float x, float y) -> float
 	{
 		//ax+by+cz+d=0
 		return (-equation.w - equation.x * x - equation.y * y) / equation.z;
@@ -100,7 +100,7 @@ namespace renderme
 
 					// Deal with each face
 					for (auto const& face : triangle_mesh->faces) {
-						
+
 						auto compute_plane_equation = [&] (glm::uvec3 const& face) -> glm::vec4 {
 							// ax+by+cz+d=0
 							auto vec0 = positions[face[1]] - positions[face[0]];
@@ -140,11 +140,11 @@ namespace renderme
 							}
 							return false;
 						};
-						
+
 						if (discard_face(face)) {
 							continue;
 						}
-						
+
 						// Start building polygon
 						int polygon_ymax = std::numeric_limits<int>::min();
 						int polygon_ymin = std::numeric_limits<int>::max();
@@ -220,13 +220,13 @@ namespace renderme
 	auto ZBuffer_Integrator::perform_zbuffer(Film* film)->void
 	{
 		// Scan line
-		auto zbuffer = std::make_unique<Float[]>(film->resolution().x);
+		auto zbuffer = std::make_unique<float[]>(film->resolution().x);
 		Active_Polygon_List active_polygon_list;
 
 		for (auto scany = static_cast<int>(film->resolution().y) - 1 ; scany >= 0; --scany) {
 
 			// Clear zbuffer
-			std::fill(zbuffer.get(), zbuffer.get() + film->resolution().x, std::numeric_limits<Float>::min());
+			std::fill(zbuffer.get(), zbuffer.get() + film->resolution().x, std::numeric_limits<float>::min());
 
 			// Add first-time scanned polygons (polygon_ymax == yscan) to active polygon table
 			for(auto &polygon :polygon_table[scany]) {
@@ -235,7 +235,7 @@ namespace renderme
 
 			// Scan through each polygon
 			for (auto polygon : active_polygon_list) {
-				
+
 				// Add new edges
 				auto modified = false;
 				for (auto &edge : polygon->edges) {
@@ -269,7 +269,7 @@ namespace renderme
 					++iter;
 					auto right = *iter;
 					++iter;
-					
+
 					//if (left->x > right->x) {
 					//	std::cerr << std::endl;
 					//	std::cerr << "danger" << std::endl;

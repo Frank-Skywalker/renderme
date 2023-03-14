@@ -17,7 +17,7 @@ namespace renderme
 		shader.set_uniform_mat4("projection", config.projection.m);
 	}
 
-	auto Perspective_Camera::generate_ray() const noexcept ->Float
+	auto Perspective_Camera::generate_ray() const noexcept ->float
 	{
 		return 0;
 	}
@@ -82,7 +82,7 @@ namespace renderme
 	auto Perspective_Camera::process_cursor(float xdelta, float ydelta)->void
 	{
 		config.yaw += xdelta * config.cursor_speed;
-		
+
 		// Reversed since y-coordinates go from bottom to top
 		config.pitch -= ydelta * config.cursor_speed;
 
@@ -135,7 +135,7 @@ namespace renderme
 
 		// Re-calculate the Right and Up vector
 		// Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-		config.right= glm::normalize(glm::cross(config.front, config.world_up));  
+		config.right= glm::normalize(glm::cross(config.front, config.world_up));
 		config.up = glm::normalize(glm::cross(config.right, config.front));
 
 		//Recalculate Transforms

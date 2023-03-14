@@ -1,5 +1,4 @@
 #pragma once
-#include "type.hpp"
 
 #include <glm/glm-all.hpp>
 
@@ -17,7 +16,7 @@ namespace renderme
 		auto transpose() const noexcept->Transform;
 		auto inverse() const noexcept->Transform;
 
-		
+
 		auto operator*(Transform const& rhs) const noexcept -> Transform;
 		auto operator==(Transform const& rhs) const noexcept->bool;
 		auto operator!=(Transform const& rhs) const noexcept->bool;
@@ -37,16 +36,16 @@ namespace renderme
 	};
 
 	//auto translate(Vector3f const& delta)->Transform;
-	//auto translate(Float x, Float y, Float z)->Transform;
+	//auto translate(float x, float y, float z)->Transform;
 	//auto scale(Vector3f const& _scale)->Transform;
-	//auto scale(Float x, Float y, Float z)->Transform;
-	//auto rotate_x(Float theta)->Transform;
-	//auto rotate_y(Float theta)->Transform;
-	//auto rotate_z(Float theta)->Transform;
-	//auto rotate(Vector3f const& axis, Float theta)->Transform;
+	//auto scale(float x, float y, float z)->Transform;
+	//auto rotate_x(float theta)->Transform;
+	//auto rotate_y(float theta)->Transform;
+	//auto rotate_z(float theta)->Transform;
+	//auto rotate(Vector3f const& axis, float theta)->Transform;
 	//auto lookat(Point3f const& position, Point3f const& lookat, Vector3f const& up)->Transform;
-	//auto orthographic(Float znear, Float zfar)->Transform;
-	//auto perspective(Float fov, Float znear, Float zfar)->Transform;
+	//auto orthographic(float znear, float zfar)->Transform;
+	//auto perspective(float fov, float znear, float zfar)->Transform;
 }
 
 #include "transform.inl"
