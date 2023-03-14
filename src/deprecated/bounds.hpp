@@ -1,5 +1,6 @@
 #pragma once
 #include "vector.hpp"
+#include <type_traits>
 #include <limits>
 
 namespace deprecated
