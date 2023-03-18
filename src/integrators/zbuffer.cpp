@@ -59,7 +59,7 @@ namespace renderme
 			if (typeid(*primitive) == typeid(Shape_Primitive)){
 				auto shape_primitive = dynamic_cast<Shape_Primitive const*>(primitive.get());
 				if (typeid(*shape_primitive->shape) == typeid(Triangle_Mesh)) {
-					auto triangle_mesh = dynamic_cast<Triangle_Mesh const*>(shape_primitive->shape.get());
+					auto triangle_mesh = dynamic_cast<Triangle_Mesh const*>(shape_primitive->shape);
 
 					// Start dealing with each Triangle_Mesh
 

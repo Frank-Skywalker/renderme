@@ -4,7 +4,7 @@
 namespace renderme
 {
 
-	Phong_Material::Phong_Material(std::vector<std::shared_ptr<Texture>> texs)
+	Phong_Material::Phong_Material(std::vector<Texture*> texs)
 		:textures{std::move(texs)}
 	{
 

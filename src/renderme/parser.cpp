@@ -58,33 +58,42 @@ namespace renderme
             return nullptr;
         }
 
-        auto create_new_scene = [&] ()->std::unique_ptr<Scene> {
-            //Create a new Scene and Integrator
-            std::vector<std::unique_ptr<Transform>> tmp_transforms;
-            std::vector<std::unique_ptr<Primitive>> tmp_gl_draw_primitives;
-            std::vector<std::unique_ptr<Primitive>> tmp_render_primitives;
-            std::vector<std::unique_ptr<Light>> tmp_lights;
-            std::vector<std::unique_ptr<Camera>> tmp_cameras;
+        //         auto create_new_scene = [&] ()->std::unique_ptr<Scene> {
+        //             //Create a new Scene and Integrator
+        //             std::vector<std::unique_ptr<Transform>> tmp_transforms;
+        //             std::vector<std::unique_ptr<Primitive>> tmp_gl_draw_primitives;
+        //             std::vector<std::unique_ptr<Primitive>> tmp_render_primitives;
+        //             std::vector<std::unique_ptr<Light>> tmp_lights;
+        //             std::vector<std::unique_ptr<Camera>> tmp_cameras;
+        //
+        //             for (auto& transform : parsing_transforms) {
+        //                 tmp_transforms.push_back(std::move(transform));
+        //             }
+        //             for (auto& primitive : parsing_gl_draw_primitives) {
+        //                 tmp_gl_draw_primitives.push_back(std::move(primitive));
+        //             }
+        //             for (auto& primitive : parsing_render_primitives) {
+        //                 tmp_render_primitives.push_back(std::move(primitive));
+        //             }
+        //             for (auto& light : parsing_lights) {
+        //                 tmp_lights.push_back(std::move(light));
+        //             }
+        //             for (auto& camera : parsing_cameras) {
+        //                 tmp_cameras.push_back(std::move(camera));
+        //             }
+        //             return std::make_unique<Scene>("test", std::move(tmp_transforms), std::move(tmp_gl_draw_primitives), std::move(tmp_render_primitives), std::move(tmp_lights));
+        //         };
 
-            for (auto& transform : parsing_transforms) {
-                tmp_transforms.push_back(std::move(transform));
-            }
-            for (auto& primitive : parsing_gl_draw_primitives) {
-                tmp_gl_draw_primitives.push_back(std::move(primitive));
-            }
-            for (auto& primitive : parsing_render_primitives) {
-                tmp_render_primitives.push_back(std::move(primitive));
-            }
-            for (auto& light : parsing_lights) {
-                tmp_lights.push_back(std::move(light));
-            }
-            for (auto& camera : parsing_cameras) {
-                tmp_cameras.push_back(std::move(camera));
-            }
-            return std::make_unique<Scene>("test", std::move(tmp_transforms), std::move(tmp_gl_draw_primitives), std::move(tmp_render_primitives), std::move(tmp_lights));
-        };
+        auto scene = std::make_unique<Scene>("test",
+            std::move(parsing_transforms),
+            std::move(parsing_textures),
+            std::move(parsing_shapes),
+            std::move(parsing_materials),
+            std::move(parsing_gl_draw_primitives),
+            std::move(parsing_render_primitives),
+            std::move(parsing_lights)
+        );
 
-        auto scene = create_new_scene();
         clean_parsing_cache();
 
         return scene;
@@ -123,7 +132,7 @@ namespace renderme
     {
         // process each mesh located at the current node
         for (auto i = 0u; i < ainode->mNumMeshes; ++i) {
-            // the node object only contains indices to index the actual objects in the scene. 
+            // the node object only contains indices to index the actual objects in the scene.
             // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             auto aimesh = aiscene->mMeshes[ainode->mMeshes[i]];
             if (!parse_aimesh(path, aiscene, aimesh)) {
@@ -199,31 +208,30 @@ namespace renderme
             nullptr, nullptr,
             std::move(faces), std::move(positions), std::move(normals),
             std::move(uvs), std::move(tangents), std::move(bitangents)
-            );
+        );
+        parsing_gl_draw_primitives.push_back(std::make_unique<Shape_Primitive>(triangle_mesh.get(), material));
         auto triangles = triangle_mesh->create_triangles();
-        auto triangle_mesh_primitive = std::make_unique<Shape_Primitive>(std::move(triangle_mesh), material);
-        parsing_gl_draw_primitives.push_back(std::move(triangle_mesh_primitive));
+        parsing_shapes.push_back(std::move(triangle_mesh));
 
         for (auto& tri : triangles) {
             auto triangle = std::make_unique<Triangle>(std::move(tri));
-            auto triangle_primitive = std::make_unique<Shape_Primitive>(std::move(triangle), material);
-            parsing_render_primitives.push_back(std::move(triangle_primitive));
+            parsing_render_primitives.push_back(std::make_unique<Shape_Primitive>(triangle.get(), material));
+            parsing_shapes.push_back(std::move(triangle));
         }
-
         return true;
     }
 
 
-    auto Parser::parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> std::shared_ptr<Material>
+    auto Parser::parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*
     {
         //Textures part
         // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER.
         // Same applies to other texture as the following list summarizes:
         // diffuse: texture_diffuseN
         // specular: texture_specularN
         // normal: texture_normalN
-        std::vector<std::shared_ptr<Texture>> textures;
+        std::vector<Texture*> textures;
 
         std::vector<std::pair<aiTextureType, Texture_Type>> types = {
             {aiTextureType_DIFFUSE, Texture_Type::diffuse},
@@ -232,38 +240,44 @@ namespace renderme
             {aiTextureType_AMBIENT, Texture_Type::ambient},
         };
 
-        for (auto const& [aitype, type]: types) {
+        for (auto const& [aitype, type] : types) {
             for (auto i = 0u; i < aimaterial->GetTextureCount(aitype); ++i) {
                 aiString tex_relative_path;
-                aimaterial->GetTexture(aitype,i, &tex_relative_path);
-                
+                aimaterial->GetTexture(aitype, i, &tex_relative_path);
+
                 //Reuse same textures
-                auto iter = parsing_textures.find(tex_relative_path.C_Str());
-                if (iter != parsing_textures.end()) {
+                auto iter = path_to_texture.find(tex_relative_path.C_Str());
+                if (iter != path_to_texture.end()) {
                     textures.push_back(iter->second);
-                }
-                else {
+                } else {
                     auto upper_dir = path.upper_directory();
                     auto tex_path = Runtime_Path(upper_dir.relative_path() + "/" + tex_relative_path.C_Str());
-                    auto texture = std::make_shared<Texture>(tex_path, type);
-                    parsing_textures.emplace(tex_relative_path.C_Str(), texture);
-                    textures.push_back(texture);
+                    auto texture = std::make_unique<Texture>(tex_path, type);
+                    textures.push_back(texture.get());
+                    path_to_texture[tex_relative_path.C_Str()] = texture.get();
+                    parsing_textures.push_back(std::move(texture));
                 }
             }
         }
 
-        return std::make_shared<Phong_Material>(std::move(textures));
+        parsing_materials.push_back(std::make_unique<Phong_Material>(std::move(textures)));
+        return parsing_materials.back().get();
     }
 
 
     auto Parser::clean_parsing_cache()->void
     {
+        parsing_cameras.clear();
+
+        parsing_textures.clear();
+        parsing_materials.clear();
         parsing_transforms.clear();
+        parsing_shapes.clear();
         parsing_gl_draw_primitives.clear();
         parsing_render_primitives.clear();
         parsing_lights.clear();
-        parsing_cameras.clear();
-        parsing_textures.clear();
+
+        path_to_texture.clear();
     }
 
 }

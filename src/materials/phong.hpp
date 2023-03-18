@@ -9,8 +9,8 @@ namespace renderme
 {
 	struct Phong_Material final: Material
 	{
-		Phong_Material(std::vector<std::shared_ptr<Texture>> texs);
+		Phong_Material(std::vector<Texture*> texs);
 		auto gl_draw(Shader const& shader) const noexcept ->void;
-		std::vector<std::shared_ptr<Texture>> textures;
+		std::vector<Texture*> textures;
 	};
 }

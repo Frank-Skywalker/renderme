@@ -30,17 +30,24 @@ namespace renderme
 		auto parse_obj(Runtime_Path const& path)->bool;
 		auto parse_ainode(Runtime_Path const& path, aiScene const* aiscene, aiNode const* ainode) -> bool;
 		auto parse_aimesh(Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool;
-		auto parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> std::shared_ptr<Material>;
+		auto parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*;
 
 		auto clean_parsing_cache()->void;
 
 	private:
-		//Transform must not move in memory, so use unique_ptr to store Transforms on stack
+		// Camera
+		std::vector<std::unique_ptr<Camera>> parsing_cameras;
+		// Scene
+		// Transform must not move in memory, so use unique_ptr to store Transforms on stack
 		std::vector<std::unique_ptr<Transform>> parsing_transforms;
+		std::vector<std::unique_ptr<Texture>> parsing_textures;
+		std::vector<std::unique_ptr<Shape>> parsing_shapes;
+		std::vector<std::unique_ptr<Material>> parsing_materials;
 		std::vector<std::unique_ptr<Primitive>> parsing_gl_draw_primitives;
 		std::vector<std::unique_ptr<Primitive>> parsing_render_primitives;
 		std::vector<std::unique_ptr<Light>> parsing_lights;
-		std::vector<std::unique_ptr<Camera>> parsing_cameras;
-		std::unordered_map<std::string, std::shared_ptr<Texture>> parsing_textures;
+
+		// Lookup buffer
+		std::unordered_map<std::string, Texture*> path_to_texture;
 	};
 }

@@ -16,14 +16,14 @@ namespace renderme
 
 	struct Shape_Primitive final: Primitive
 	{
-		Shape_Primitive(std::unique_ptr<Shape> shape, std::shared_ptr<Material> material);
+		Shape_Primitive(Shape* shape, Material* material);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto intersect() const noexcept ->bool;
 		auto intersect_shadow() const noexcept ->bool;
 		auto imgui_config() const noexcept ->void;
 
-		std::unique_ptr<Shape> shape;
-		std::shared_ptr<Material> material;
+		Shape* shape;
+		Material* material;
 	};
 
 
