@@ -109,9 +109,10 @@ namespace renderme
         }
 
         integrators.push_back(Parser::instance().parse_integrator(Runtime_Path()));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/cube/cube.obj")));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/nanosuit/nanosuit.obj")));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/backpack/backpack.obj")));
+        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/staircase/stairscase.obj")));
+        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/cube/cube.obj")));
+        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/nanosuit/nanosuit.obj")));
+        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/backpack/backpack.obj")));
     }
 
 

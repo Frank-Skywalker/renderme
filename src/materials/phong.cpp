@@ -4,8 +4,8 @@
 namespace renderme
 {
 
-	Phong_Material::Phong_Material(std::vector<Texture*> texs)
-		:textures{std::move(texs)}
+	Phong_Material::Phong_Material(std::string name)
+		:Material{std::move(name)}
 	{
 
 	}

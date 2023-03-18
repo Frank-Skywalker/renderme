@@ -6,12 +6,12 @@
 #include <string>
 namespace renderme
 {
-	enum struct Texture_Type
+	enum struct Texture_Type: uint16_t
 	{
-		diffuse,
-		specular,
+		ambient,		// map_Ka
+		diffuse,		// map_Kd
+		specular,		// map_Ks
 		normal,
-		ambient,
 	};
 	struct Texture final
 	{

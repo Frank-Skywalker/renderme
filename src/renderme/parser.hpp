@@ -47,7 +47,8 @@ namespace renderme
 		std::vector<std::unique_ptr<Primitive>> parsing_render_primitives;
 		std::vector<std::unique_ptr<Light>> parsing_lights;
 
-		// Lookup buffer
+		// Lookup buffers
+		std::unordered_map<std::string, Material*> name_to_material;
 		std::unordered_map<std::string, Texture*> path_to_texture;
 	};
 }
