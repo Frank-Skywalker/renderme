@@ -58,32 +58,6 @@ namespace renderme
 			return nullptr;
 		}
 
-		//         auto create_new_scene = [&] ()->std::unique_ptr<Scene> {
-		//             //Create a new Scene and Integrator
-		//             std::vector<std::unique_ptr<Transform>> tmp_transforms;
-		//             std::vector<std::unique_ptr<Primitive>> tmp_gl_draw_primitives;
-		//             std::vector<std::unique_ptr<Primitive>> tmp_render_primitives;
-		//             std::vector<std::unique_ptr<Light>> tmp_lights;
-		//             std::vector<std::unique_ptr<Camera>> tmp_cameras;
-		//
-		//             for (auto& transform : parsing_transforms) {
-		//                 tmp_transforms.push_back(std::move(transform));
-		//             }
-		//             for (auto& primitive : parsing_gl_draw_primitives) {
-		//                 tmp_gl_draw_primitives.push_back(std::move(primitive));
-		//             }
-		//             for (auto& primitive : parsing_render_primitives) {
-		//                 tmp_render_primitives.push_back(std::move(primitive));
-		//             }
-		//             for (auto& light : parsing_lights) {
-		//                 tmp_lights.push_back(std::move(light));
-		//             }
-		//             for (auto& camera : parsing_cameras) {
-		//                 tmp_cameras.push_back(std::move(camera));
-		//             }
-		//             return std::make_unique<Scene>("test", std::move(tmp_transforms), std::move(tmp_gl_draw_primitives), std::move(tmp_render_primitives), std::move(tmp_lights));
-		//         };
-
 		auto scene = std::make_unique<Scene>("test",
 			std::move(parsing_transforms),
 			std::move(parsing_textures),
@@ -308,7 +282,7 @@ namespace renderme
 		// Save material to lookup buffer
 		name_to_material[aimaterial->GetName().C_Str()] = phong_material.get();
 		parsing_materials.push_back(std::move(phong_material));
-		
+
 		return parsing_materials.back().get();
 	}
 
