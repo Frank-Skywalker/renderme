@@ -90,7 +90,7 @@ namespace renderme
 	{
 		std::vector<Triangle> triangles;
 		for (auto i = 0u; i < num_faces; ++i) {
-			triangles.push_back(Triangle(object_to_world, world_to_object, this, i));
+			triangles.push_back(Triangle(_object_to_world, _world_to_object, this, i));
 		}
 		return triangles;
 	}
@@ -98,7 +98,24 @@ namespace renderme
 
 	Triangle::Triangle(Transform const* object_to_world, Transform const* world_to_object, Triangle_Mesh const* mesh, unsigned int index)
 		:Shape(object_to_world, world_to_object), mesh{mesh}, index{index}
-	{}
+	{
+		auto& p0 = mesh->positions[mesh->faces[index].x];
+		auto& p1 = mesh->positions[mesh->faces[index].y];
+		auto& p2 = mesh->positions[mesh->faces[index].z];
+
+		_object_bounds.eat(p0);
+		_object_bounds.eat(p1);
+		_object_bounds.eat(p2);
+
+		if (object_to_world != nullptr) {
+			_world_bounds.eat(object_to_world->transform_point(p0));
+			_world_bounds.eat(object_to_world->transform_point(p1));
+			_world_bounds.eat(object_to_world->transform_point(p2));
+		}
+		else {
+			_world_bounds = _object_bounds;
+		}
+	}
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
 	{

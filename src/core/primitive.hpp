@@ -12,18 +12,22 @@ namespace renderme
 		virtual auto intersect() const noexcept ->bool = 0;
 		virtual auto intersect_shadow() const noexcept ->bool= 0;
 		virtual auto imgui_config() const noexcept ->void = 0;
+
+		virtual auto world_bounds() const noexcept -> Bounds3f const& = 0;
 	};
 
 	struct Shape_Primitive final: Primitive
 	{
-		Shape_Primitive(Shape* shape, Material* material);
-		auto gl_draw(Shader const& shader) const noexcept -> void;
-		auto intersect() const noexcept ->bool;
-		auto intersect_shadow() const noexcept ->bool;
-		auto imgui_config() const noexcept ->void;
+		Shape_Primitive(Shape const* shape, Material const* material);
+		auto gl_draw(Shader const& shader) const noexcept -> void final;
+		auto intersect() const noexcept ->bool final;
+		auto intersect_shadow() const noexcept ->bool final;
+		auto imgui_config() const noexcept ->void final;
 
-		Shape* shape;
-		Material* material;
+		auto world_bounds() const noexcept -> Bounds3f const& final;
+
+		Shape const* shape;
+		Material const* material;
 	};
 
 

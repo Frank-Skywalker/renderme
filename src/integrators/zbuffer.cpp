@@ -71,8 +71,8 @@ namespace renderme
 						auto model_space_to_ndc = [&] (glm::vec3 const& model)->glm::vec3 {
 							auto ndc = model;
 							// From Model Space to World Space
-							if (triangle_mesh->object_to_world != nullptr) {
-								ndc = triangle_mesh->object_to_world->transform_point(ndc);
+							if (triangle_mesh->object_to_world() != nullptr) {
+								ndc = triangle_mesh->object_to_world()->transform_point(ndc);
 							}
 							// From World Space to NDC
 							ndc = camera->world_to_camera.transform_point(ndc);

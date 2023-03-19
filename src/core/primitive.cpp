@@ -3,8 +3,8 @@
 namespace renderme
 {
 	Shape_Primitive::Shape_Primitive(
-		Shape* shape,
-		Material* material
+		Shape const* shape,
+		Material const* material
 		)
 		:shape{shape},
 		material{material}
@@ -31,6 +31,12 @@ namespace renderme
 	{
 		shape->imgui_config();
 	}
+
+	auto Shape_Primitive::world_bounds() const noexcept -> Bounds3f const&
+	{
+		return shape->world_bounds();
+	}
+
 
 
 }
