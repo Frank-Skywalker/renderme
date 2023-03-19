@@ -33,6 +33,11 @@ namespace renderme
 			pmax = glm::tvec2<T>(std::max(pmax.x, p.x), std::max(pmax.y, p.y));
 		}
 
+		auto center() const noexcept -> glm::tvec2<T>
+		{
+			return (pmax + pmin) / 2.0f;
+		}
+
 		auto diagonal() const noexcept -> glm::tvec2<T>
 		{ 
 			return pmax - pmin; 
@@ -69,6 +74,11 @@ namespace renderme
 		Bounds(glm::tvec3<T> const& p1, glm::tvec3<T> const& p2)
 			:pmin{ std::min(p1.x, p2.x), std::min(p1.y, p2.y), std::min(p1.z, p2.z) },
 			pmax{ std::max(p1.x,p2.x), std::max(p1.y, p2.y), std::max(p1.z, p2.z) } {}
+
+		auto center() const noexcept -> glm::tvec2<T>
+		{
+			return (pmax + pmin) / 2.0f;
+		}
 
 		auto eat(glm::tvec3<T> const& p) -> void
 		{
