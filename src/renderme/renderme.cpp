@@ -292,13 +292,14 @@ namespace renderme
             }
 
             if (ImGui::CollapsingHeader("Cameras Config")) {
-                for (auto i = 0u; i < cameras.size(); ++i) {
-                    std::string id = "Camera" + std::to_string(i);
-                    if (ImGui::TreeNode(id.c_str())) {
-                        cameras[i]->imgui_config();
-                        ImGui::TreePop();
-                    }
-                }
+                //for (auto i = 0u; i < cameras.size(); ++i) {
+                //    std::string id = "Camera" + std::to_string(i);
+                //    if (ImGui::TreeNode(id.c_str())) {
+                //        cameras[i]->imgui_config();
+                //        ImGui::TreePop();
+                //    }
+                //}
+                cameras[config.camera_index]->imgui_config();
             }
 
             if (ImGui::CollapsingHeader("Integrators Config")) {
@@ -396,15 +397,18 @@ namespace renderme
         ImGui::SliderFloat("Line Width/Point Size", &config.line_width_point_size, 0.0f, 10.0f);
 
         ImGui::Checkbox("Enable IO", &config.enable_io);
-        ImGui::Checkbox("ZBuffer", &config.raytrace);
+        ImGui::Checkbox("Non-Realtime", &config.raytrace);
         if (scenes.size() > 0) {
             ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
         }
         if (integrators.size() > 0) {
             ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size() - 1);
         }
-        if (cameras.size() > 0) {
-            ImGui::SliderInt("Camera", (int*)&config.integrator_index, 0, cameras.size() - 1);
+        //if (cameras.size() > 0) {
+        //    ImGui::SliderInt("Camera", (int*)&config.camera_index, 0, cameras.size() - 1);
+        //}
+        if (cameras.size() > config.scene_index) {
+            config.camera_index = config.scene_index;
         }
     }
 
