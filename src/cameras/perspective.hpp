@@ -51,7 +51,8 @@ namespace renderme
 	private:
 		auto update_camera_transforms() ->void;
 		auto check_config() -> void;
-		Config config;
 
+	public:
+		Config config;
 	};
 }

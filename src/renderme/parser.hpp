@@ -9,34 +9,17 @@
 #include<core/texture.hpp>
 #include<core/film.hpp>
 
-
-#include <assimp/scene.h>
 #include<vector>
 #include<unordered_map>
 #include<memory>
 
+#include <assimp/scene.h>
+#include <nlohmann/json.hpp>
+
 namespace renderme
 {
-	struct Parser final: Singleton<Parser>
+	struct Scene_Parse_Cache
 	{
-		//////Parsing//////
-		//auto parse_file(Runtime_Path path)->void;
-		auto parse_film(Runtime_Path const& path)->std::unique_ptr<Film>;
-		auto parse_camera(Runtime_Path const& path)->std::unique_ptr<Camera>;
-		auto parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>;
-		auto parse_scene(Runtime_Path const& path)->std::unique_ptr<Scene>;
-
-	private:
-		auto parse_obj(Runtime_Path const& path)->bool;
-		auto parse_ainode(Runtime_Path const& path, aiScene const* aiscene, aiNode const* ainode) -> bool;
-		auto parse_aimesh(Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool;
-		auto parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*;
-
-		auto clean_parsing_cache()->void;
-
-	private:
-		// Camera
-		std::vector<std::unique_ptr<Camera>> parsing_cameras;
 		// Scene
 		// Transform must not move in memory, so use unique_ptr to store Transforms on stack
 		std::vector<std::unique_ptr<Transform>> parsing_transforms;
@@ -51,4 +34,20 @@ namespace renderme
 		std::unordered_map<std::string, Material*> name_to_material;
 		std::unordered_map<std::string, Texture*> path_to_texture;
 	};
+
+
+	//////Parsing//////
+	auto parse_film(nlohmann::json const& json) -> std::unique_ptr<Film>;
+	auto parse_camera(nlohmann::json const& json) -> std::unique_ptr<Camera>;
+	auto parse_integrator(nlohmann::json const& json) -> std::unique_ptr<Integrator>;
+	auto parse_scene(nlohmann::json const& json) -> std::unique_ptr<Scene>;
+
+
+	// Scene parsing functions
+	auto parse_obj_into(Scene_Parse_Cache& cache, Runtime_Path const& path) -> bool;
+	auto parse_ainode_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiNode const* ainode) -> bool;
+	auto parse_aimesh_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool;
+	auto parse_aimaterial_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*;
+	auto parse_light_into(Scene_Parse_Cache& cache, nlohmann::json const& json) -> void;
+
 }

@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "renderme.hpp"
 
 #include<core/log.hpp>
 #include<shapes/triangle.hpp>
@@ -9,73 +10,91 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
-
 namespace renderme
 {
-
-	auto Parser::parse_film(Runtime_Path const& path)->std::unique_ptr<Film>
+	auto parse_film(nlohmann::json const& j)->std::unique_ptr<Film>
 	{
-		clean_parsing_cache();
 		return std::make_unique<Film>();
 	}
 
 
-	auto Parser::parse_camera(Runtime_Path const& path)->std::unique_ptr<Camera>
+	auto parse_camera(nlohmann::json const& j)->std::unique_ptr<Camera>
 	{
-		clean_parsing_cache();
-		return std::make_unique<Perspective_Camera>();
-	}
+		std::string type = j.at("type");
 
-	auto Parser::parse_integrator(Runtime_Path const& path)->std::unique_ptr<Integrator>
-	{
-		if (path.full_path() == Runtime_Path::renderme_root_path()) {
-			log(Status::error, "empty path");
-			clean_parsing_cache();
-			return nullptr;
+		if (type == "perspective") {
+			auto camera = std::make_unique<Perspective_Camera>();
+			camera->config.position.x = j.at("position").at(0);
+			camera->config.position.y = j.at("position").at(1);
+			camera->config.position.z = j.at("position").at(2);
+			return camera;
 		}
 
-		auto create_new_integrator = [&]() -> std::unique_ptr<Integrator> {
-			//auto camera = std::make_unique<Perspective_Camera>();
-			//auto shader = std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl");
-			//return std::make_unique<Sample_Integrator>(
-			//        std::move(camera),
-			//        std::move(shader)
-			//        );
+		throw std::logic_error("Invalid camera type");
+		return nullptr;
+	}
+
+	auto parse_integrator(nlohmann::json const& j)->std::unique_ptr<Integrator>
+	{
+		std::string type = j.at("type");
+
+		if (type == "zbuffer") {
 			return std::make_unique<ZBuffer_Integrator>();
-		};
+		}
+		else if (type == "pathtracer") {
+			return std::make_unique<ZBuffer_Integrator>();
+		}
 
-		auto integrator = create_new_integrator();
-		clean_parsing_cache();
-
-		return integrator;
+		throw std::logic_error("Invalid integrator type");
+		return nullptr;
 	}
 
 
-	auto Parser::parse_scene(Runtime_Path const& path)->std::unique_ptr<Scene>
+	auto parse_scene(nlohmann::json const& j)->std::unique_ptr<Scene>
 	{
-		if (!parse_obj(path)) {
-			clean_parsing_cache();
+		Scene_Parse_Cache cache;
+
+		if (!parse_obj_into(cache, std::string(j.at("obj")))) {
+			throw std::logic_error("Invalid obj path");
 			return nullptr;
 		}
 
-		auto scene = std::make_unique<Scene>("test",
-			std::move(parsing_transforms),
-			std::move(parsing_textures),
-			std::move(parsing_shapes),
-			std::move(parsing_materials),
-			std::move(parsing_gl_draw_primitives),
-			std::move(parsing_render_primitives),
-			std::move(parsing_lights)
+		for (auto const& json : j.at("lights")) {
+			parse_light_into(cache, json);
+		}
+
+		return std::make_unique<Scene>(
+			j.at("name"),
+			std::move(cache.parsing_transforms),
+			std::move(cache.parsing_textures),
+			std::move(cache.parsing_shapes),
+			std::move(cache.parsing_materials),
+			std::move(cache.parsing_gl_draw_primitives),
+			std::move(cache.parsing_render_primitives),
+			std::move(cache.parsing_lights)
 		);
 
-		clean_parsing_cache();
-
-		return scene;
 	}
 
 
+	auto parse_light_into(Scene_Parse_Cache& cache, nlohmann::json const& json) -> void
+	{
+		std::string mat_name = json.at("material");
+		if (auto iter = cache.name_to_material.find(mat_name); iter != cache.name_to_material.end()) {
+			auto light = std::make_unique<Light>();
+			light->material = iter->second;
+			light->radiance.r = json.at("radiance").at(0);
+			light->radiance.g = json.at("radiance").at(1);
+			light->radiance.b = json.at("radiance").at(2);
+			cache.parsing_lights.push_back(std::move(light));
+		}
+		else {
+			throw std::logic_error("Invalid material name for light");
+		}
+	}
+
 	// loads a model with supported ASSIMP extensions from file
-	auto Parser::parse_obj(Runtime_Path const& path)->bool
+	auto parse_obj_into(Scene_Parse_Cache& cache, Runtime_Path const& path)->bool
 	{
 		// read file via ASSIMP
 		Assimp::Importer importer;
@@ -98,32 +117,32 @@ namespace renderme
 		}
 
 		// process ASSIMP's root node recursively
-		return parse_ainode(path, aiscene, aiscene->mRootNode);
+		return parse_ainode_into(cache, path, aiscene, aiscene->mRootNode);
 	}
 
 	// processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-	auto Parser::parse_ainode(Runtime_Path const& path, aiScene const* aiscene, aiNode const* ainode) -> bool
+	auto parse_ainode_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiNode const* ainode) -> bool
 	{
 		// process each mesh located at the current node
 		for (auto i = 0u; i < ainode->mNumMeshes; ++i) {
 			// the node object only contains indices to index the actual objects in the scene.
 			// the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 			auto aimesh = aiscene->mMeshes[ainode->mMeshes[i]];
-			if (!parse_aimesh(path, aiscene, aimesh)) {
+			if (!parse_aimesh_into(cache, path, aiscene, aimesh)) {
 				return false;
 			}
 		}
 
 		// after we've processed all of the meshes (if any) we then recursively process each of the children nodes
 		for (auto i = 0u; i < ainode->mNumChildren; ++i) {
-			if (!parse_ainode(path, aiscene, ainode->mChildren[i])) {
+			if (!parse_ainode_into(cache,path, aiscene, ainode->mChildren[i])) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	auto Parser::parse_aimesh(Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool
+	auto parse_aimesh_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiMesh const* aimesh) -> bool
 	{
 		// data to fill
 		std::vector<glm::vec3> positions;
@@ -177,7 +196,7 @@ namespace renderme
 
 		//Process materials
 		auto aimaterial = aiscene->mMaterials[aimesh->mMaterialIndex];
-		auto material = parse_aimaterial(path, aiscene, aimaterial);
+		auto material = parse_aimaterial_into(cache, path, aiscene, aimaterial);
 
 		//Create primitives
 		auto triangle_mesh = std::make_unique<Triangle_Mesh>(
@@ -185,23 +204,23 @@ namespace renderme
 			std::move(faces), std::move(positions), std::move(normals),
 			std::move(uvs), std::move(tangents), std::move(bitangents)
 		);
-		parsing_gl_draw_primitives.push_back(std::make_unique<Shape_Primitive>(triangle_mesh.get(), material));
+		cache.parsing_gl_draw_primitives.push_back(std::make_unique<Shape_Primitive>(triangle_mesh.get(), material));
 		auto triangles = triangle_mesh->create_triangles();
-		parsing_shapes.push_back(std::move(triangle_mesh));
+		cache.parsing_shapes.push_back(std::move(triangle_mesh));
 
 		for (auto& tri : triangles) {
 			auto triangle = std::make_unique<Triangle>(std::move(tri));
-			parsing_render_primitives.push_back(std::make_unique<Shape_Primitive>(triangle.get(), material));
-			parsing_shapes.push_back(std::move(triangle));
+			cache.parsing_render_primitives.push_back(std::make_unique<Shape_Primitive>(triangle.get(), material));
+			cache.parsing_shapes.push_back(std::move(triangle));
 		}
 		return true;
 	}
 
 
-	auto Parser::parse_aimaterial(Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*
+	auto parse_aimaterial_into(Scene_Parse_Cache& cache, Runtime_Path const& path, aiScene const* aiscene, aiMaterial const* aimaterial) -> Material*
 	{
 		// Need not create material if material has already been parsed
-		if (auto iter = name_to_material.find(aimaterial->GetName().C_Str()); iter != name_to_material.end()) {
+		if (auto iter = cache.name_to_material.find(aimaterial->GetName().C_Str()); iter != cache.name_to_material.end()) {
 			return iter->second;
 		}
 
@@ -262,8 +281,8 @@ namespace renderme
 				aimaterial->GetTexture(aitype, i, &tex_relative_path);
 
 				//Reuse same textures
-				auto iter = path_to_texture.find(tex_relative_path.C_Str());
-				if (iter != path_to_texture.end()) {
+				auto iter = cache.path_to_texture.find(tex_relative_path.C_Str());
+				if (iter != cache.path_to_texture.end()) {
 					textures.push_back(iter->second);
 				}
 				else {
@@ -272,8 +291,8 @@ namespace renderme
 					auto texture = std::make_unique<Texture>(type, tex_path);
 					textures.push_back(texture.get());
 					// Save texture to lookup buffer
-					path_to_texture[tex_relative_path.C_Str()] = texture.get();
-					parsing_textures.push_back(std::move(texture));
+					cache.path_to_texture[tex_relative_path.C_Str()] = texture.get();
+					cache.parsing_textures.push_back(std::move(texture));
 				}
 			}
 		}
@@ -291,33 +310,17 @@ namespace renderme
 			auto texture = std::make_unique<Texture>(Texture_Type::diffuse, glm::vec3(phong_material->diffuse + phong_material->specular + phong_material->transparent) / 3.0f);
 			textures.push_back(texture.get());
 			// Need not save this texture to lookup buffer
-			parsing_textures.push_back(std::move(texture));
+			cache.parsing_textures.push_back(std::move(texture));
 		}
 		
 		phong_material->textures = std::move(textures);
 
 		// Save material to lookup buffer
-		name_to_material[aimaterial->GetName().C_Str()] = phong_material.get();
-		parsing_materials.push_back(std::move(phong_material));
+		cache.name_to_material[aimaterial->GetName().C_Str()] = phong_material.get();
+		cache.parsing_materials.push_back(std::move(phong_material));
 
-		return parsing_materials.back().get();
+		return cache.parsing_materials.back().get();
 	}
 
-
-	auto Parser::clean_parsing_cache()->void
-	{
-		parsing_cameras.clear();
-
-		parsing_textures.clear();
-		parsing_materials.clear();
-		parsing_transforms.clear();
-		parsing_shapes.clear();
-		parsing_gl_draw_primitives.clear();
-		parsing_render_primitives.clear();
-		parsing_lights.clear();
-
-		name_to_material.clear();
-		path_to_texture.clear();
-	}
 
 }

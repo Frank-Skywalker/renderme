@@ -1,0 +1,27 @@
+{
+  "film": {
+  },
+  "scenes": [
+    {
+      "name": "cube",
+      "obj": "/data/cube/cube.obj",
+      "lights": [
+      ]
+    }
+  ],
+  "cameras": [
+    {
+      "type": "perspective",
+      "position": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "integrators": [
+    {
+      "type": "zbuffer"
+    }
+  ]
+}

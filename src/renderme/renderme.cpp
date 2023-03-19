@@ -7,6 +7,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <fstream>
+
 namespace renderme
 {
     //Believe me I don't wanna do this.
@@ -100,21 +102,34 @@ namespace renderme
 
 
         ///////////Data Members Init/////////////////
-        film = Parser::instance().parse_film(Runtime_Path());
-        film->reset_resolution(config.framebuffer_size);
 
-        cameras.push_back(Parser::instance().parse_camera(Runtime_Path()));
+        try {
+            std::ifstream f(app_path.full_path());
+            nlohmann::json j = nlohmann::json::parse(f);
+
+            film = parse_film(j.at("film"));
+
+            for (auto const& json : j.at("scenes")) {
+                scenes.push_back(parse_scene(json));
+            }
+
+            for (auto const& json : j.at("cameras")) {
+                cameras.push_back(parse_camera(json));
+            }
+
+            for (auto const& json : j.at("integrators")) {
+                integrators.push_back(parse_integrator(json));
+            }
+        }
+        catch (std::exception const& e) {
+            log(Status::fatal, e.what());
+        }
+
+        if (film != nullptr)
+            film->reset_resolution(config.framebuffer_size);
         for (auto& camera : cameras) {
             camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
         }
-
-        integrators.push_back(Parser::instance().parse_integrator(Runtime_Path()));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/staircase/stairscase.obj")));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/cornell-box/cornell-box.obj")));
-        scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/veach-mis/veach-mis.obj")));
-        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/cube/cube.obj")));
-        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/nanosuit/nanosuit.obj")));
-        //scenes.push_back(Parser::instance().parse_scene(Runtime_Path("data/backpack/backpack.obj")));
     }
 
 
@@ -364,24 +379,6 @@ namespace renderme
     {
         ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
         ImGui::ColorEdit4("Clear Color", glm::value_ptr(config.clear_color));
-
-        if (ImGui::Button("Parse Scene")) {
-            auto scene=Parser::instance().parse_scene(config.scene_path);
-            if (scene != nullptr) {
-                scenes.push_back(std::move(scene));
-            }
-        }
-        ImGui::SameLine();
-        ImGui::InputText("Scene Path", config.scene_path, MAX_FILE_NAME_LENGTH);
-
-        if (ImGui::Button("Parse Integrator")) {
-            auto integrator=Parser::instance().parse_integrator(config.integrator_path);
-            if (integrator != nullptr) {
-                integrators.push_back(std::move(integrator));
-            }
-        }
-        ImGui::SameLine();
-        ImGui::InputText("Integrator Path", config.integrator_path, MAX_FILE_NAME_LENGTH);
 
         if (ImGui::BeginCombo("GL Draw Mode", std::to_string(config.gl_draw_mode).c_str())) {
             for (auto mode = GL_Draw_Mode::fill; mode <= GL_Draw_Mode::point; mode=(GL_Draw_Mode)(mode+1)){
