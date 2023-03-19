@@ -129,7 +129,7 @@
   ],
   "integrators": [
     {
-      "type": "pathtracer"
+      "type": "raytrace"
     },
     {
       "type": "zbuffer"

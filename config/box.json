@@ -22,6 +22,9 @@
   "integrators": [
     {
       "type": "zbuffer"
+    },
+    {
+      "type": "raytrace"
     }
   ]
 }
