@@ -17,6 +17,9 @@ namespace renderme
 			float pitch{0};
 			float fov{45.f};
 
+			float near{0.1f};
+			float far{1000.0f};
+
 			//Calculated from above
 			glm::vec3 up;
 			glm::vec3 front;

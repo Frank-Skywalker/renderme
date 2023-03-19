@@ -269,7 +269,7 @@ namespace renderme
 				else {
 					auto upper_dir = path.upper_directory();
 					auto tex_path = Runtime_Path(upper_dir.relative_path() + "/" + tex_relative_path.C_Str());
-					auto texture = std::make_unique<Texture>(tex_path, type);
+					auto texture = std::make_unique<Texture>(type, tex_path);
 					textures.push_back(texture.get());
 					// Save texture to lookup buffer
 					path_to_texture[tex_relative_path.C_Str()] = texture.get();
@@ -277,6 +277,23 @@ namespace renderme
 				}
 			}
 		}
+		// Generate pure color diffuse texture if no such
+		auto has_diffuse_texture = [&]()->bool {
+			for (auto texture : textures) {
+				if (texture->type == Texture_Type::diffuse) {
+					return true;
+				}
+			}
+			return false;
+		}();
+
+		if (!has_diffuse_texture) {
+			auto texture = std::make_unique<Texture>(Texture_Type::diffuse, glm::vec3(phong_material->diffuse + phong_material->specular + phong_material->transparent) / 3.0f);
+			textures.push_back(texture.get());
+			// Need not save this texture to lookup buffer
+			parsing_textures.push_back(std::move(texture));
+		}
+		
 		phong_material->textures = std::move(textures);
 
 		// Save material to lookup buffer

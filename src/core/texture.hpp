@@ -15,16 +15,15 @@ namespace renderme
 	};
 	struct Texture final
 	{
-		Texture(Runtime_Path path, Texture_Type type);
+		Texture(Texture_Type type, Runtime_Path path);
+		Texture(Texture_Type type, glm::vec3 color);
 		auto gl_draw(Shader const& shader, unsigned int i, unsigned int type_cnt) const noexcept -> void;
 
+		Texture_Type type;
 		unsigned int id;
 		unsigned int format;
+		int num_components;
 		int width;
 		int height;
-		int num_components;
-		Texture_Type type;
-		//std::string type;
-		//std::string path;
 	};
 }

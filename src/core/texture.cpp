@@ -6,7 +6,7 @@
 
 namespace renderme
 {
-	Texture::Texture(Runtime_Path path, Texture_Type type)
+	Texture::Texture(Texture_Type type, Runtime_Path path)
 		:type{type}
 	{
 		//Texture loading
@@ -43,6 +43,24 @@ namespace renderme
 		stbi_image_free(data);
 	}
 
+	Texture::Texture(Texture_Type type, glm::vec3 color)
+		:type{type}
+	{
+		format = GL_RGB;
+		num_components = 3;
+		width = 1;
+		height = 1;
+
+		glGenTextures(1, &id);
+		glBindTexture(GL_TEXTURE_2D, id);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, glm::value_ptr(color));
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 
 	auto Texture::gl_draw(Shader const& shader, unsigned int i, unsigned int type_cnt) const noexcept -> void
 	{

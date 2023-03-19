@@ -30,6 +30,9 @@ namespace renderme
 		modified |= ImGui::DragFloat("Pitch", &config.pitch);
 		modified |= ImGui::DragFloat("Zoom", &config.fov);
 
+		modified |= ImGui::DragFloat("Near", &config.near);
+		modified |= ImGui::DragFloat("Far", &config.far);
+
 		if (modified) {
 			update_camera_transforms();
 		}
@@ -140,7 +143,7 @@ namespace renderme
 
 		//Recalculate Transforms
 		config.view = glm::lookAt(config.position, config.position + config.front, config.up);
-		config.projection = glm::perspective(glm::radians(config.fov), config.aspect, 0.1f, 100.0f);
+		config.projection = glm::perspective(glm::radians(config.fov), config.aspect, config.near, config.far);
 
 		// Recalculate camera transforms
 		world_to_camera = config.projection * config.view;
