@@ -24,13 +24,23 @@ namespace renderme
 			:pmin{ p }, pmax{ p }{}
 
 		Bounds(glm::tvec2<T> const& p1, glm::tvec2<T> const& p2)
-			:pmin{ std::min(p1.x, p2.x), std::min(p1.y, p2.y) },
-			pmax{ std::max(p1.x,p2.x), std::max(p1.y, p2.y) } {}
+			:pmin{ glm::min(p1, p2)},
+			pmax{ glm::max(p1, p2)} {}
 
-		auto eat(glm::tvec2<T> const& p)->void
+		Bounds(Bounds const& b1, Bounds const& b2)
+			:pmin{ glm::min(b1.pmin, b2.pmin) },
+			pmax{ glm::max(b1.pmax, b2.pmax) } {}
+
+		auto eat(glm::tvec3<T> const& p) -> void
 		{
-			pmin = glm::tvec2<T>(std::min(pmin.x, p.x), std::min(pmin.y, p.y));
-			pmax = glm::tvec2<T>(std::max(pmax.x, p.x), std::max(pmax.y, p.y));
+			pmin = glm::min(pmin, p);
+			pmax = glm::max(pmax, p);
+		}
+
+		auto eat(Bounds const& b) -> void
+		{
+			pmin = glm::min(pmin, b.pmin);
+			pmax = glm::max(pmax, b.pmax);
 		}
 
 		auto center() const noexcept -> glm::tvec2<T>
@@ -44,7 +54,8 @@ namespace renderme
 		}
 
 
-		glm::tvec2<T> pmin, pmax;
+		glm::tvec2<T> pmin;
+		glm::tvec2<T> pmax;
 	};
 
 	template<typename T>
@@ -72,18 +83,28 @@ namespace renderme
 			:pmin{ p }, pmax{ p } {}
 
 		Bounds(glm::tvec3<T> const& p1, glm::tvec3<T> const& p2)
-			:pmin{ std::min(p1.x, p2.x), std::min(p1.y, p2.y), std::min(p1.z, p2.z) },
-			pmax{ std::max(p1.x,p2.x), std::max(p1.y, p2.y), std::max(p1.z, p2.z) } {}
+			:pmin{ glm::min(p1, p2) },
+			pmax{ glm::max(p1, p2) } {}
+
+		Bounds(Bounds const& b1, Bounds const& b2)
+			:pmin{ glm::min(b1.pmin, b2.pmin) },
+			pmax{ glm::max(b1.pmax, b2.pmax) } {}
+
+		auto eat(glm::tvec3<T> const& p) -> void
+		{
+			pmin = glm::min(pmin, p);
+			pmax = glm::max(pmax, p);
+		}
+
+		auto eat(Bounds const& b) -> void
+		{
+			pmin = glm::min(pmin, b.pmin);
+			pmax = glm::max(pmax, b.pmax);
+		}
 
 		auto center() const noexcept -> glm::tvec2<T>
 		{
 			return (pmax + pmin) / 2.0f;
-		}
-
-		auto eat(glm::tvec3<T> const& p) -> void
-		{
-			pmin = glm::tvec3<T>(std::min(pmin.x, p.x), std::min(pmin.y, p.y), std::min(pmin.z, p.z));
-			pmax = glm::tvec3<T>(std::max(pmax.x, p.x), std::max(pmax.y, p.y), std::max(pmax.z, p.z));
 		}
 
 		auto diagonal() const noexcept -> glm::tvec3<T>
@@ -91,7 +112,8 @@ namespace renderme
 			return pmax - pmin;
 		}
 
-		glm::tvec3<T> pmin, pmax;
+		glm::tvec3<T> pmin;
+		glm::tvec3<T> pmax;
 	};
 
 	template<typename T>
