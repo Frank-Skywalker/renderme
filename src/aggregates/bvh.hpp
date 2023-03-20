@@ -47,12 +47,17 @@ namespace renderme
 
 
 	private:
+		auto build_bvh_recursively(int begin, int end) -> std::unique_ptr<BVH_Node>;
+
+	private:
 		std::vector<std::unique_ptr<Primitive>> primitives;
 		unsigned int max_primitives_per_node{ 1 };
 		Strategy strategy{ Strategy::sah };
 
 		std::vector<Primitive const*> ordered_primitives;
 		std::unique_ptr<BVH_Node> bvh_tree;
+
+		unsigned int vao;
 	};
 
 }

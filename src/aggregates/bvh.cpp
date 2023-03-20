@@ -2,6 +2,7 @@
 
 #include <core/log.hpp>
 
+#include <GL/glew.h>
 #include <algorithm>
 
 #define RR_BVH_SAH_APROXIMATE_LIMIT 2
@@ -10,20 +11,15 @@
 namespace renderme
 {
 
-	auto build_bvh_recursively(
-		int begin, int end, 
-		std::vector<Primitive const*>& primitives,
-		Strategy strategy, 
-		int max_primitives_per_node
-	) -> std::unique_ptr<BVH_Node>
+	auto BVH::build_bvh_recursively(int begin, int end) -> std::unique_ptr<BVH_Node>
 	{
 		// Calculate bvh node bounds
 		Bounds3f bounds;
 		Bounds3f center_bounds;
 		for (auto i = begin; i < end; ++i)
 		{
-			bounds.eat(primitives[i]->world_bounds());
-			center_bounds.eat(primitives[i]->world_bounds().center());
+			bounds.eat(ordered_primitives[i]->world_bounds());
+			center_bounds.eat(ordered_primitives[i]->world_bounds().center());
 		}
 
 		auto num_primitives = end - begin;
@@ -43,7 +39,7 @@ namespace renderme
 
 		auto equal_partition = [&]()->void {
 			mid = (begin + end) / 2;
-			std::nth_element(&primitives[begin], &primitives[mid], &primitives[end - 1] + 1,
+			std::nth_element(&ordered_primitives[begin], &ordered_primitives[mid], &ordered_primitives[end - 1] + 1,
 				[axis](Primitive const* lhs, Primitive const* rhs)->bool {
 					return lhs->world_bounds().center()[int(axis)] < rhs->world_bounds().center()[int(axis)];
 				}
@@ -69,13 +65,13 @@ namespace renderme
 				// Insert all primitives into buckets
 				for (auto i = begin; i < end; ++i) {
 					// Calculate which bucket this primitive center falls in
-					auto offset = center_bounds.offset(primitives[i]->world_bounds().center());
+					auto offset = center_bounds.offset(ordered_primitives[i]->world_bounds().center());
 					int n = RR_BVH_SAH_BUCKET_NUM * offset[int(axis)];
 					if (n >= RR_BVH_SAH_BUCKET_NUM)
 						n = RR_BVH_SAH_BUCKET_NUM - 1;
 
 					++buckets[n].first;
-					buckets[n].second.eat(primitives[i]->world_bounds());
+					buckets[n].second.eat(ordered_primitives[i]->world_bounds());
 				}
 
 				// Compute costs when partitioning before each bucket
@@ -113,7 +109,7 @@ namespace renderme
 				// Perform partition
 				else {
 					auto mid_ptr = std::partition(
-						&primitives[begin], &primitives[end - 1] + 1,
+						&ordered_primitives[begin], &ordered_primitives[end - 1] + 1,
 						[&](Primitive const* p)->bool {
 							// Calculate which bucket this primitive center falls in
 							auto offset = center_bounds.offset(p->world_bounds().center());
@@ -125,7 +121,7 @@ namespace renderme
 						}
 					);
 					// Set mid
-					mid = mid_ptr - &primitives[0];
+					mid = mid_ptr - &ordered_primitives[0];
 				}
 			}
 			break;
@@ -137,8 +133,8 @@ namespace renderme
 		
 		return std::make_unique<BVH_Node>(
 			axis,
-			build_bvh_recursively(begin, mid, primitives, strategy, max_primitives_per_node),
-			build_bvh_recursively(mid, end, primitives, strategy, max_primitives_per_node)
+			build_bvh_recursively(begin, mid),
+			build_bvh_recursively(mid, end)
 		);
 	}
 
@@ -146,21 +142,17 @@ namespace renderme
 	BVH::BVH(std::vector<std::unique_ptr<Primitive>> primivites, unsigned int max_primitives_per_node, Strategy strategy)
 		:primitives{ std::move(primitives) }, max_primitives_per_node{max_primitives_per_node}, strategy{strategy}
 	{
-		if (primitives.empty())
-			return;
-
 		ordered_primitives.reserve(primitives.size());
 		for (auto const& prim : primitives) {
 			ordered_primitives.push_back(prim.get());
 		}
 
-		bvh_tree = build_bvh_recursively(0, primitives.size(), ordered_primitives, strategy, max_primitives_per_node);
+		bvh_tree = build_bvh_recursively(0, ordered_primitives.size());
 	}
 
 
 	auto BVH::gl_draw(Shader const& shader) const noexcept -> void
 	{
-
 	}
 
 	auto BVH::intersect() const noexcept ->bool
@@ -180,7 +172,7 @@ namespace renderme
 
 	auto BVH::world_bounds() const noexcept -> Bounds3f const&
 	{
-		return Bounds3f();
+		return bvh_tree->bounds;
 	}
 
 

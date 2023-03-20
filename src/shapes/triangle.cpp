@@ -68,13 +68,13 @@ namespace renderme
 
 	auto Triangle_Mesh::intersect() const noexcept ->bool
 	{
-		//intersect nothing
+		// Intersect nothing
 		return false;
 	}
 
 	auto Triangle_Mesh::intersect_shadow() const noexcept ->bool
 	{
-		//intersect nothing
+		// Intersect nothing
 		return false;
 	}
 
@@ -119,7 +119,7 @@ namespace renderme
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
 	{
-		//draw nothing
+		// Draw nothing
 		return;
 	}
 

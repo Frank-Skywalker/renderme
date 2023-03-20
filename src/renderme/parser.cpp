@@ -7,6 +7,7 @@
 #include<materials/phong.hpp>
 #include<integrators/zbuffer.hpp>
 #include<integrators/raytrace.hpp>
+#include<aggregates/bvh.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -64,14 +65,18 @@ namespace renderme
 			parse_light_into(cache, json);
 		}
 
+		// Create BVH
+		auto parsing_primitives = std::move(cache.parsing_gl_draw_primitives);
+		auto bvh = std::make_unique<BVH>(std::move(cache.parsing_render_primitives));
+		parsing_primitives.push_back(std::move(bvh));
+
 		return std::make_unique<Scene>(
 			j.at("name"),
 			std::move(cache.parsing_transforms),
 			std::move(cache.parsing_textures),
 			std::move(cache.parsing_shapes),
 			std::move(cache.parsing_materials),
-			std::move(cache.parsing_gl_draw_primitives),
-			std::move(cache.parsing_render_primitives),
+			std::move(parsing_primitives),
 			std::move(cache.parsing_lights)
 		);
 

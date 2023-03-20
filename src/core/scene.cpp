@@ -10,8 +10,7 @@ namespace renderme
 			std::vector<std::unique_ptr<Texture>> _textures,
 			std::vector<std::unique_ptr<Shape>> _shapes,
 			std::vector<std::unique_ptr<Material>> _materials,
-			std::vector<std::unique_ptr<Primitive>> _gl_draw_primitives,
-			std::vector<std::unique_ptr<Primitive>> _render_primitives,
+			std::vector<std::unique_ptr<Primitive>> _primitives,
 			std::vector<std::unique_ptr<Light>> _lights
 		)
 		:name{std::move(_name)},
@@ -19,15 +18,14 @@ namespace renderme
 		textures{std::move(_textures)},
 		shapes{std::move(_shapes)},
 		materials{std::move(_materials)},
-		gl_draw_primitives{std::move(_gl_draw_primitives)},
-		render_primitives{std::move(_render_primitives)},
+		primitives{std::move(_primitives)},
 		lights{std::move(_lights)}
 	{}
 
 
 	auto Scene::gl_draw(Shader const& shader) const noexcept -> void
 	{
-		for (auto const& primitive : gl_draw_primitives) {
+		for (auto const& primitive : primitives) {
 			primitive->gl_draw(shader);
 		}
 	}
@@ -36,7 +34,7 @@ namespace renderme
 	auto Scene::intersect() const noexcept->bool
 	{
 		auto result = false;
-		for (auto const& primitive : render_primitives) {
+		for (auto const& primitive : primitives) {
 			result |= primitive->intersect();
 		}
 		return result;
@@ -46,7 +44,7 @@ namespace renderme
 	auto Scene::intersect_shadow() const noexcept->bool
 	{
 		auto result = false;
-		for (auto const& primitive : render_primitives) {
+		for (auto const& primitive : primitives) {
 			result |= primitive->intersect_shadow();
 		}
 		return result;
@@ -58,7 +56,7 @@ namespace renderme
 		auto face_count=0;
 		auto vertex_count = 0;
 
-		for (auto& primitive : gl_draw_primitives) {
+		for (auto& primitive : primitives) {
 			//Get Triangle_Mesh
 			if (typeid(*primitive) == typeid(Shape_Primitive)) {
 				auto shape_primitive = dynamic_cast<Shape_Primitive const*>(primitive.get());

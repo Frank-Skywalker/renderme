@@ -20,8 +20,7 @@ namespace renderme
 			std::vector<std::unique_ptr<Texture>> textures,
 			std::vector<std::unique_ptr<Shape>> shapes,
 			std::vector<std::unique_ptr<Material>> materials,
-			std::vector<std::unique_ptr<Primitive>> gl_draw_primitives,
-			std::vector<std::unique_ptr<Primitive>> render_primitives,
+			std::vector<std::unique_ptr<Primitive>> primitives,
 			std::vector<std::unique_ptr<Light>> lights
 		);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
@@ -35,8 +34,7 @@ namespace renderme
 		std::vector<std::unique_ptr<Texture>> textures;
 		std::vector<std::unique_ptr<Shape>> shapes;
 		std::vector<std::unique_ptr<Material>> materials;
-		std::vector<std::unique_ptr<Primitive>> gl_draw_primitives;
-		std::vector<std::unique_ptr<Primitive>> render_primitives;
+		std::vector<std::unique_ptr<Primitive>> primitives;
 		std::vector<std::unique_ptr<Light>> lights;
 	};
 }

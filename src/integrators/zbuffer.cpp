@@ -54,7 +54,7 @@ namespace renderme
 		//Resize polygon table
 		polygon_table.resize(film->resolution().y);
 
-		for (auto& primitive: scene.gl_draw_primitives) {
+		for (auto& primitive: scene.primitives) {
 			//Get Triangle_Mesh
 			if (typeid(*primitive) == typeid(Shape_Primitive)){
 				auto shape_primitive = dynamic_cast<Shape_Primitive const*>(primitive.get());
