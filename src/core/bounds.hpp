@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ray.hpp"
-
+#include "config.hpp"
 #include <glm/glm-all.hpp>
 
 #include <limits>
@@ -31,11 +31,11 @@ namespace renderme
 		}
 
 		Bounds(glm::tvec2<T> const& p)
-			:pmin{ p }, pmax{ p }{}
+			:pmin{ p }, pmax{ p } {}
 
 		Bounds(glm::tvec2<T> const& p1, glm::tvec2<T> const& p2)
-			:pmin{ glm::min(p1, p2)},
-			pmax{ glm::max(p1, p2)} {}
+			:pmin{ glm::min(p1, p2) },
+			pmax{ glm::max(p1, p2) } {}
 
 		Bounds(Bounds const& b1, Bounds const& b2)
 			:pmin{ glm::min(b1.pmin, b2.pmin) },
@@ -59,8 +59,8 @@ namespace renderme
 		}
 
 		auto diagonal() const noexcept -> glm::tvec2<T>
-		{ 
-			return pmax - pmin; 
+		{
+			return pmax - pmin;
 		}
 
 		auto max_extent() const noexcept -> Axis
@@ -138,7 +138,7 @@ namespace renderme
 		auto max_extent() const noexcept -> Axis
 		{
 			auto dia = diagonal();
-			if (dia.x >= dia.y && dia.x>=dia.z) {
+			if (dia.x >= dia.y && dia.x >= dia.z) {
 				return Axis::x;
 			}
 			else if (dia.y >= dia.z) {
@@ -160,9 +160,29 @@ namespace renderme
 			return 2 * (dia.x * dia.y + dia.y * dia.z + dia.x * dia.z);
 		}
 
-		auto intersect(Ray const& ray) -> bool
+		auto intersect(Ray const& ray) const noexcept -> bool
 		{
-			return false;
+			auto tnear = std::numeric_limits<float>::min();
+			auto tfar = std::numeric_limits<float>::max();
+
+			for (int i = 0; i < 3; i++) {
+				if (ray.direction[i] >= 0) {
+					tnear = std::fmin(tnear, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
+					tfar = std::fmin(tfar, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
+				}
+				else {
+					tnear = std::fmax(tnear, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
+					tfar = std::fmin(tfar, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
+				}
+			}
+
+			// Add EPSILON to ensure robust
+			tfar += RR_EPSILON;
+
+			if (tnear > tfar || tnear > ray.tmax || tfar < 0) {
+				return false;
+			}
+			return true;
 		}
 
 		glm::tvec3<T> pmin;

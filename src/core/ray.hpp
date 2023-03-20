@@ -10,5 +10,6 @@ namespace renderme
 		glm::vec3 origin;
 		glm::vec3 direction;
 		float tmax{ std::numeric_limits<float>::max() };
+		glm::vec3 inv_direction;
 	};
 }

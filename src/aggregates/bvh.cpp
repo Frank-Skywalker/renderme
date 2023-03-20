@@ -4,6 +4,7 @@
 
 #include <GL/glew.h>
 #include <algorithm>
+#include <stack>
 
 #define RR_BVH_SAH_APROXIMATE_LIMIT 2
 #define RR_BVH_SAH_BUCKET_NUM 12
@@ -158,11 +159,78 @@ namespace renderme
 
 	auto BVH::intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool
 	{
-		return false;
+		auto hit = false;
+		std::stack<BVH_Node const*> stack;
+
+		stack.push(bvh_tree.get());
+
+		while (!stack.empty()) {
+			auto node = stack.top();
+			stack.pop();
+
+			// Check if ray intersect with BVH node's bounding box
+			if (node->bounds.intersect(ray)) {
+				// Leaf node
+				if (node->num_primitives > 0) {
+					for (auto i = 0; i < node->num_primitives; ++i)
+						hit |= ordered_primitives[node->offset + i]->intersect(ray, interaction);
+				}
+				// Interior node
+				else {
+					// Visit near half tree first
+					if (ray.direction[int(node->split_axis)] > 0) {
+						stack.push(node->right.get());
+						// Left is first visited
+						stack.push(node->left.get());
+					}
+					else {
+						stack.push(node->left.get());
+						// Right is first visited
+						stack.push(node->right.get());
+					}
+				}
+			}
+		}
+
+		return hit;
 	}
 
 	auto BVH::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
+		std::stack<BVH_Node const*> stack;
+
+		stack.push(bvh_tree.get());
+
+		while (!stack.empty()) {
+			auto node = stack.top();
+			stack.pop();
+
+			// Check if ray intersect with BVH node's bounding box
+			if (node->bounds.intersect(ray)) {
+				// Leaf node
+				if (node->num_primitives > 0) {
+					for (auto i = 0; i < node->num_primitives; ++i){
+						if (ordered_primitives[node->offset + i]->intersect_shadow(ray)) {
+							return true;
+						}
+					}
+				}
+				// Interior node
+				else {
+					// Visit near half tree first
+					if (ray.direction[int(node->split_axis)] > 0) {
+						stack.push(node->right.get());
+						// Left is first visited
+						stack.push(node->left.get());
+					}
+					else {
+						stack.push(node->left.get());
+						// Right is first visited
+						stack.push(node->right.get());
+					}
+				}
+			}
+		}
 		return false;
 	}
 
