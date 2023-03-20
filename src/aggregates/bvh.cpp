@@ -1,31 +1,145 @@
 #include "bvh.hpp"
 
+#include <core/log.hpp>
+
+#include <algorithm>
+
+#define RR_BVH_SAH_APROXIMATE_LIMIT 2
+#define RR_BVH_SAH_BUCKET_NUM 12
+
 namespace renderme
 {
 
 	auto build_bvh_recursively(
 		int begin, int end, 
-		std::vector<Primitive const*>& primitives, 
-		std::vector<Primitive const*>& ordered_primitives, 
+		std::vector<Primitive const*>& primitives,
 		Strategy strategy, 
 		int max_primitives_per_node
 	) -> std::unique_ptr<BVH_Node>
 	{
 		// Calculate bvh node bounds
 		Bounds3f bounds;
-		for (auto i = begin; i < end; ++i) {
+		Bounds3f center_bounds;
+		for (auto i = begin; i < end; ++i)
+		{
 			bounds.eat(primitives[i]->world_bounds());
+			center_bounds.eat(primitives[i]->world_bounds().center());
 		}
 
 		auto num_primitives = end - begin;
 
-		if (num_primitives == 1) {
-			// Create a leaf node
-			ordered_primitives.push_back(primitives[begin]);
-			return std::make_unique<BVH_Node>(begin, 1, bounds);
+		// Create a leaf node if only one primitive is left
+		if (num_primitives <= 1) {
+			return std::make_unique<BVH_Node>(begin, num_primitives, bounds);
 		}
 
+		auto axis = center_bounds.max_extent();
+		// Create a leaf node if all primitives' center overlaps on the maximum extent axis
+		if (center_bounds.pmin[int(axis)] == center_bounds.pmax[int(axis)]) {
+			return std::make_unique<BVH_Node>(begin, num_primitives, bounds);
+		}
 
+		auto mid = (begin + end) / 2;
+
+		auto equal_partition = [&]()->void {
+			mid = (begin + end) / 2;
+			std::nth_element(&primitives[begin], &primitives[mid], &primitives[end - 1] + 1,
+				[axis](Primitive const* lhs, Primitive const* rhs)->bool {
+					return lhs->world_bounds().center()[int(axis)] < rhs->world_bounds().center()[int(axis)];
+				}
+			);
+		};
+
+		// Partition primitives depending on strategy
+		switch (strategy) {
+		case Strategy::equal:
+			equal_partition();
+			break;
+
+		case Strategy::sah:
+			// If num primitives less than approximate limit
+			// Use approximate SAH strategy whitch is Strategy::equal
+			if (num_primitives <= RR_BVH_SAH_APROXIMATE_LIMIT) {
+				equal_partition();
+			}
+			else {
+				// <count, bb>
+				std::vector<std::pair<int, Bounds3f>> buckets;
+
+				// Insert all primitives into buckets
+				for (auto i = begin; i < end; ++i) {
+					// Calculate which bucket this primitive center falls in
+					auto offset = center_bounds.offset(primitives[i]->world_bounds().center());
+					int n = RR_BVH_SAH_BUCKET_NUM * offset[int(axis)];
+					if (n >= RR_BVH_SAH_BUCKET_NUM)
+						n = RR_BVH_SAH_BUCKET_NUM - 1;
+
+					++buckets[n].first;
+					buckets[n].second.eat(primitives[i]->world_bounds());
+				}
+
+				// Compute costs when partitioning before each bucket
+				// Find minimum cost partition at the same time
+				auto min_cost = std::numeric_limits<float>::max();
+				int min_split_bucket = 0;
+
+				for (auto i = 1; i < RR_BVH_SAH_BUCKET_NUM; ++i) {
+					int left_count = 0;
+					int right_count = 0;
+					Bounds3f left_bounds;
+					Bounds3f right_bounds;
+
+					for (auto j = 0; j < i; ++j) {
+						left_count += buckets[j].first;
+						left_bounds.eat(buckets[j].second);
+					}
+					for (auto j = i; j < RR_BVH_SAH_BUCKET_NUM; ++j) {
+						right_count += buckets[j].first;
+						right_bounds.eat(buckets[j].second);
+					}
+
+					auto cost = 1 + (left_count * left_bounds.surface_area() + right_count * right_bounds.surface_area()) / bounds.surface_area();
+					if (cost < min_cost) {
+						min_cost = cost;
+						min_split_bucket = i;
+					}
+				}
+
+				float leaf_cost = num_primitives;
+				// Create leaf node
+				if (min_cost >= leaf_cost && num_primitives <= max_primitives_per_node) {
+					return std::make_unique<BVH_Node>(begin, num_primitives, bounds);
+				}
+				// Perform partition
+				else {
+					auto mid_ptr = std::partition(
+						&primitives[begin], &primitives[end - 1] + 1,
+						[&](Primitive const* p)->bool {
+							// Calculate which bucket this primitive center falls in
+							auto offset = center_bounds.offset(p->world_bounds().center());
+							int n = RR_BVH_SAH_BUCKET_NUM * offset[int(axis)];
+							if (n >= RR_BVH_SAH_BUCKET_NUM)
+								n = RR_BVH_SAH_BUCKET_NUM - 1;
+
+							return n < min_split_bucket;
+						}
+					);
+					// Set mid
+					mid = mid_ptr - &primitives[0];
+				}
+			}
+			break;
+
+		default:
+			log(Status::fatal, "No such strategy");
+		}
+
+		
+		return std::make_unique<BVH_Node>(
+			axis,
+			build_bvh_recursively(begin, mid, primitives, strategy, max_primitives_per_node),
+			build_bvh_recursively(mid, end, primitives, strategy, max_primitives_per_node)
+		);
 	}
 
 
@@ -36,13 +150,11 @@ namespace renderme
 			return;
 
 		ordered_primitives.reserve(primitives.size());
-
-		std::vector<Primitive const*> primitives_info;
 		for (auto const& prim : primitives) {
-			primitives_info.push_back(prim.get());
+			ordered_primitives.push_back(prim.get());
 		}
 
-		bvh_tree = build_bvh_recursively(0, primitives.size(), primitives_info, ordered_primitives, strategy, max_primitives_per_node);
+		bvh_tree = build_bvh_recursively(0, primitives.size(), ordered_primitives, strategy, max_primitives_per_node);
 	}
 
 

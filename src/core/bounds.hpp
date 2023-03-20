@@ -6,6 +6,14 @@
 
 namespace renderme
 {
+	enum struct Axis
+	{
+		x,
+		y,
+		z,
+		invalid,
+	};
+
 	template<unsigned int dim, typename T>
 	struct Bounds;
 
@@ -53,6 +61,19 @@ namespace renderme
 			return pmax - pmin; 
 		}
 
+		auto max_extent() const noexcept -> Axis
+		{
+			auto dia = diagonal();
+			if (dia.x >= dia.y) {
+				return Axis::x;
+			}
+			return Axis::y;
+		}
+
+		auto offset(glm::tvec2<T> const& p) const noexcept ->glm::tvec2<T>
+		{
+			return (p - pmin) / (pmax - pmin);
+		}
 
 		glm::tvec2<T> pmin;
 		glm::tvec2<T> pmax;
@@ -102,7 +123,7 @@ namespace renderme
 			pmax = glm::max(pmax, b.pmax);
 		}
 
-		auto center() const noexcept -> glm::tvec2<T>
+		auto center() const noexcept -> glm::tvec3<T>
 		{
 			return (pmax + pmin) / 2.0f;
 		}
@@ -110,6 +131,31 @@ namespace renderme
 		auto diagonal() const noexcept -> glm::tvec3<T>
 		{
 			return pmax - pmin;
+		}
+
+		auto max_extent() const noexcept -> Axis
+		{
+			auto dia = diagonal();
+			if (dia.x >= dia.y && dia.x>=dia.z) {
+				return Axis::x;
+			}
+			else if (dia.y >= dia.z) {
+				return Axis::y;
+			}
+			else {
+				return Axis::z;
+			}
+		}
+
+		auto offset(glm::tvec3<T> const& p) const noexcept ->glm::tvec3<T>
+		{
+			return (p - pmin) / (pmax - pmin);
+		}
+
+		auto surface_area() const noexcept->T
+		{
+			auto dia = diagonal();
+			return 2 * (dia.x * dia.y + dia.y * dia.z + dia.x * dia.z);
 		}
 
 		glm::tvec3<T> pmin;

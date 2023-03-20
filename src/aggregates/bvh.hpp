@@ -1,20 +1,15 @@
 #pragma once
 #include <core/primitive.hpp>
 #include <vector>
+
 namespace renderme
 {
 	enum struct Strategy
 	{
-		sah,
+		equal,
+		sah,		// Surface Area Heuristic
 	};
 
-	enum struct Axis
-	{
-		invalid,
-		x,
-		y,
-		z,
-	};
 
 	struct BVH_Node
 	{

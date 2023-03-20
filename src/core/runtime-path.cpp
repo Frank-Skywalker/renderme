@@ -35,7 +35,7 @@ namespace renderme
 
 	auto Runtime_Path::full_path() const noexcept ->std::string
 	{
-		return RENDERME_ROOT_PATH + path;
+		return RR_ROOT_PATH + path;
 	}
 
 	auto Runtime_Path::relative_path() const noexcept ->std::string
@@ -54,6 +54,6 @@ namespace renderme
 
 	auto Runtime_Path::renderme_root_path()->std::string
 	{
-		return std::string(RENDERME_ROOT_PATH);
+		return std::string(RR_ROOT_PATH);
 	}
 }

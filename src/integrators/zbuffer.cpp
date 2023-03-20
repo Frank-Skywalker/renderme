@@ -135,7 +135,7 @@ namespace renderme
 							}
 							// Discard the face if it's perpendicular to XOY plane,
                             // in which case its normal is parallel to the XOY plane
-							if (std::fabsf(equation.z) < EPSILON) {
+							if (std::fabsf(equation.z) < RR_EPSILON) {
 								return true;
 							}
 							return false;

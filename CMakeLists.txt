@@ -63,7 +63,7 @@ endforeach(LIB_DIRECTORY)
 
 ############ config part #################
 # use double or not
-option(USE_CUDA "use CUDA to pipeline" OFF)
+option(RR_ENABLE_CUDA "use CUDA to pipeline" OFF)
 
 # configure a header file to pass some of the CMake settings to the source code
 configure_file(
@@ -82,7 +82,7 @@ target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 target_link_libraries(${PROJECT_NAME} hah)
 
 # Find CUDA
-if(USE_CUDA)
+if(RR_ENABLE_CUDA)
     find_package(CUDA REQUIRED)
     if(CUDA_FOUND)
         message(STATUS ${CUDA_INCLUDE_DIRS})

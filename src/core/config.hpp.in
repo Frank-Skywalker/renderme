@@ -1,8 +1,8 @@
 #pragma once
 // the configured options and settings for renderme
-#define PROJECT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
-#define PROJECT_VERSION_MINOR @PROJECT_VERSION_MINOR@
-#define RENDERME_ROOT_PATH "@PROJECT_SOURCE_DIR@"
-#cmakedefine USE_CUDA
+#define RR_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define RR_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define RR_ROOT_PATH "@PROJECT_SOURCE_DIR@"
+#cmakedefine RR_ENABLE_CUDA
 
-#define EPSILON 1e-10
+#define RR_EPSILON 1e-10
