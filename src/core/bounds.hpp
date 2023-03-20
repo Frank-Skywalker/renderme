@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ray.hpp"
+
 #include <glm/glm-all.hpp>
 
 #include <limits>
@@ -156,6 +158,11 @@ namespace renderme
 		{
 			auto dia = diagonal();
 			return 2 * (dia.x * dia.y + dia.y * dia.z + dia.x * dia.z);
+		}
+
+		auto intersect(Ray const& ray) -> bool
+		{
+			return false;
 		}
 
 		glm::tvec3<T> pmin;

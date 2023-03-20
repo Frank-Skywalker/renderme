@@ -39,8 +39,8 @@ namespace renderme
 		BVH(std::vector<std::unique_ptr<Primitive>> primivites, unsigned int max_primitives_per_node = 1, Strategy strategy = Strategy::sah);
 
 		auto gl_draw(Shader const& shader) const noexcept -> void override;
-		auto intersect() const noexcept ->bool override;
-		auto intersect_shadow() const noexcept ->bool override;
+		auto intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool override;
+		auto intersect_shadow(Ray const& ray) const noexcept ->bool override;
 		auto imgui_config() const noexcept ->void override;
 
 		auto world_bounds() const noexcept -> Bounds3f const& override;

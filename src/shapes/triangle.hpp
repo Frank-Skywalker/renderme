@@ -24,8 +24,8 @@ namespace renderme
 		auto operator=(Triangle_Mesh&&)->Triangle_Mesh & = default;
 
 		auto gl_draw(Shader const& shader) const noexcept -> void final;
-		auto intersect() const noexcept ->bool final;
-		auto intersect_shadow() const noexcept ->bool final;
+		auto intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool final;
+		auto intersect_shadow(Ray const& ray) const noexcept ->bool final;
 		auto imgui_config() const noexcept ->void final;
 
 		auto create_triangles() const noexcept->std::vector<Triangle>;
@@ -47,8 +47,8 @@ namespace renderme
 	{
 		Triangle(Transform const* object_to_world, Transform const* world_to_object, Triangle_Mesh const* mesh, unsigned int index);
 		auto gl_draw(Shader const& shader) const noexcept -> void final;
-		auto intersect() const noexcept ->bool final;
-		auto intersect_shadow() const noexcept ->bool final;
+		auto intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool final;
+		auto intersect_shadow(Ray const& ray) const noexcept ->bool final;
 		auto imgui_config() const noexcept ->void final;
 
 	private:

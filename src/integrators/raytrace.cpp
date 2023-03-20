@@ -27,7 +27,15 @@ namespace renderme
 
 	auto Raytrace_Integrator::render(Camera const* camera, Scene const& scene, Film* film) -> void
 	{
-
+		for (auto x = 0; x < film->resolution().x; ++x) {
+			for (auto y = 0; y < film->resolution().y; ++y) {
+				auto ray = camera->generate_ray(glm::vec2(float(x) / float(film->resolution().x), float(y) / float(film->resolution().y)));
+				Interaction interaction;
+				if (scene.intersect(ray, &interaction)) {
+					film->set_pixel(glm::uvec2(x, y), interaction.color);
+				}
+			}
+		}
 	}
 
 	auto Raytrace_Integrator::imgui_config() ->void

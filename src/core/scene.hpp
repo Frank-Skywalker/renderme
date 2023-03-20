@@ -5,6 +5,7 @@
 #include "light.hpp"
 #include "material.hpp"
 #include "texture.hpp"
+#include "interaction.hpp"
 
 #include<vector>
 #include<memory>
@@ -25,8 +26,8 @@ namespace renderme
 		);
 		auto gl_draw(Shader const& shader) const noexcept -> void;
 		auto imgui_config() -> void;
-		auto intersect() const noexcept->bool;
-		auto intersect_shadow() const noexcept->bool;
+		auto intersect(Ray const& ray, Interaction* interaction) const noexcept->bool;
+		auto intersect_shadow(Ray const& ray) const noexcept->bool;
 
 
 		std::string name;

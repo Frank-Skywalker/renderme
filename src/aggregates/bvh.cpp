@@ -153,14 +153,15 @@ namespace renderme
 
 	auto BVH::gl_draw(Shader const& shader) const noexcept -> void
 	{
+
 	}
 
-	auto BVH::intersect() const noexcept ->bool
+	auto BVH::intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool
 	{
 		return false;
 	}
 
-	auto BVH::intersect_shadow() const noexcept ->bool
+	auto BVH::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
 		return false;
 	}

@@ -17,14 +17,13 @@ namespace renderme
 		shape->gl_draw(shader);
 	}
 
-	auto Shape_Primitive::intersect() const noexcept ->bool
+	auto Shape_Primitive::intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool
 	{
-		return shape->intersect();
+		return shape->intersect(ray, interaction, nullptr);
 	}
-
-	auto Shape_Primitive::intersect_shadow() const noexcept ->bool
+	auto Shape_Primitive::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
-		return shape->intersect_shadow();
+		return shape->intersect_shadow(ray);
 	}
 
 	auto Shape_Primitive::imgui_config() const noexcept ->void

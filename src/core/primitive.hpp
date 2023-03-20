@@ -9,8 +9,8 @@ namespace renderme
 	struct Primitive
 	{
 		virtual auto gl_draw(Shader const& shader) const noexcept -> void =0;
-		virtual auto intersect() const noexcept ->bool = 0;
-		virtual auto intersect_shadow() const noexcept ->bool= 0;
+		virtual auto intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool = 0;
+		virtual auto intersect_shadow(Ray const& ray) const noexcept ->bool= 0;
 		virtual auto imgui_config() const noexcept ->void = 0;
 
 		virtual auto world_bounds() const noexcept -> Bounds3f const& = 0;
@@ -20,8 +20,8 @@ namespace renderme
 	{
 		Shape_Primitive(Shape const* shape, Material const* material);
 		auto gl_draw(Shader const& shader) const noexcept -> void final;
-		auto intersect() const noexcept ->bool final;
-		auto intersect_shadow() const noexcept ->bool final;
+		auto intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool final;
+		auto intersect_shadow(Ray const& ray) const noexcept ->bool final;
 		auto imgui_config() const noexcept ->void final;
 
 		auto world_bounds() const noexcept -> Bounds3f const& final;

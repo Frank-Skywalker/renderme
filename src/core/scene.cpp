@@ -31,21 +31,20 @@ namespace renderme
 	}
 
 
-	auto Scene::intersect() const noexcept->bool
+	auto Scene::intersect(Ray const& ray, Interaction* interaction) const noexcept->bool
 	{
 		auto result = false;
 		for (auto const& primitive : primitives) {
-			result |= primitive->intersect();
+			result |= primitive->intersect(ray, interaction);
 		}
 		return result;
 	}
 
-
-	auto Scene::intersect_shadow() const noexcept->bool
+	auto Scene::intersect_shadow(Ray const& ray) const noexcept->bool
 	{
 		auto result = false;
 		for (auto const& primitive : primitives) {
-			result |= primitive->intersect_shadow();
+			result |= primitive->intersect_shadow(ray);
 		}
 		return result;
 	}

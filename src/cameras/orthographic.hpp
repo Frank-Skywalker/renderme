@@ -19,7 +19,7 @@ namespace renderme
 		};
 
 		auto gl_draw(Shader const& shader) const noexcept -> void;
-		auto generate_ray() const noexcept ->float;
+		auto generate_ray(glm::vec2 const& p) const noexcept -> Ray override;
 		auto imgui_config() ->void;
 
 		auto process_keyboard(Camera_Movement move, float delta_time)->void;

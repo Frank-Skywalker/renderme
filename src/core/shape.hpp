@@ -3,6 +3,8 @@
 #include "transform.hpp"
 #include "shader.hpp"
 #include "bounds.hpp"
+#include "ray.hpp"
+#include "interaction.hpp"
 
 namespace renderme
 {
@@ -10,8 +12,8 @@ namespace renderme
 	{
 		Shape(Transform const* object_to_world, Transform const* world_to_object);
 		virtual auto gl_draw(Shader const& shader) const noexcept -> void = 0;
-		virtual auto intersect() const noexcept ->bool = 0;
-		virtual auto intersect_shadow() const noexcept ->bool = 0;
+		virtual auto intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool = 0;
+		virtual auto intersect_shadow(Ray const& ray) const noexcept ->bool = 0;
 		virtual auto imgui_config() const noexcept ->void = 0;
 
 		auto object_to_world() const noexcept -> Transform const*;

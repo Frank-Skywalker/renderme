@@ -1,5 +1,7 @@
 #include "perspective.hpp"
 
+#include <core/log.hpp>
+
 #include <imgui/imgui.h>
 
 
@@ -17,10 +19,19 @@ namespace renderme
 		shader.set_uniform_mat4("projection", config.projection.m);
 	}
 
-	auto Perspective_Camera::generate_ray() const noexcept ->float
+	auto Perspective_Camera::generate_ray(glm::vec2 const& p) const noexcept -> Ray
 	{
-		return 0;
+		if (p.x < 0 || p.x>1 || p.y < 0 || p.y>1) {
+			log(Status::fatal, "Invalid ray generate");
+		}
+
+		auto virtual_screen_size = 2 * tanf(config.fov / 2.0f);
+		auto ray_direction = config.front + config.right * (p.x - 0.5f) * virtual_screen_size + config.up * (p.y - 0.5f) * virtual_screen_size;
+		ray_direction = glm::normalize(ray_direction);
+
+		return Ray(config.position, ray_direction);
 	}
+
 	auto Perspective_Camera::imgui_config() ->void
 	{
 		auto modified=false;

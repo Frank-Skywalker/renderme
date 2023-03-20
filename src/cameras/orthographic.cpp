@@ -1,4 +1,7 @@
 #include "orthographic.hpp"
+
+#include <core/log.hpp>
+
 #include <imgui/imgui.h>
 
 namespace renderme
@@ -10,10 +13,15 @@ namespace renderme
 	}
 
 
-	auto Orthographic_Camera::generate_ray() const noexcept ->float
+	auto Orthographic_Camera::generate_ray(glm::vec2 const& p) const noexcept -> Ray
 	{
-		return 0;
+		if (p.x < 0 || p.x>1 || p.y < 0 || p.y>1) {
+			log(Status::fatal, "Invalid ray generate");
+		}
+
+		return Ray(glm::vec3(), glm::vec3());
 	}
+
 	auto Orthographic_Camera::imgui_config() ->void
 	{
 		ImGui::DragFloat3("Position", glm::value_ptr(config.position));

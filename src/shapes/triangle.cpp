@@ -66,15 +66,13 @@ namespace renderme
 		glBindVertexArray(0);
 	}
 
-	auto Triangle_Mesh::intersect() const noexcept ->bool
+	auto Triangle_Mesh::intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool
 	{
-		// Intersect nothing
 		return false;
 	}
 
-	auto Triangle_Mesh::intersect_shadow() const noexcept ->bool
+	auto Triangle_Mesh::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
-		// Intersect nothing
 		return false;
 	}
 
@@ -123,20 +121,19 @@ namespace renderme
 		return;
 	}
 
-	auto Triangle::intersect() const noexcept ->bool
+	auto Triangle::intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool
 	{
-		return true;
+		return false;
 	}
 
-	auto Triangle::intersect_shadow() const noexcept ->bool
+	auto Triangle::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
-		return true;
+		return false;
 	}
 
 	auto Triangle::imgui_config() const noexcept ->void
 	{
 		
 	}
-
 
 }
