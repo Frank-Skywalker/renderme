@@ -1,5 +1,3 @@
-#pragma once
-
 #include "film.hpp"
 #include "log.hpp"
 

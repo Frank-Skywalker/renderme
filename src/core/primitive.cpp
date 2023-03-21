@@ -19,7 +19,13 @@ namespace renderme
 
 	auto Shape_Primitive::intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool
 	{
-		return shape->intersect(ray, interaction, nullptr);
+		float t_hit;
+		if (shape->intersect(ray, interaction, &t_hit)) {
+			ray.update_tmax(t_hit);
+			interaction->material = material;
+			return true;
+		}
+		return false;
 	}
 	auto Shape_Primitive::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{

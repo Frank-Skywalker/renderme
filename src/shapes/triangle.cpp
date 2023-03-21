@@ -121,13 +121,98 @@ namespace renderme
 		return;
 	}
 
-	auto Triangle::intersect(Ray const& ray, Interaction* interaction, float* t) const noexcept ->bool
+	auto Triangle::intersect(Ray const& ray, Interaction* interaction, float* t_hit) const noexcept ->bool
 	{
+		// Get three points
+		auto a = mesh->positions[mesh->faces[index].x];
+		auto b = mesh->positions[mesh->faces[index].y];
+		auto c = mesh->positions[mesh->faces[index].z];
+
+		auto ro = ray.origin;
+		auto rd = ray.direction;
+
+		auto v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		auto v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		auto v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_a = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_beta = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		v2 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_gamma = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		v3 = glm::vec3(ro.x, ro.y, ro.z);
+
+		float det_t = glm::determinant(glm::mat3(v1, v2, v3));
+
+		auto beta = det_beta / det_a;
+		auto gamma = det_gamma / det_a;
+		auto t = det_t / det_a;
+
+		if ( ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
+		{
+			*t_hit = t;
+			interaction->position = ray.point_at(t);
+			interaction->normal = mesh->normals[mesh->faces[index].x];
+			interaction->color = mesh->normals[mesh->faces[index].x];
+			return true;
+		}
+
 		return false;
 	}
 
 	auto Triangle::intersect_shadow(Ray const& ray) const noexcept ->bool
 	{
+		// Get three points
+		auto a = mesh->positions[mesh->faces[index].x];
+		auto b = mesh->positions[mesh->faces[index].y];
+		auto c = mesh->positions[mesh->faces[index].z];
+
+		auto ro = ray.origin;
+		auto rd = ray.direction;
+
+		auto v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		auto v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		auto v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_a = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_beta = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		v2 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v3 = glm::vec3(rd.x, rd.y, rd.z);
+
+		float det_gamma = glm::determinant(glm::mat3(v1, v2, v3));
+
+		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
+		v3 = glm::vec3(ro.x, ro.y, ro.z);
+
+		float det_t = glm::determinant(glm::mat3(v1, v2, v3));
+
+		auto beta = det_beta / det_a;
+		auto gamma = det_gamma / det_a;
+		auto t = det_t / det_a;
+
+		if (ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
+		{
+			return true;
+		}
 		return false;
 	}
 
