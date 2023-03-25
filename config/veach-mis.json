@@ -1,0 +1,54 @@
+{
+  "film": {
+  },
+  "scenes": [
+    {
+      "name": "veach-mis",
+      "obj": "/data/veach-mis/veach-mis.obj",
+      "lights": [
+        {
+          "material": "light1",
+          "radiance": [
+            300,
+            300,
+            300
+          ]
+        },
+        {
+          "material": "light2",
+          "radiance": [
+            50,
+            50,
+            50
+          ]
+        },
+        {
+          "material": "light3",
+          "radiance": [
+            10,
+            10,
+            10
+          ]
+        }
+      ]
+    }
+  ],
+  "cameras": [
+    {
+      "type": "perspective",
+      "position": [
+        28.2792,
+        5.2,
+        1.23612e-06
+      ]
+    }
+  ],
+  "integrators": [
+    {
+      "type": "raytrace"
+    },
+    {
+      "type": "zbuffer"
+    }
+  ]
+}

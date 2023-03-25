@@ -25,7 +25,7 @@ namespace renderme
 		Bounds()
 		{
 			T max = std::numeric_limits<T>::max();
-			T min = std::numeric_limits<T>::min();
+			T min = std::numeric_limits<T>::lowest();
 			pmin = glm::tvec2<T>(max, max);
 			pmax = glm::tvec2<T>(min, min);
 		}
@@ -97,7 +97,7 @@ namespace renderme
 		Bounds()
 		{
 			T max = std::numeric_limits<T>::max();
-			T min = std::numeric_limits<T>::min();
+			T min = std::numeric_limits<T>::lowest();
 			pmin = glm::tvec3<T>(max, max, max);
 			pmax = glm::tvec3<T>(min, min, min);
 		}

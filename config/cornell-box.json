@@ -1,0 +1,38 @@
+{
+  "film": {
+  },
+  "scenes": [
+    {
+      "name": "cornell-box",
+      "obj": "/data/cornell-box/cornell-box.obj",
+      "lights": [
+        {
+          "material": "Light",
+          "radiance": [
+            34.0,
+            24.0,
+            8.0
+          ]
+        }
+      ]
+    }
+  ],
+  "cameras": [
+    {
+      "type": "perspective",
+      "position": [
+        278.0,
+        273.0,
+        -800.0
+      ]
+    }
+  ],
+  "integrators": [
+    {
+      "type": "raytrace"
+    },
+    {
+      "type": "zbuffer"
+    }
+  ]
+}

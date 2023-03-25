@@ -48,6 +48,7 @@ namespace renderme
 
 	private:
 		auto build_bvh_recursively(int begin, int end) -> std::unique_ptr<BVH_Node>;
+		auto build_bvh_vao()->void;
 
 	private:
 		std::vector<std::unique_ptr<Primitive>> primitives;
@@ -57,6 +58,7 @@ namespace renderme
 		std::vector<Primitive const*> ordered_primitives;
 		std::unique_ptr<BVH_Node> bvh_tree;
 
+		int num_bvh_nodes{0};
 		unsigned int vao;
 	};
 
