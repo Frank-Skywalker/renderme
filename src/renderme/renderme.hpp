@@ -37,8 +37,6 @@ namespace renderme
 		{
 			GL_Draw_Mode gl_draw_mode{GL_Draw_Mode::fill};
 			float line_width_point_size;
-
-			bool show_aggregate{ false };
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
 			bool enable_io{true};
@@ -91,7 +89,7 @@ namespace renderme
 		auto render() const noexcept->void;
 		auto imgui_config()->void;
 	private:
-		Runtime_Path app_path{ "/config/stairscase.json" };
+		Runtime_Path app_path{ "/config/veach-mis.json" };
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;

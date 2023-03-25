@@ -15,6 +15,13 @@ namespace renderme
 {
 	struct Scene final : Only_Movable
 	{
+
+		struct Config
+		{
+			bool show_aggregate{ true };
+			bool show_primitives{ true };
+		};
+
 		Scene(
 			std::string name,
 			std::vector<std::unique_ptr<Transform>> transforms,
@@ -37,5 +44,8 @@ namespace renderme
 		std::vector<std::unique_ptr<Material>> materials;
 		std::vector<std::unique_ptr<Primitive>> primitives;
 		std::vector<std::unique_ptr<Light>> lights;
+
+	private:
+		Config config;
 	};
 }

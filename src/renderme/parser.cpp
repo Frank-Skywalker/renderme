@@ -105,8 +105,8 @@ namespace renderme
 		// read file via ASSIMP
 		Assimp::Importer importer;
 		auto aiscene = importer.ReadFile(path.full_path(),
-			//aiProcess_Triangulate |
-			//aiProcess_GenSmoothNormals |
+			aiProcess_Triangulate |
+			aiProcess_GenSmoothNormals |
 			//aiProcess_FlipUVs |
 			//aiProcess_JoinIdenticalVertices |
 			//aiProcess_SortByPType |

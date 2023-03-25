@@ -395,7 +395,6 @@ namespace renderme
 
         ImGui::Checkbox("Enable IO", &config.enable_io);
         ImGui::Checkbox("Non-Realtime", &config.raytrace);
-        ImGui::Checkbox("Show Aggregate", &config.show_aggregate);
         if (scenes.size() > 0) {
             ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
         }

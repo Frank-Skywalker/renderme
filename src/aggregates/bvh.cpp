@@ -112,9 +112,9 @@ namespace renderme
 					}
 
 					auto cost = 1 + (left_count * left_bounds.surface_area() + right_count * right_bounds.surface_area()) / bounds.surface_area();
-					if (bounds.surface_area() == 0) {
-						cost = 1;
-					}
+					//if (bounds.surface_area() == 0) {
+					//	cost = 1;
+					//}
 
 					//std::cout << "left surface area: " << left_bounds.surface_area() << std::endl;
 					//std::cout << "right surface area: " << right_bounds.surface_area() << std::endl;
