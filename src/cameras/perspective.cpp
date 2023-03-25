@@ -21,14 +21,22 @@ namespace renderme
 
 	auto Perspective_Camera::generate_ray(glm::vec2 const& p) const noexcept -> Ray
 	{
+		// Ensure that p is in NDC space
 		if (p.x < -1 || p.x > 1 || p.y < -1 || p.y > 1) {
 			log(Status::fatal, "Invalid ray generate");
 		}
 
-		//auto ray_direction = config.front + config.right * (p.x - 0.5f) + config.up * (p.y - 0.5f);
-		//ray_direction = glm::normalize(ray_direction);
-		Ray local_ray(glm::vec3(p.x, p.y, 1.0f), glm::vec3(0.f, 0.f, -1.f));
-		return camera_to_world.transform_ray(local_ray);
+		//auto origin = config.projection.transform_point(glm::vec3(0.f, 0.f, 0.f));
+		//Ray local_ray(glm::vec3(p.x, p.y, origin.z), glm::vec3(0.f, 0.f, 1.f), config.near, config.far);
+		//return camera_to_world.transform_ray(local_ray);
+
+		auto front_scale = config.near;
+		auto up_scale = front_scale * std::tanf( glm::radians(config.fov) / 2.f);
+		auto right_scale = up_scale * config.aspect;
+		
+		auto ray_direction = config.front * front_scale + config.up * up_scale * p.y + config.right * right_scale * p.x;
+		ray_direction = glm::normalize(ray_direction);
+		return Ray(config.position, ray_direction, config.near, config.far);
 	}
 
 	auto Perspective_Camera::imgui_config() ->void
