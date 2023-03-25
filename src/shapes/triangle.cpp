@@ -105,6 +105,10 @@ namespace renderme
 		_object_bounds.eat(p1);
 		_object_bounds.eat(p2);
 
+		if (_object_bounds.is_line()) {
+			log(Status::error, "Line found");
+		}
+
 		if (object_to_world != nullptr) {
 			_world_bounds.eat(object_to_world->transform_point(p0));
 			_world_bounds.eat(object_to_world->transform_point(p1));

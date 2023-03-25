@@ -41,6 +41,21 @@ namespace renderme
 			:pmin{ glm::min(b1.pmin, b2.pmin) },
 			pmax{ glm::max(b1.pmax, b2.pmax) } {}
 
+		auto is_valid() const noexcept -> bool
+		{
+			return pmax.x >= pmin.x && pmax.y >= pmin.y;
+		}
+
+		auto is_line() const noexcept->bool
+		{
+			return pmin.x == pmax.x || pmin.y == pmax.y;
+		}
+
+		auto is_point() const noexcept->bool
+		{
+			return pmin == pmax;
+		}
+
 		auto eat(glm::tvec3<T> const& p) -> void
 		{
 			pmin = glm::min(pmin, p);
@@ -112,6 +127,28 @@ namespace renderme
 		Bounds(Bounds const& b1, Bounds const& b2)
 			:pmin{ glm::min(b1.pmin, b2.pmin) },
 			pmax{ glm::max(b1.pmax, b2.pmax) } {}
+
+		auto is_valid() const noexcept -> bool
+		{
+			return pmax.x >= pmin.x && pmax.y >= pmin.y && pmax.z >= pmin.z;
+		}
+
+		auto is_planar() const noexcept -> bool
+		{
+			return pmin.x == pmax.x || pmin.y == pmax.y || pmin.z == pmax.z;
+		}
+
+		auto is_line() const noexcept->bool
+		{
+			return (pmin.x == pmax.x && pmin.y == pmax.y)
+				|| (pmin.x == pmax.x && pmin.z == pmax.z)
+				|| (pmin.y == pmax.y && pmin.z == pmax.z);
+		}
+
+		auto is_point() const noexcept->bool
+		{
+			return pmin == pmax;
+		}
 
 		auto eat(glm::tvec3<T> const& p) -> void
 		{

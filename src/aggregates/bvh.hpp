@@ -36,7 +36,7 @@ namespace renderme
 
 	struct BVH final: Aggregate
 	{
-		BVH(std::vector<std::unique_ptr<Primitive>> primivites, unsigned int max_primitives_per_node = 1, Strategy strategy = Strategy::sah);
+		BVH(std::vector<std::unique_ptr<Primitive>> primivites, Strategy strategy = Strategy::sah);
 
 		auto gl_draw(Shader const& shader) const noexcept -> void override;
 		auto intersect(Ray const& ray, Interaction* interaction) const noexcept ->bool override;
@@ -52,7 +52,6 @@ namespace renderme
 
 	private:
 		std::vector<std::unique_ptr<Primitive>> primitives;
-		unsigned int max_primitives_per_node{ 1 };
 		Strategy strategy{ Strategy::sah };
 
 		std::vector<Primitive const*> ordered_primitives;

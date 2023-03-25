@@ -9,6 +9,7 @@
 #include <array>
 #include <iostream>
 
+#define RR_BVH_MAX_PRIMITIVE_NUM_PER_NODE 1
 #define RR_BVH_SAH_APROXIMATE_LIMIT 2
 #define RR_BVH_SAH_BUCKET_NUM 12
 
@@ -25,10 +26,6 @@ namespace renderme
 			bounds.eat(ordered_primitives[i]->world_bounds());
 			center_bounds.eat(ordered_primitives[i]->world_bounds().center());
 		}
-		//std::cout << "center_bounds min: " << center_bounds.pmin << std::endl;
-		//std::cout << "center_bounds max: " << center_bounds.pmax << std::endl;
-		//std::cout << "bounds min: " << bounds.pmin << std::endl;
-		//std::cout << "bounds max: " << bounds.pmax << std::endl;
 		auto num_primitives = end - begin;
 
 		// Create a leaf node if only one primitive is left
@@ -73,23 +70,13 @@ namespace renderme
 				for (auto i = begin; i < end; ++i) {
 					// Calculate which bucket this primitive center falls in
 					auto offset = center_bounds.offset(ordered_primitives[i]->world_bounds().center());
-					//std::cout << "world_bounds center: " << ordered_primitives[i]->world_bounds().center() << std::endl;
-					//std::cout << "offset: " << offset << std::endl;
 					int n = RR_BVH_SAH_BUCKET_NUM * offset[int(axis)];
 					if (n >= RR_BVH_SAH_BUCKET_NUM)
 						n = RR_BVH_SAH_BUCKET_NUM - 1;
-
-					//std::cout << "n: " << n << std::endl;
-
 					++buckets[n].first;
 					buckets[n].second.eat(ordered_primitives[i]->world_bounds());
 				}
 
-				//for (auto i = 0; i < RR_BVH_SAH_BUCKET_NUM; ++i) {
-				//	std::cout << "bucket" << i << ": " << buckets[i].first << std::endl;
-				//	std::cout << "min" << i << ": " << buckets[i].second.pmin << std::endl;
-				//	std::cout << "max" << i << ": " << buckets[i].second.pmax << std::endl;
-				//}
 
 				// Compute costs when partitioning before each bucket
 				// Find minimum cost partition at the same time
@@ -111,27 +98,26 @@ namespace renderme
 						right_bounds.eat(buckets[j].second);
 					}
 
-					auto cost = 1 + (left_count * left_bounds.surface_area() + right_count * right_bounds.surface_area()) / bounds.surface_area();
-					//if (bounds.surface_area() == 0) {
-					//	cost = 1;
-					//}
+					assert(left_bounds.is_valid());
+					assert(right_bounds.is_valid());
+					assert(bounds.is_valid());
 
-					//std::cout << "left surface area: " << left_bounds.surface_area() << std::endl;
-					//std::cout << "right surface area: " << right_bounds.surface_area() << std::endl;
-					//std::cout << "bounds surface area: " << bounds.surface_area() << std::endl;
-					//std::cout << "cost: " << cost << std::endl;
-					//std::cout << "min cost: " << min_cost << std::endl;
+					auto cost = 1 + (left_count * left_bounds.surface_area() + right_count * right_bounds.surface_area()) / bounds.surface_area();
+
+					// In case a bound degenerates into a line for some ill-formed triangle
+					if (bounds.surface_area() == 0) {
+						cost = 1;
+					}
+
 					if (cost < min_cost) {
 						min_cost = cost;
 						min_split_bucket = i;
 					}
 				}
 
-				//std::cout << "min_split: "<<min_split_bucket << std::endl;
-
 				float leaf_cost = num_primitives;
 				// Create leaf node
-				if (min_cost >= leaf_cost && num_primitives <= max_primitives_per_node) {
+				if (min_cost >= leaf_cost && num_primitives <= RR_BVH_MAX_PRIMITIVE_NUM_PER_NODE) {
 					return std::make_unique<BVH_Node>(begin, num_primitives, bounds);
 				}
 				// Perform partition
@@ -218,8 +204,8 @@ namespace renderme
 
 
 			if (node->num_primitives == 0) {
-				stack.push(node->right.get());
 				stack.push(node->left.get());
+				stack.push(node->right.get());
 			}
 		}
 
@@ -257,8 +243,8 @@ namespace renderme
 	}
 
 
-	BVH::BVH(std::vector<std::unique_ptr<Primitive>> _primitives, unsigned int _max_primitives_per_node, Strategy strategy)
-		:primitives{ std::move(_primitives) }, max_primitives_per_node{_max_primitives_per_node}, strategy{strategy}
+	BVH::BVH(std::vector<std::unique_ptr<Primitive>> _primitives, Strategy strategy)
+		:primitives{ std::move(_primitives) }, strategy{strategy}
 	{
 		ordered_primitives.reserve(primitives.size());
 		for (auto const& prim : primitives) {
@@ -274,7 +260,7 @@ namespace renderme
 	{
 		shader.set_uniform_mat4("model", glm::identity<glm::mat4>());
 		glBindVertexArray(vao);
-		glDrawElements(GL_LINES, num_bvh_nodes * 12, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_LINES, num_bvh_nodes * 2 * 12, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 	}
 

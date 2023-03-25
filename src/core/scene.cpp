@@ -65,7 +65,7 @@ namespace renderme
 	auto Scene::imgui_config()->void
 	{
 		ImGui::Checkbox("Show Aggreagte", &config.show_aggregate);
-		ImGui::Checkbox("Show Aggreagte", &config.show_primitives);
+		ImGui::Checkbox("Show Primitives", &config.show_primitives);
 
 		//auto i = 0;
 		auto face_count = 0;
