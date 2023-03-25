@@ -57,5 +57,13 @@ namespace renderme
 		return os << transform.m;
 	}
 
+	auto Transform::transform_ray(Ray const& ray) const noexcept ->Ray
+	{
+		glm::vec3 origin = transform_point(ray.origin);
+		glm::vec3 direction = glm::normalize(transform_vector(ray.direction));
+		return Ray(origin, direction, ray.tmin, ray.tmax);
+	}
+
+
 
 }

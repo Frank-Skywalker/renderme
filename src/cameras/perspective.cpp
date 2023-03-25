@@ -21,15 +21,14 @@ namespace renderme
 
 	auto Perspective_Camera::generate_ray(glm::vec2 const& p) const noexcept -> Ray
 	{
-		if (p.x < 0 || p.x>1 || p.y < 0 || p.y>1) {
+		if (p.x < -1 || p.x > 1 || p.y < -1 || p.y > 1) {
 			log(Status::fatal, "Invalid ray generate");
 		}
 
-		auto virtual_screen_size = 2 * tanf(config.fov / 2.0f);
-		auto ray_direction = config.front + config.right * (p.x - 0.5f) * virtual_screen_size + config.up * (p.y - 0.5f) * virtual_screen_size;
-		ray_direction = glm::normalize(ray_direction);
-
-		return Ray(config.position, ray_direction);
+		//auto ray_direction = config.front + config.right * (p.x - 0.5f) + config.up * (p.y - 0.5f);
+		//ray_direction = glm::normalize(ray_direction);
+		Ray local_ray(glm::vec3(p.x, p.y, 1.0f), glm::vec3(0.f, 0.f, -1.f));
+		return camera_to_world.transform_ray(local_ray);
 	}
 
 	auto Perspective_Camera::imgui_config() ->void

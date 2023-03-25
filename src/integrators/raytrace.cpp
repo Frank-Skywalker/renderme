@@ -29,7 +29,9 @@ namespace renderme
 	{
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
-				auto ray = camera->generate_ray(glm::vec2(float(x) / float(film->resolution().x), float(y) / float(film->resolution().y)));
+				auto ndc_x = float(x) / float(film->resolution().x) * 2.0f - 1.0f;
+				auto ndc_y = float(y) / float(film->resolution().y) * 2.0f - 1.0f;
+				auto ray = camera->generate_ray(glm::vec2(ndc_x, ndc_y));
 				Interaction interaction;
 				if (scene.intersect(ray, &interaction)) {
 					film->set_pixel(glm::uvec2(x, y), interaction.color);

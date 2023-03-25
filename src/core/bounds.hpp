@@ -199,24 +199,24 @@ namespace renderme
 
 		auto intersect(Ray const& ray) const noexcept -> bool
 		{
-			auto tnear = std::numeric_limits<float>::min();
+			auto tnear = std::numeric_limits<float>::lowest();
 			auto tfar = std::numeric_limits<float>::max();
 
 			for (int i = 0; i < 3; i++) {
-				if (ray.direction[i] >= 0) {
-					tnear = std::fmin(tnear, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
-					tfar = std::fmin(tfar, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
+				if (ray.inv_direction[i] >= 0) {
+					tnear = std::fmaxf(tnear, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
+					tfar = std::fminf(tfar, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
 				}
 				else {
-					tnear = std::fmax(tnear, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
-					tfar = std::fmin(tfar, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
+					tnear = std::fmaxf(tnear, (pmax[i] - ray.origin[i]) * ray.inv_direction[i]);
+					tfar = std::fminf(tfar, (pmin[i] - ray.origin[i]) * ray.inv_direction[i]);
 				}
 			}
 
 			// Add EPSILON to ensure robust
 			tfar += RR_EPSILON;
 
-			if (tnear > tfar || tnear > ray.tmax || tfar < 0) {
+			if (tnear > tfar || tnear > ray.tmax || tfar < ray.tmin) {
 				return false;
 			}
 			return true;

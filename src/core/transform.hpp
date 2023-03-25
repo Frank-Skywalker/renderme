@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm-all.hpp>
-
+#include "ray.hpp"
 #include <iostream>
 
 namespace renderme
@@ -29,6 +29,8 @@ namespace renderme
 		auto transform_vector(glm::tvec3<T> const& vector) const noexcept ->glm::tvec3<T>;
 		template<typename T>
 		auto transform_normal(glm::tvec3<T> const& normal) const noexcept ->glm::tvec3<T>;
+
+		auto transform_ray(Ray const& ray) const noexcept ->Ray;
 
 
 		glm::mat4 m;
