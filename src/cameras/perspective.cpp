@@ -7,9 +7,17 @@
 
 namespace renderme
 {
-
 	Perspective_Camera::Perspective_Camera()
 	{
+		update_camera_transforms();
+	}
+
+	Perspective_Camera::Perspective_Camera(glm::vec3 position, float yaw, float pitch, float fov)
+	{
+		config.position = position;
+		config.yaw = yaw;
+		config.pitch = pitch;
+		config.fov = fov;
 		update_camera_transforms();
 	}
 

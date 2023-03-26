@@ -22,13 +22,20 @@ namespace renderme
 
 	auto parse_camera(nlohmann::json const& j)->std::unique_ptr<Camera>
 	{
-		std::string type = j.at("type");
+		std::unique_ptr<Camera> camera;
 
+		std::string type = j.at("type");
 		if (type == "perspective") {
-			auto camera = std::make_unique<Perspective_Camera>();
-			camera->config.position.x = j.at("position").at(0);
-			camera->config.position.y = j.at("position").at(1);
-			camera->config.position.z = j.at("position").at(2);
+			if (j.contains("position")) {
+				auto position = glm::vec3(j.at("position").at(0), j.at("position").at(1), j.at("position").at(2));
+				float yaw = j.at("yaw");
+				float pitch = j.at("pitch");
+				float fov = j.at("fov");
+				camera = std::make_unique<Perspective_Camera>(position, yaw, pitch, fov);
+			}
+			else {
+				camera = std::make_unique<Perspective_Camera>();
+			}
 			return camera;
 		}
 

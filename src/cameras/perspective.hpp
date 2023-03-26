@@ -8,6 +8,7 @@ namespace renderme
 	struct Perspective_Camera final: Camera
 	{
 		Perspective_Camera();
+		Perspective_Camera(glm::vec3 position, float yaw, float pitch, float fov);
 		struct Config
 		{
 			//Can be set

@@ -102,10 +102,13 @@ namespace renderme
 
 
         ///////////Data Members Init/////////////////
-
         try {
             std::ifstream f(app_path.full_path());
             nlohmann::json j = nlohmann::json::parse(f);
+
+            config.framebuffer_size.x = j.at("width");
+            config.framebuffer_size.y = j.at("height");
+            glfwSetWindowSize(window, config.framebuffer_size.x, config.framebuffer_size.y);
 
             film = parse_film(j.at("film"));
 
