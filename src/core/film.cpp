@@ -20,9 +20,33 @@ namespace renderme
 		return _resolution;
 	}
 
+	auto Film::clear_color() const noexcept -> glm::vec3 const&
+	{
+		return _clear_color;
+	}
+
+	auto Film::pixel_of(glm::uvec2 id) const noexcept-> glm::vec3 const&
+	{
+		if (id.x >= _resolution.x || id.y >= _resolution.y) {
+			log(Status::fatal, "Index out of range");
+		}
+		auto index = id.y * _resolution.x + id.x;
+		return pixels[index];
+	}
+
+	auto Film::pixel_of(unsigned int x, unsigned int y) const noexcept -> glm::vec3 const&
+	{
+		if (x >= _resolution.x || y >= _resolution.y) {
+			log(Status::fatal, "Index out of range");
+		}
+		auto index = y * _resolution.x + x;
+		return pixels[index];
+
+	}
+
 	auto Film::set_clear_color(glm::vec3 const& color) -> void
 	{
-		clear_color = color;
+		_clear_color = color;
 	}
 
 
@@ -58,12 +82,17 @@ namespace renderme
 
 	auto Film::clear() ->void
 	{
-		std::fill(pixels.get(), pixels.get() + _resolution.x * _resolution.y, clear_color);
+		std::fill(pixels.get(), pixels.get() + _resolution.x * _resolution.y, _clear_color);
 	}
 
 	auto Film::hash() const noexcept-> std::size_t
 	{
-		return Hasher().hash(_resolution).hash(clear_color).value();
+		return Hasher().hash(_resolution).hash(_clear_color).value();
+	}
+
+	auto Film::export_to_file(Runtime_Path path) const noexcept -> void
+	{
+
 	}
 
 }

@@ -9,7 +9,7 @@ namespace renderme
 	{
 		glm::vec3 position;
 		glm::vec3 normal;
-		glm::vec3 color;
+		glm::vec3 color{ 0.f,0.f,0.f };
 		Material const* material;
 	};
 }

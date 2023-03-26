@@ -1,8 +1,12 @@
 #include "path-tracer.hpp"
 
 #include <core/shader.hpp>
+#include <core/log.hpp>
 
 #include <imgui/imgui.h>
+
+#define RR_PATH_TRACER_MAX_ITERATION 100
+#define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 10
 
 namespace renderme
 {
@@ -33,20 +37,36 @@ namespace renderme
 			hash_hash(std::size_t(film)).hash_hash(film->hash()).value();
 
 		if (last_hash != new_hash) {
+			last_hash = new_hash;
 			film->clear();
+			iteration_counter = 0;
 		}
 
+		if (iteration_counter == RR_PATH_TRACER_MAX_ITERATION) {
+			return;
+		}
+
+		++iteration_counter;
+		log(Status::log, "Path Tracing Begins");
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
-				//auto ndc_x = float(x) / float(film->resolution().x) * 2.0f - 1.0f;
-				//auto ndc_y = float(y) / float(film->resolution().y) * 2.0f - 1.0f;
 				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
 				auto ray = camera->generate_ray(sample);
-				auto color = trace(std::move(ray), scene, 0);
-				film->set_pixel(glm::uvec2(x, y), color);
+				auto new_color = trace(std::move(ray), scene, 0);
+
+				if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
+					auto& last_color = film->pixel_of(glm::uvec2(x, y));
+					if (last_color != film->clear_color()) {
+						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
+					}
+					film->set_pixel(glm::uvec2(x, y), new_color);
+				}
 			}
 		}
 
+		if (iteration_counter % RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION == 0) {
+			film->export_to_file(Runtime_Path());
+		}
 	}
 
 	auto Path_Tracer::imgui_config() ->void
@@ -61,7 +81,6 @@ namespace renderme
 	auto Path_Tracer::trace(Ray ray, Scene const& scene, int depth) -> glm::vec3
 	{
 		Interaction interaction;
-		scene.intersect(ray, &interaction);
 		scene.intersect(ray, &interaction);
 		return interaction.color;
 	}
