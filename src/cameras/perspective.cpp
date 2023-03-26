@@ -176,5 +176,10 @@ namespace renderme
 		camera_to_world = world_to_camera.inverse();
 	}
 
+	auto Perspective_Camera::hash() const noexcept-> std::size_t
+	{
+		return Hasher().hash(config.position).hash(config.world_up).hash(config.yaw).hash(config.pitch).hash(config.fov).hash(config.near).hash(config.far).value();
+	}
+
 
 }

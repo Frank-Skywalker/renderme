@@ -20,6 +20,12 @@ namespace renderme
 		return _resolution;
 	}
 
+	auto Film::set_clear_color(glm::vec3 const& color) -> void
+	{
+		clear_color = color;
+	}
+
+
 	auto Film::set_pixel(unsigned int x, unsigned int y, glm::vec3 const& p) ->void
 	{
 		if (x >= _resolution.x || y >= _resolution.y) {
@@ -50,9 +56,9 @@ namespace renderme
 		glDrawPixels(_resolution.x, _resolution.y, GL_RGB, GL_FLOAT, pixels.get());
 	}
 
-	auto Film::clear(glm::vec3 const& color) ->void
+	auto Film::clear() ->void
 	{
-		std::fill(pixels.get(), pixels.get() + _resolution.x * _resolution.y, color);
+		std::fill(pixels.get(), pixels.get() + _resolution.x * _resolution.y, clear_color);
 	}
 
 }

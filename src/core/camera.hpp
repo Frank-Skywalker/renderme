@@ -25,6 +25,7 @@ namespace renderme
 		virtual auto process_cursor(float xoffset, float yoffset)->void = 0;
 		virtual auto process_scroll(float offset)->void = 0;
 		virtual auto reset_aspect(float aspect)->void = 0;
+		virtual auto hash() const noexcept-> std::size_t = 0;
 
 		Transform camera_to_world;
 		Transform world_to_camera;

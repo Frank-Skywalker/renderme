@@ -14,12 +14,14 @@ namespace renderme
 		auto set_pixel(unsigned int x, unsigned int y, glm::vec3 const& p) ->void;
 		auto set_pixel(glm::uvec2 id, glm::vec3 const& p) ->void;
 		auto resolution() const noexcept ->glm::uvec2 const&;
+		auto set_clear_color(glm::vec3 const& color) -> void;
 
 		auto gl_display() const noexcept ->void;
-		auto clear(glm::vec3 const& color) ->void;
+		auto clear() ->void;
 
 	private:
 		std::unique_ptr<glm::vec3[]> pixels;
 		glm::uvec2 _resolution;
+		glm::vec3 clear_color{ 0.f, 0.f, 0.f };
 	};
 }

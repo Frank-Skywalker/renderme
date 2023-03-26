@@ -65,4 +65,10 @@ namespace renderme
 
 	}
 
+	auto Orthographic_Camera::hash() const noexcept-> std::size_t
+	{
+		return 0;
+	}
+
+
 }

@@ -21,6 +21,9 @@ namespace renderme
 			float near{0.1f};
 			float far{10000.0f};
 
+			// Fed in
+			float aspect{ 1.0f };
+
 			//Calculated from above
 			glm::vec3 up;
 			glm::vec3 front;
@@ -28,9 +31,6 @@ namespace renderme
 
 			Transform view;
 			Transform projection;
-
-			// Fed in
-			float aspect{1.0f};
 
 			//Speed metadatas
 			float move_speed{2.0f};
@@ -47,6 +47,8 @@ namespace renderme
 		auto process_cursor(float xdelta, float ydelta)->void override;
 		auto process_scroll(float delta)->void override;
 		auto reset_aspect(float aspect)->void override;
+		auto hash() const noexcept-> std::size_t override;
+
 
 
 	private:
