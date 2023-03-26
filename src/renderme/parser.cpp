@@ -6,7 +6,7 @@
 #include<cameras/perspective.hpp>
 #include<materials/phong.hpp>
 #include<integrators/zbuffer.hpp>
-#include<integrators/raytrace.hpp>
+#include<integrators/path-tracer.hpp>
 #include<aggregates/bvh.hpp>
 
 #include <assimp/Importer.hpp>
@@ -50,8 +50,8 @@ namespace renderme
 		if (type == "zbuffer") {
 			return std::make_unique<ZBuffer_Integrator>();
 		}
-		else if (type == "raytrace") {
-			return std::make_unique<Raytrace_Integrator>();
+		else if (type == "pathtracer") {
+			return std::make_unique<Path_Tracer>();
 		}
 
 		throw std::logic_error("Invalid integrator type");

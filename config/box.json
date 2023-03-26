@@ -18,10 +18,10 @@
   ],
   "integrators": [
     {
-      "type": "zbuffer"
+      "type": "pathtracer"
     },
     {
-      "type": "raytrace"
+      "type": "zbuffer"
     }
   ]
 }

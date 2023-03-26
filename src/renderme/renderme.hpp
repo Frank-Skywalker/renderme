@@ -90,7 +90,7 @@ namespace renderme
 		auto render() const noexcept->void;
 		auto imgui_config()->void;
 	private:
-		Runtime_Path app_path{ "/config/cornell-box.json" };
+		Runtime_Path app_path{ "/config/box.json" };
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;

@@ -34,7 +34,7 @@
   ],
   "integrators": [
     {
-      "type": "raytrace"
+      "type": "pathtracer"
     },
     {
       "type": "zbuffer"
