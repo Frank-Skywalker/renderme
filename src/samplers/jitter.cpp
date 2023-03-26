@@ -10,7 +10,7 @@ namespace renderme
 		std::srand(std::time(nullptr));
 	}
 
-	auto Jitter_Sampler::get_ndc_sample(glm::uvec2 pos) -> glm::vec2
+	auto Jitter_Sampler::get_ndc_sample(glm::uvec2 pos) const noexcept -> glm::vec2
 	{
 		if (pos.x >= sample_space.x || pos.y >= sample_space.y) {
 			log(Status::fatal, "Exists sample space");

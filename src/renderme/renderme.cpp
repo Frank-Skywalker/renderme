@@ -123,6 +123,10 @@ namespace renderme
             for (auto const& json : j.at("integrators")) {
                 integrators.push_back(parse_integrator(json));
             }
+
+            for (auto const& json : j.at("samplers")) {
+                samplers.push_back(parse_sampler(json));
+            }
         }
         catch (std::exception const& e) {
             log(Status::fatal, e.what());
@@ -132,6 +136,9 @@ namespace renderme
             film->reset_resolution(config.framebuffer_size);
         for (auto& camera : cameras) {
             camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
+        }
+        for (auto& sampler : samplers) {
+            sampler->reset_sample_space(config.framebuffer_size);
         }
     }
 
@@ -196,7 +203,7 @@ namespace renderme
     auto Renderme::update()->void
     {
         //Update renderme state
-        if (integrators.size() > 0 && scenes.size() > 0 && cameras.size() > 0) {
+        if (integrators.size() > 0 && scenes.size() > 0 && cameras.size() > 0 && samplers.size() > 0) {
             state = State::ready;
         }
         else {
@@ -216,6 +223,9 @@ namespace renderme
             film->reset_resolution(config.framebuffer_size);
             for (auto& camera : cameras) {
                 camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
+            }
+            for (auto& sampler : samplers) {
+                sampler->reset_sample_space(config.framebuffer_size);
             }
         }
 
@@ -367,14 +377,14 @@ namespace renderme
 	auto Renderme::gl_draw() const noexcept->void
 	{
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-		integrators[config.integrator_index]->gl_draw(cameras[config.camera_index].get(), *scenes[config.scene_index]);
+		integrators[config.integrator_index]->gl_draw(*scenes[config.scene_index], cameras[config.camera_index].get());
 	}
 
 	auto Renderme::render() const noexcept->void
 	{
         film->clear(glm::vec3(config.clear_color.x/config.clear_color.w, config.clear_color.y / config.clear_color.w, config.clear_color.z / config.clear_color.w));
         assert(config.integrator_index < integrators.size() && config.scene_index < scenes.size());
-        integrators[config.integrator_index]->render(cameras[config.camera_index].get(), *scenes[config.scene_index], film.get());
+        integrators[config.integrator_index]->render(*scenes[config.scene_index], cameras[config.camera_index].get(), samplers[config.sampler_index].get(), film.get());
         film->gl_display();
 	}
 
@@ -403,6 +413,9 @@ namespace renderme
         }
         if (integrators.size() > 0) {
             ImGui::SliderInt("Integrator", (int*)&config.integrator_index, 0, integrators.size() - 1);
+        }
+        if (samplers.size() > 0) {
+            ImGui::SliderInt("Sampler", (int*)&config.sampler_index, 0, samplers.size() - 1);
         }
         //if (cameras.size() > 0) {
         //    ImGui::SliderInt("Camera", (int*)&config.camera_index, 0, cameras.size() - 1);

@@ -7,6 +7,9 @@
 #include<materials/phong.hpp>
 #include<integrators/zbuffer.hpp>
 #include<integrators/path-tracer.hpp>
+#include<samplers/uniform.hpp>
+#include<samplers/jitter.hpp>
+#include<samplers/random.hpp>
 #include<aggregates/bvh.hpp>
 
 #include <assimp/Importer.hpp>
@@ -57,6 +60,25 @@ namespace renderme
 		throw std::logic_error("Invalid integrator type");
 		return nullptr;
 	}
+
+	auto parse_sampler(nlohmann::json const& j) -> std::unique_ptr<Sampler>
+	{
+		std::string type = j.at("type");
+
+		if (type == "uniform") {
+			return std::make_unique<Uniform_Sampler>();
+		}
+		else if (type == "jitter") {
+			return std::make_unique<Jitter_Sampler>();
+		}
+		else if (type == "random") {
+			return std::make_unique<Random_Sampler>();
+		}
+
+		throw std::logic_error("Invalid integrator type");
+		return nullptr;
+	}
+
 
 
 	auto parse_scene(nlohmann::json const& j)->std::unique_ptr<Scene>

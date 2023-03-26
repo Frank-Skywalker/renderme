@@ -48,13 +48,13 @@ namespace renderme
 
 		ZBuffer_Integrator();
 
-		auto gl_draw(Camera const* camera, Scene const& scene) -> void;
-		auto render(Camera const* camera, Scene const& scene, Film* film)  -> void;
-		auto imgui_config() ->void;
+		auto gl_draw(Scene const& scene, Camera const* camera) -> void override;
+		auto render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film)  -> void override;
+		auto imgui_config() ->void override;
 
 	private:
 		//Build the polygon table and edge table
-		auto build_polygon_table(Camera const* camera, Scene const& scene, Film* film)->void;
+		auto build_polygon_table(Scene const& scene, Camera const* camera, Film* film)->void;
 		auto perform_zbuffer(Film* film)->void;
 		auto clean_polygon_table()->void;
 

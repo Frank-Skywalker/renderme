@@ -8,6 +8,7 @@
 #include<core/light.hpp>
 #include<core/texture.hpp>
 #include<core/film.hpp>
+#include<core/sampler.hpp>
 
 #include<vector>
 #include<unordered_map>
@@ -40,6 +41,7 @@ namespace renderme
 	auto parse_film(nlohmann::json const& json) -> std::unique_ptr<Film>;
 	auto parse_camera(nlohmann::json const& json) -> std::unique_ptr<Camera>;
 	auto parse_integrator(nlohmann::json const& json) -> std::unique_ptr<Integrator>;
+	auto parse_sampler(nlohmann::json const& json) -> std::unique_ptr<Sampler>;
 	auto parse_scene(nlohmann::json const& json) -> std::unique_ptr<Scene>;
 
 

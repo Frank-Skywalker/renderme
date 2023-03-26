@@ -7,8 +7,8 @@ namespace renderme
 	{
 		Path_Tracer();
 
-		auto gl_draw(Camera const* camera, Scene const& scene) -> void override;
-		auto render(Camera const* camera, Scene const& scene, Film* film) -> void override;
+		auto gl_draw(Scene const& scene, Camera const* camera) -> void override;
+		auto render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film) -> void override;
 		auto imgui_config() -> void override;
 
 	private:

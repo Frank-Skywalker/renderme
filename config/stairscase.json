@@ -79,5 +79,16 @@
     {
       "type": "zbuffer"
     }
+  ],
+  "samplers": [
+    {
+      "type": "uniform"
+    },
+    {
+      "type": "jitter"
+    },
+    {
+      "type": "random"
+    }
   ]
 }

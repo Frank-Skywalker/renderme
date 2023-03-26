@@ -12,7 +12,7 @@ namespace renderme
 
 	}
 
-	auto Path_Tracer::gl_draw(Camera const* camera, Scene const& scene) -> void
+	auto Path_Tracer::gl_draw(Scene const& scene, Camera const* camera) -> void
 	{
 		//Be sure to enable shader before setting uniforms
 		shader->use();
@@ -25,13 +25,14 @@ namespace renderme
 		shader->unuse();
 	}
 
-	auto Path_Tracer::render(Camera const* camera, Scene const& scene, Film* film) -> void
+	auto Path_Tracer::render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film) -> void
 	{
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
-				auto ndc_x = float(x) / float(film->resolution().x) * 2.0f - 1.0f;
-				auto ndc_y = float(y) / float(film->resolution().y) * 2.0f - 1.0f;
-				auto ray = camera->generate_ray(glm::vec2(ndc_x, ndc_y));
+				//auto ndc_x = float(x) / float(film->resolution().x) * 2.0f - 1.0f;
+				//auto ndc_y = float(y) / float(film->resolution().y) * 2.0f - 1.0f;
+				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
+				auto ray = camera->generate_ray(sample);
 				auto color = trace(std::move(ray), scene, 0);
 				film->set_pixel(glm::uvec2(x, y), color);
 			}

@@ -14,7 +14,7 @@ namespace renderme
 		:Integrator(std::make_unique<Shader>("src/shaders/phong.vert.glsl", "src/shaders/phong.frag.glsl"))
 	{}
 
-	auto ZBuffer_Integrator::gl_draw(Camera const* camera, Scene const& scene) -> void
+	auto ZBuffer_Integrator::gl_draw(Scene const& scene, Camera const* camera) -> void
 	{
 		//Be sure to enable shader before setting uniforms
 		shader->use();
@@ -27,9 +27,9 @@ namespace renderme
 		shader->unuse();
 	}
 
-	auto ZBuffer_Integrator::render(Camera const* camera, Scene const& scene, Film* film) -> void
+	auto ZBuffer_Integrator::render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film) -> void
 	{
-		build_polygon_table(camera, scene, film);
+		build_polygon_table(scene, camera, film);
 		perform_zbuffer(film);
 		clean_polygon_table();
 	}
@@ -49,7 +49,7 @@ namespace renderme
 		return (-equation.w - equation.x * x - equation.y * y) / equation.z;
 	}
 
-	auto ZBuffer_Integrator::build_polygon_table(Camera const* camera, Scene const& scene, Film* film)->void
+	auto ZBuffer_Integrator::build_polygon_table(Scene const& scene, Camera const* camera, Film* film)->void
 	{
 		//Resize polygon table
 		polygon_table.resize(film->resolution().y);

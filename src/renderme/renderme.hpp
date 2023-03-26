@@ -3,6 +3,7 @@
 #include<core/scene.hpp>
 #include<core/integrator.hpp>
 #include<core/film.hpp>
+#include<core/sampler.hpp>
 
 //explicitly disable inclusion of the development environment header of glfw
 #define GLFW_INCLUDE_NONE
@@ -42,6 +43,7 @@ namespace renderme
 			bool enable_io{true};
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
+			unsigned int sampler_index{ 0 };
 			unsigned int camera_index{0};
 
 			//Metadata
@@ -94,6 +96,7 @@ namespace renderme
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;
+		std::vector<std::unique_ptr<Sampler>> samplers;
 		std::vector<std::unique_ptr<Camera>> cameras;
 		std::unique_ptr<Film> film;
 	};
