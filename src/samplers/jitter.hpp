@@ -8,6 +8,7 @@ namespace renderme
 		Jitter_Sampler() = default;
 		Jitter_Sampler(glm::uvec2 _sample_space);
 		auto get_ndc_sample(glm::uvec2 pos) const noexcept -> glm::vec2 override;
+		auto hash() const noexcept-> std::size_t override;
 	};
 
 }

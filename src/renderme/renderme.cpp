@@ -217,12 +217,19 @@ namespace renderme
 		info.delta_time = now_time - info.time;
 		info.time = now_time;
 
-		//Update film size and camera aspect with framebuffer size
+		// Update clear color to film
+		if (film != nullptr) {
+			film->set_clear_color(config.clear_color);
+		}
+
+		// Update film size and camera aspect with framebuffer size
 		glm::ivec2 new_size;
 		glfwGetFramebufferSize(window, &new_size.x, &new_size.y);
 		if (new_size != config.framebuffer_size) {
 			config.framebuffer_size = new_size;
-			film->reset_resolution(config.framebuffer_size);
+			if (film != nullptr) {
+				film->reset_resolution(config.framebuffer_size);
+			}
 			for (auto& camera : cameras) {
 				camera->reset_aspect(static_cast<float>(config.framebuffer_size.x) / static_cast<float>(config.framebuffer_size.y));
 			}

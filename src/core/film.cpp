@@ -61,4 +61,9 @@ namespace renderme
 		std::fill(pixels.get(), pixels.get() + _resolution.x * _resolution.y, clear_color);
 	}
 
+	auto Film::hash() const noexcept-> std::size_t
+	{
+		return Hasher().hash(_resolution).hash(clear_color).value();
+	}
+
 }

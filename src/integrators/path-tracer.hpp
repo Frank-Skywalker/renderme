@@ -14,6 +14,8 @@ namespace renderme
 	private:
 		auto trace(Ray ray, Scene const& scene, int depth) -> glm::vec3;
 
+		std::size_t last_hash;
+		int iteration{ 0 };
 	};
 
 }

@@ -53,7 +53,7 @@ namespace renderme
 		auto value() const noexcept->std::size_t;
 	private:
 
-		std::size_t _value;
+		std::size_t _value{};
 	};
 
 }

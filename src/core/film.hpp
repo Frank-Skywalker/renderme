@@ -18,6 +18,8 @@ namespace renderme
 
 		auto gl_display() const noexcept ->void;
 		auto clear() ->void;
+		auto hash() const noexcept-> std::size_t;
+
 
 	private:
 		std::unique_ptr<glm::vec3[]> pixels;

@@ -29,9 +29,20 @@ namespace renderme
 
 	auto ZBuffer_Integrator::render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film) -> void
 	{
-		build_polygon_table(scene, camera, film);
-		perform_zbuffer(film);
-		clean_polygon_table();
+		auto new_hash = Hasher{}.hash_hash(std::size_t(&scene)).
+			hash_hash(std::size_t(camera)).hash_hash(camera->hash()).
+			hash_hash(std::size_t(sampler)).hash_hash(sampler->hash()).
+			hash_hash(std::size_t(film)).hash_hash(film->hash()).value();
+
+		if (last_hash != new_hash) {
+			last_hash = new_hash;
+			film->clear();
+			//log(Status::log, "ZBuffer Begins");
+			build_polygon_table(scene, camera, film);
+			perform_zbuffer(film);
+			clean_polygon_table();
+			//log(Status::log, "ZBuffer Ends");
+		}
 	}
 
 	auto ZBuffer_Integrator::imgui_config() ->void

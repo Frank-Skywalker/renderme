@@ -59,6 +59,8 @@ namespace renderme
 		auto clean_polygon_table()->void;
 
 		Polygon_Table polygon_table;
+
+		std::size_t last_hash;
 	};
 
 }

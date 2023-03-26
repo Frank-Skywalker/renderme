@@ -27,6 +27,15 @@ namespace renderme
 
 	auto Path_Tracer::render(Scene const& scene, Camera const* camera, Sampler const* sampler, Film* film) -> void
 	{
+		auto new_hash = Hasher{}.hash_hash(std::size_t(&scene)).
+			hash_hash(std::size_t(camera)).hash_hash(camera->hash()).
+			hash_hash(std::size_t(sampler)).hash_hash(sampler->hash()).
+			hash_hash(std::size_t(film)).hash_hash(film->hash()).value();
+
+		if (last_hash != new_hash) {
+			film->clear();
+		}
+
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
 				//auto ndc_x = float(x) / float(film->resolution().x) * 2.0f - 1.0f;
@@ -37,6 +46,7 @@ namespace renderme
 				film->set_pixel(glm::uvec2(x, y), color);
 			}
 		}
+
 	}
 
 	auto Path_Tracer::imgui_config() ->void

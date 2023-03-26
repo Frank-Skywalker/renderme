@@ -19,4 +19,10 @@ namespace renderme
 		auto random = glm::vec2(std::rand(), std::rand());
 		return random / float(RAND_MAX) * 2.0f - 1.0f;
 	}
+
+	auto Random_Sampler::hash() const noexcept-> std::size_t
+	{
+		return std::size_t(2);
+	}
+
 }
