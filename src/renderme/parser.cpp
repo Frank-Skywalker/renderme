@@ -6,6 +6,7 @@
 #include<cameras/perspective.hpp>
 #include<integrators/zbuffer.hpp>
 #include<integrators/path-tracer.hpp>
+#include<integrators/ray-caster.hpp>
 #include<samplers/uniform.hpp>
 #include<samplers/jitter.hpp>
 #include<samplers/random.hpp>
@@ -55,6 +56,9 @@ namespace renderme
 		}
 		else if (type == "pathtracer") {
 			return std::make_unique<Path_Tracer>();
+		}
+		else if (type == "raycaster") {
+			return std::make_unique<Ray_Caster>();
 		}
 
 		throw std::logic_error("Invalid integrator type");

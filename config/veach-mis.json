@@ -53,6 +53,9 @@
       "type": "pathtracer"
     },
     {
+      "type": "raycaster"
+    },
+    {
       "type": "zbuffer"
     }
   ],
