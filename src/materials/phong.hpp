@@ -3,11 +3,11 @@
 #include <core/material.hpp>
 #include<core/texture.hpp>
 
-#include<vector>
+#include<array>
 
 namespace renderme
 {
-	struct Phong_Material final: Material
+	struct Phong_Material final : Material
 	{
 		Phong_Material(std::string name);
 		auto gl_draw(Shader const& shader) const noexcept ->void;
@@ -27,6 +27,7 @@ namespace renderme
 		glm::vec3 _transparent{ 0.f,0.f,0.f };				// Tr
 		float _refraction_index;							// Ni
 		glm::vec3 _emition{ 0.f,0.f,0.f };					// Ke
-		std::vector<Texture*> textures;
+
+		std::array<Texture*, size_t(Texture_Type::invalid)> textures;
 	};
 }

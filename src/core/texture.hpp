@@ -12,6 +12,7 @@ namespace renderme
 		diffuse,		// map_Kd
 		specular,		// map_Ks
 		normal,
+		invalid,
 	};
 	struct Texture final
 	{

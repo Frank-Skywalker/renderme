@@ -51,6 +51,7 @@ namespace renderme
 
 		++iteration_counter;
 		log(Status::log, "Path Tracing Begins");
+#pragma omp parallel for schedule(dynamic, 1)
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
 				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));

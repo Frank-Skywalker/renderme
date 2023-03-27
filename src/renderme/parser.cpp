@@ -312,7 +312,8 @@ namespace renderme
 		// diffuse: texture_diffuseN
 		// specular: texture_specularN
 		// normal: texture_normalN
-		std::vector<Texture*> textures;
+		std::array<Texture*, size_t(Texture_Type::invalid)> textures;
+		textures.fill(nullptr);
 
 		std::vector<std::pair<aiTextureType, Texture_Type>> types = {
 			{aiTextureType_DIFFUSE, Texture_Type::diffuse},
@@ -329,28 +330,29 @@ namespace renderme
 				//Reuse same textures
 				auto iter = cache.path_to_texture.find(tex_relative_path.C_Str());
 				if (iter != cache.path_to_texture.end()) {
-					textures.push_back(iter->second);
+					textures[size_t(type)] = iter->second;
 				}
 				else {
 					auto upper_dir = path.upper_directory();
 					auto tex_path = Runtime_Path(upper_dir.relative_path() + "/" + tex_relative_path.C_Str());
 					auto texture = std::make_unique<Texture>(type, tex_path);
-					textures.push_back(texture.get());
+					textures[size_t(type)] = texture.get();
 					// Save texture to lookup buffer
 					cache.path_to_texture[tex_relative_path.C_Str()] = texture.get();
 					cache.parsing_textures.push_back(std::move(texture));
 				}
 			}
 		}
-		// Generate pure color diffuse texture if no such
-		auto has_diffuse_texture = [&]()->bool {
-			for (auto texture : textures) {
-				if (texture->type == Texture_Type::diffuse) {
-					return true;
-				}
-			}
-			return false;
-		}();
+
+		//// Generate pure color diffuse texture if no such
+		//auto has_diffuse_texture = [&]()->bool {
+		//	for (auto texture : textures) {
+		//		if (texture->type == Texture_Type::diffuse) {
+		//			return true;
+		//		}
+		//	}
+		//	return false;
+		//}();
 
 		//if (!has_diffuse_texture) {
 		//	auto texture = std::make_unique<Texture>(Texture_Type::diffuse, glm::vec3(phong_material->_diffuse + phong_material->_specular + phong_material->_transparent) / 3.0f);
