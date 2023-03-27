@@ -12,7 +12,9 @@ namespace renderme
 		auto imgui_config() -> void override;
 
 	private:
-		auto path_trace(Ray ray, Scene const& scene, int depth) -> glm::vec3;
+		auto trace(Ray ray, Scene const& scene, int depth) -> glm::vec3;
+		auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction) -> Ray;
+		auto compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& camera) -> glm::vec3;
 
 		std::size_t last_hash;
 		int iteration_counter{ 0 };

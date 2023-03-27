@@ -19,7 +19,7 @@ namespace renderme
 			log(Status::fatal, "Invalid ray generate");
 		}
 
-		return Ray(glm::vec3(), glm::vec3());
+		return Ray(Ray_Type::camera, glm::vec3(), glm::vec3());
 	}
 
 	auto Orthographic_Camera::imgui_config() ->void

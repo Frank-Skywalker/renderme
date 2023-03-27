@@ -61,7 +61,7 @@ namespace renderme
 	{
 		glm::vec3 origin = transform_point(ray.origin);
 		glm::vec3 direction = glm::normalize(transform_vector(ray.direction));
-		return Ray(origin, direction, ray.tmin, ray.tmax);
+		return Ray(ray.type, origin, direction, ray.tmin, ray.tmax);
 	}
 
 

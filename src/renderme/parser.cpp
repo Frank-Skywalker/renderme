@@ -121,7 +121,12 @@ namespace renderme
 			light->radiance.r = json.at("radiance").at(0);
 			light->radiance.g = json.at("radiance").at(1);
 			light->radiance.b = json.at("radiance").at(2);
+			light->radiance = light->radiance / glm::vec3(255.f, 255.f, 255.f);
 			cache.parsing_lights.push_back(std::move(light));
+
+			// TODO
+			auto mat = dynamic_cast<Phong_Material*>(iter->second);
+			mat->emition = light->radiance;
 		}
 		else {
 			throw std::logic_error("Invalid material name for light");

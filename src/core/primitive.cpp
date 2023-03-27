@@ -23,6 +23,7 @@ namespace renderme
 		if (shape->intersect(ray, interaction, &t_hit)) {
 			ray.update_tmax(t_hit);
 			interaction->material = material;
+			interaction->primitive = this;
 			return true;
 		}
 		return false;
