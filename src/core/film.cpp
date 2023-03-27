@@ -2,6 +2,7 @@
 #include "log.hpp"
 
 #include <gl/glew.h>
+#include <stb/stb_image_write.h>
 
 #include<algorithm>
 
@@ -92,7 +93,19 @@ namespace renderme
 
 	auto Film::export_to_file(Runtime_Path path) const noexcept -> void
 	{
+		std::vector<unsigned char> write_buffer(_resolution.x * _resolution.y * 3);
 
+		auto clamp_min = glm::vec3(0.f, 0.f, 0.f);
+		auto clamp_max = glm::vec3(1.f, 1.f, 1.f);
+		for (auto i = 0; i < _resolution.x * _resolution.y; ++i) {
+			auto color = glm::fclamp(pixels[i], clamp_min, clamp_max);
+			write_buffer[i * 3] = color.x * 255;
+			write_buffer[i * 3 + 1] = color.y * 255;
+			write_buffer[i * 3 + 2] = color.z * 255;
+		}
+
+		stbi_flip_vertically_on_write(true);
+		stbi_write_bmp(path.full_path().c_str(), _resolution.x, _resolution.y, 3, write_buffer.data());
 	}
 
 }

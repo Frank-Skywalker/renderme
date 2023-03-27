@@ -5,8 +5,8 @@
 
 #include <imgui/imgui.h>
 
-#define RR_PATH_TRACER_MAX_ITERATION 100
-#define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 10
+#define RR_PATH_TRACER_MAX_ITERATION 1
+#define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 1
 
 namespace renderme
 {
@@ -52,7 +52,7 @@ namespace renderme
 			for (auto y = 0; y < film->resolution().y; ++y) {
 				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
 				auto ray = camera->generate_ray(sample);
-				auto new_color = trace(std::move(ray), scene, 0);
+				auto new_color = path_trace(std::move(ray), scene, 0);
 
 				if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
 					auto& last_color = film->pixel_of(glm::uvec2(x, y));
@@ -65,7 +65,7 @@ namespace renderme
 		}
 
 		if (iteration_counter % RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION == 0) {
-			film->export_to_file(Runtime_Path());
+			film->export_to_file(Runtime_Path("/result/test.bmp"));
 		}
 	}
 
@@ -78,7 +78,7 @@ namespace renderme
 	}
 
 
-	auto Path_Tracer::trace(Ray ray, Scene const& scene, int depth) -> glm::vec3
+	auto Path_Tracer::path_trace(Ray ray, Scene const& scene, int depth) -> glm::vec3
 	{
 		Interaction interaction;
 		scene.intersect(ray, &interaction);
