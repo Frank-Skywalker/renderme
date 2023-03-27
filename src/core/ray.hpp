@@ -9,7 +9,7 @@ namespace renderme
 		camera,
 		diffuse,
 		specular,
-		transparent,
+		refract,
 	};
 
 	struct Ray final

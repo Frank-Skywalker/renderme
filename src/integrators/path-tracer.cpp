@@ -126,9 +126,65 @@ namespace renderme
 		return result;
 	}
 
+	auto fresnel(glm::vec3 const& ray_dir, glm::vec3 const& normal, float ri_from, float ri_to) -> float
+	{
+		// Calculate frenel according to Schlick method
+		auto cos_von = glm::dot(ray_dir, normal);
+		auto f0 = (ri_from - ri_to) / (ri_from + ri_to);
+		f0 *= f0;
+		auto fc = std::powf(1 - std::fabs(cos_von), 5.0f);
+		return f0 + (1.f - f0) * fc;
+	}
+
+	auto reflect_direction(glm::vec3 const& ray_dir, glm::vec3 const& normal) -> glm::vec3
+	{
+		auto dir = ray_dir - 2 * glm::dot(ray_dir, normal) * normal;
+		return glm::normalize(dir);
+	}
+
+	auto refract_direction(glm::vec3 const& ray_dir, glm::vec3 const& normal, float ri_from, float ri_to) -> glm::vec3
+	{
+		auto inv_ray= -ray_dir;
+		float ri_ratio = ri_from / ri_to;
+		auto cos_theta = glm::dot(normal, inv_ray);
+		auto dir = (ri_ratio * cos_theta - std::sqrtf(1 - std::powf(ri_ratio, 2.f) * (1 - std::powf(cos_theta, 2.f)))) * normal - ri_ratio * inv_ray;
+		return glm::normalize(dir);
+	}
 
 	auto Path_Tracer::mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction) -> Ray
 	{
+		auto material = dynamic_cast<Phong_Material const*>(interaction.material);
+
+		// Try generate with refraction ray
+		if (material->refraction_index > 1.0f) {
+			auto cos_von = glm::dot( -ray.direction, interaction.normal);
+			// Refract index of both sides of the surface
+			// Init to refract index of the air(1.0f)
+			float ri_from = 1.0f;
+			float ri_to = 1.0f;
+
+			// Ray direction from outside to inside of the surface
+			if (cos_von > 0) {
+				ri_to = material->refraction_index;
+			}
+			// Ray direction from inside to outside of the surface
+			else {
+				ri_from = material->refraction_index;
+			}
+
+			auto fres = fresnel(ray.direction, interaction.normal, ri_from, ri_to);
+			auto random = russian_roulette();
+			// Create refrac ray
+			if (random > fres) {
+				auto refract_dir = refract_direction(ray.direction, interaction.normal, ri_from, ri_to);
+				return Ray(Ray_Type::refract, interaction.position, refract_dir, RR_EPSILON);
+			}
+		}
+
+
+
+
+
 		return Ray(ray);
 	}
 
@@ -136,6 +192,12 @@ namespace renderme
 	auto Path_Tracer::compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& camera) -> glm::vec3
 	{
 		return glm::vec3();
+	}
+
+
+	auto Path_Tracer::russian_roulette() -> float
+	{
+		return float(std::rand()) / float(RAND_MAX);
 	}
 
 }
