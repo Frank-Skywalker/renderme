@@ -44,7 +44,7 @@ namespace renderme
 		
 		auto ray_direction = config.front * front_scale + config.up * up_scale * p.y + config.right * right_scale * p.x;
 		ray_direction = glm::normalize(ray_direction);
-		return Ray(Ray_Type::camera, config.position, ray_direction, config.near, config.far);
+		return Ray(config.position, ray_direction);
 	}
 
 	auto Perspective_Camera::imgui_config() ->void

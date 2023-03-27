@@ -5,6 +5,13 @@ namespace renderme
 {
 	struct Path_Tracer final : Integrator
 	{
+		enum struct Ray_Type
+		{
+			diffuse,
+			specular,
+			refract,
+		};
+
 		Path_Tracer();
 
 		auto gl_draw(Scene const& scene, Camera const* camera) -> void override;
@@ -13,9 +20,6 @@ namespace renderme
 
 	private:
 		auto trace(Ray ray, Scene const& scene, int depth) -> glm::vec3;
-		auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction) -> Ray;
-		auto compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& camera) -> glm::vec3;
-		auto russian_roulette() -> float;
 
 		std::size_t last_hash;
 		int iteration_counter{ 0 };
