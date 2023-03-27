@@ -200,8 +200,8 @@ namespace renderme
 		if (ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
 		{
 			*t_hit = t;
-			auto uvw = uvw_of(interaction->position);
 			interaction->position = ray.point_at(t);
+			auto uvw = uvw_of(interaction->position);
 			interaction->normal = normal_of(uvw);
 			interaction->uv = texture_coordinate_of(uvw);
 			return true;
