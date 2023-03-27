@@ -10,6 +10,7 @@
 #include<samplers/jitter.hpp>
 #include<samplers/random.hpp>
 #include<aggregates/bvh.hpp>
+#include<materials/phong.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -130,7 +131,8 @@ namespace renderme
 				}
 			}
 			// TODO
-			iter->second->emition = radiance;
+			auto material = dynamic_cast<Phong_Material*>(iter->second);
+			material->_emition = radiance;
 		}
 		else {
 			throw std::logic_error("Invalid material name for light");
@@ -268,14 +270,14 @@ namespace renderme
 			return iter->second;
 		}
 
-		auto phong_material = std::make_unique<Material>(aimaterial->GetName().C_Str());
+		auto phong_material = std::make_unique<Phong_Material>(aimaterial->GetName().C_Str());
 
 		aiColor4D diffuse;
 		if (aiGetMaterialColor(aimaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse) != aiReturn_SUCCESS) {
 			log(Status::error, "No diffuse");
 		}
 		else {
-			phong_material->diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+			phong_material->_diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
 		}
 
 		aiColor4D specular;
@@ -283,10 +285,10 @@ namespace renderme
 			log(Status::error, "No Specular");
 		}
 		else {
-			phong_material->specular = glm::vec3(specular.r, specular.g, specular.b);
+			phong_material->_specular = glm::vec3(specular.r, specular.g, specular.b);
 		}
 
-		if (aiGetMaterialFloat(aimaterial, AI_MATKEY_SHININESS, &phong_material->specular_exponent)!=aiReturn_SUCCESS) {
+		if (aiGetMaterialFloat(aimaterial, AI_MATKEY_SHININESS, &phong_material->_specular_exponent)!=aiReturn_SUCCESS) {
 			log(Status::error, "No Specular Factor");
 		}
 
@@ -295,10 +297,10 @@ namespace renderme
 			log(Status::error, "No Transparent");
 		}
 		else {
-			phong_material->transparent = glm::vec3(transparent.r, transparent.g, transparent.b);
+			phong_material->_transparent = glm::vec3(transparent.r, transparent.g, transparent.b);
 		}
 
-		if (aiGetMaterialFloat(aimaterial, AI_MATKEY_REFRACTI, &phong_material->refraction_index) != aiReturn_SUCCESS) {
+		if (aiGetMaterialFloat(aimaterial, AI_MATKEY_REFRACTI, &phong_material->_refraction_index) != aiReturn_SUCCESS) {
 			log(Status::error, "No Refraction Index");
 		}
 
@@ -350,12 +352,12 @@ namespace renderme
 			return false;
 		}();
 
-		if (!has_diffuse_texture) {
-			auto texture = std::make_unique<Texture>(Texture_Type::diffuse, glm::vec3(phong_material->diffuse + phong_material->specular + phong_material->transparent) / 3.0f);
-			textures.push_back(texture.get());
-			// Need not save this texture to lookup buffer
-			cache.parsing_textures.push_back(std::move(texture));
-		}
+		//if (!has_diffuse_texture) {
+		//	auto texture = std::make_unique<Texture>(Texture_Type::diffuse, glm::vec3(phong_material->_diffuse + phong_material->_specular + phong_material->_transparent) / 3.0f);
+		//	textures.push_back(texture.get());
+		//	// Need not save this texture to lookup buffer
+		//	cache.parsing_textures.push_back(std::move(texture));
+		//}
 		
 		phong_material->textures = std::move(textures);
 

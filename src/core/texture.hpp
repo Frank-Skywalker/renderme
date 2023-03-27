@@ -18,6 +18,7 @@ namespace renderme
 		Texture(Texture_Type type, Runtime_Path path);
 		Texture(Texture_Type type, glm::vec3 color);
 		auto gl_draw(Shader const& shader, unsigned int i, unsigned int type_cnt) const noexcept -> void;
+		auto color_of(glm::vec2 uv) const noexcept -> glm::vec3;
 
 		Texture_Type type;
 		unsigned int id;
@@ -25,5 +26,8 @@ namespace renderme
 		int num_components;
 		int width;
 		int height;
+
+		std::unique_ptr<glm::vec3[]> pixels;
+
 	};
 }

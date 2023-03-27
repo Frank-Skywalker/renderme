@@ -17,6 +17,7 @@ namespace renderme
 	auto Area_Light::light_up(Interaction const& interaction, Scene const& scene) -> glm::vec3
 	{
 		auto result = glm::vec3(0.f, 0.f, 0.f);
+		auto uv = interaction.uv;
 
 		auto& material = interaction.material;
 		for (auto i = 0u; i < RR_AREA_LIGHT_SAMPLE_NUM; ++i) {
@@ -44,10 +45,10 @@ namespace renderme
 				float cos_theta = glm::dot(shadow_dir, interaction.normal);
 				if (cos_theta > 0.f) {
 					// Diffuse color at intersection point
-					result += cos_theta * material->diffuse * intensity / float(std::numbers::pi);
+					result += cos_theta * material->diffuse(uv) * intensity / float(std::numbers::pi);
 					// Specular color at intersection point
-					result += std::powf(cos_theta, material->specular_exponent) * material->specular * intensity 
-						* (material->specular_exponent + 1) / (2.f * float(std::numbers::pi));
+					result += std::powf(cos_theta, material->specular_exponent(uv)) * material->specular(uv) * intensity 
+						* (material->specular_exponent(uv) + 1) / (2.f * float(std::numbers::pi));
 				}
 			}
 

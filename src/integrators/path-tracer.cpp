@@ -155,9 +155,10 @@ namespace renderme
 	auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction, Path_Tracer::Ray_Type* out_type) -> Ray
 	{
 		auto material = interaction.material;
+		auto uv = interaction.uv;
 
 		// Try generate with refraction ray
-		if (material->refraction_index > 1.0f) {
+		if (material->refraction_index(uv) > 1.0f) {
 			auto cos_von = glm::dot(-ray.direction, interaction.normal);
 			// Refract index of both sides of the surface
 			// Init to refract index of the air(1.0f)
@@ -166,11 +167,11 @@ namespace renderme
 
 			// Ray direction from outside to inside of the surface
 			if (cos_von > 0) {
-				ri_to = material->refraction_index;
+				ri_to = material->refraction_index(uv);
 			}
 			// Ray direction from inside to outside of the surface
 			else {
-				ri_from = material->refraction_index;
+				ri_from = material->refraction_index(uv);
 			}
 
 			auto fres = fresnel(ray.direction, interaction.normal, ri_from, ri_to);
@@ -183,11 +184,11 @@ namespace renderme
 			}
 		}
 
-		auto kd_ks_ratio = glm::length(material->diffuse) / glm::length(material->specular);
+		auto kd_ks_ratio = glm::length(material->diffuse(uv)) / glm::length(material->specular(uv));
 		auto percentage = russian_roulette();
 		if (kd_ks_ratio < percentage) {
 			auto main_dir = reflect_direction(ray.direction, interaction.normal);
-			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent);
+			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent(uv));
 			*out_type = Path_Tracer::Ray_Type::specular;
 			return Ray(interaction.position, sample_dir, RR_EPSILON);
 		}
@@ -216,12 +217,10 @@ namespace renderme
 			return glm::vec3(0.f, 0.f, 0.f);
 		}
 
-		// I don't wanna do this...
-		// Can't think of a better architecture for now
-		//auto material = dynamic_cast<Phong_Material const*>(interaction.material);
 		auto material = interaction.material;
+		auto uv = interaction.uv;
 
-		glm::vec3 result = material->emition;
+		glm::vec3 result = material->emition(uv);
 		// Maximum depth reached
 		if (depth > RR_PATH_TRACER_MAX_DEPTH) {
 			return result;
@@ -234,13 +233,13 @@ namespace renderme
 		auto indirect_component = trace(ray, scene, depth + 1);
 		switch (type) {
 		case Ray_Type::diffuse:
-			indirect_component *= material->diffuse;
+			indirect_component *= material->diffuse(uv);
 			break;
 		case Ray_Type::specular:
-			indirect_component *= material->specular;
+			indirect_component *= material->specular(uv);
 			break;
 		case Ray_Type::refract:
-			indirect_component *= material->transparent;
+			indirect_component *= material->transparent(uv);
 			break;
 		default:
 			log(Status::fatal, "Invalid ray type");

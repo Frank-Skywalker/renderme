@@ -18,12 +18,14 @@ namespace renderme
 
 		if (num_components == 1) {
 			format = GL_RED;
+			log(Status::fatal, "unsuported format");
 		}
 		else if (num_components == 3) {
 			format = GL_RGB;
 		}
 		else if (num_components == 4) {
 			format = GL_RGBA;
+			log(Status::fatal, "unsuported format");
 		}
 		else {
 			log(Status::fatal, "unsuported format");
@@ -39,6 +41,14 @@ namespace renderme
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		pixels = std::make_unique<glm::vec3[]>(width * height);
+		auto ptr = static_cast<unsigned char*>(data);
+		for (auto i = 0; i < width * height; ++i) {
+			pixels[i].x = float(ptr[3 * i]) / 255.0f;
+			pixels[i].y = float(ptr[3 * i + 1]) / 255.0f;
+			pixels[i].z = float(ptr[3 * i + 2]) / 255.0f;
+		}
 
 		stbi_image_free(data);
 	}
@@ -91,5 +101,18 @@ namespace renderme
 		// always good practice to set everything back to defaults once configured.
 		//glActiveTexture(GL_TEXTURE0);
 	}
+
+
+	auto Texture::color_of(glm::vec2 uv) const noexcept -> glm::vec3
+	{
+		auto clamp_uv = glm::fclamp(uv, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f));
+		int index = clamp_uv.y * height * width + clamp_uv.x * width - 1;
+		if (index >= height * width) {
+			index = height * width - 1;
+		}
+
+		return pixels[index];
+	}
+
 
 }

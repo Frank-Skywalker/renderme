@@ -1,6 +1,5 @@
 #pragma once
 #include "shader.hpp"
-#include "texture.hpp"
 
 namespace renderme
 {
@@ -8,17 +7,16 @@ namespace renderme
 	struct Material
 	{
 		Material(std::string name);
-		virtual auto gl_draw(Shader const& shader) const noexcept ->void;
+		virtual auto gl_draw(Shader const& shader) const noexcept ->void = 0;
+
+		virtual auto diffuse(glm::vec2 uv) const noexcept ->glm::vec3 = 0;
+		virtual auto specular(glm::vec2 uv) const noexcept ->glm::vec3 = 0;
+		virtual auto specular_exponent(glm::vec2 uv) const noexcept ->float = 0;
+		virtual auto transparent(glm::vec2 uv) const noexcept ->glm::vec3 = 0;
+		virtual auto refraction_index(glm::vec2 uv) const noexcept ->float = 0;
+		virtual auto emition(glm::vec2 uv) const noexcept ->glm::vec3 = 0;
 
 		std::string name;
 
-		//glm::vec3 ambient;								// Ka
-		glm::vec3 diffuse{ 0.f,0.f,0.f };					// Kd
-		glm::vec3 specular{ 0.f,0.f,0.f };					// Ks
-		float specular_exponent;							// Ns
-		glm::vec3 transparent{ 0.f,0.f,0.f };				// Tr
-		float refraction_index;								// Ni
-		glm::vec3 emition{ 0.f,0.f,0.f };					// Ke
-		std::vector<Texture*> textures;
 	};
 }

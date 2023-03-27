@@ -34,4 +34,34 @@ namespace renderme
 		}
 	}
 
+	auto Phong_Material::diffuse(glm::vec2 uv) const noexcept ->glm::vec3
+	{
+		return _diffuse;
+	}
+
+	auto Phong_Material::specular(glm::vec2 uv) const noexcept ->glm::vec3
+	{
+		return _specular;
+	}
+
+	auto Phong_Material::specular_exponent(glm::vec2 uv) const noexcept ->float
+	{
+		return _specular_exponent;
+	}
+
+	auto Phong_Material::transparent(glm::vec2 uv) const noexcept ->glm::vec3
+	{
+		return _transparent;
+	}
+
+	auto Phong_Material::refraction_index(glm::vec2 uv) const noexcept ->float
+	{
+		return _refraction_index;
+	}
+
+	auto Phong_Material::emition(glm::vec2 uv) const noexcept ->glm::vec3
+	{
+		return _emition;
+	}
+
 }
