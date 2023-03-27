@@ -28,6 +28,12 @@ namespace renderme
 		auto intersect_shadow(Ray const& ray) const noexcept ->bool final;
 		auto imgui_config() const noexcept ->void final;
 
+		auto surface_area() const noexcept -> float override;
+		auto uvw_of(glm::vec3 point) const noexcept -> glm::vec3 override;
+		auto position_of(glm::vec3 uvw) const noexcept -> glm::vec3 override;
+		auto normal_of(glm::vec3 uvw) const noexcept -> glm::vec3 override;
+		auto texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2 override;
+
 		auto create_triangles() const noexcept->std::vector<Triangle>;
 
 		unsigned int num_faces;
@@ -51,8 +57,16 @@ namespace renderme
 		auto intersect_shadow(Ray const& ray) const noexcept ->bool final;
 		auto imgui_config() const noexcept ->void final;
 
+		auto surface_area() const noexcept -> float override;
+		auto uvw_of(glm::vec3 point) const noexcept -> glm::vec3 override;
+		auto position_of(glm::vec3 uvw) const noexcept -> glm::vec3 override;
+		auto normal_of(glm::vec3 uvw) const noexcept -> glm::vec3 override;
+		auto texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2 override;
+
 	private:
 		Triangle_Mesh const* mesh;
 		unsigned int index;
+		glm::mat3 barycentric_mat;
+		float _surface_area;
 	};
 }

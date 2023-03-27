@@ -11,8 +11,8 @@ namespace renderme
 		std::vector<glm::uvec3> _faces, std::vector<glm::vec3> _positions, std::vector<glm::vec3> _normals,
 		std::vector<glm::vec2> _uvs, std::vector<glm::vec3> _tangents, std::vector<glm::vec3> _bitangents)
 		:Shape(_object_to_world, _world_to_object),
-		faces{std::move(_faces)}, positions{std::move(_positions)}, normals{std::move(_normals)},
-		uvs{std::move(_uvs)}, tangents{std::move(_tangents)}, bitangents{std::move(_bitangents)}
+		faces{ std::move(_faces) }, positions{ std::move(_positions) }, normals{ std::move(_normals) },
+		uvs{ std::move(_uvs) }, tangents{ std::move(_tangents) }, bitangents{ std::move(_bitangents) }
 	{
 		num_faces = faces.size();
 
@@ -62,7 +62,7 @@ namespace renderme
 	{
 		shader.set_uniform_mat4("model", glm::identity<glm::mat4>());
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, num_faces*3 , GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, num_faces * 3, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 	}
 
@@ -93,9 +93,35 @@ namespace renderme
 		return triangles;
 	}
 
+	auto Triangle_Mesh::uvw_of(glm::vec3 point) const noexcept -> glm::vec3
+	{
+		return glm::vec3();
+	}
+
+	auto Triangle_Mesh::position_of(glm::vec3 uv) const noexcept -> glm::vec3
+	{
+		return glm::vec3();
+	}
+
+	auto Triangle_Mesh::normal_of(glm::vec3 uv) const noexcept -> glm::vec3
+	{
+		return glm::vec3();
+	}
+
+	auto Triangle_Mesh::surface_area() const noexcept -> float
+	{
+		return 0;
+	}
+
+	auto Triangle_Mesh::texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2
+	{
+		return glm::vec2();
+	}
+
+
 
 	Triangle::Triangle(Transform const* object_to_world, Transform const* world_to_object, Triangle_Mesh const* mesh, unsigned int index)
-		:Shape(object_to_world, world_to_object), mesh{mesh}, index{index}
+		:Shape(object_to_world, world_to_object), mesh{ mesh }, index{ index }
 	{
 		auto& p0 = mesh->positions[mesh->faces[index].x];
 		auto& p1 = mesh->positions[mesh->faces[index].y];
@@ -117,6 +143,14 @@ namespace renderme
 		else {
 			_world_bounds = _object_bounds;
 		}
+
+		// Calculate barycentric matrix
+		barycentric_mat = glm::inverse(glm::mat3(p0, p1, p2));
+
+		// Calculate surface area
+		auto edge1 = p1 - p0;
+		auto edge2 = p2 - p0;
+		_surface_area = glm::length(glm::cross(edge1, edge2)) / 2.f;
 	}
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
@@ -163,12 +197,11 @@ namespace renderme
 		auto gamma = det_gamma / det_a;
 		auto t = det_t / det_a;
 
-		if ( ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
+		if (ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
 		{
 			*t_hit = t;
 			interaction->position = ray.point_at(t);
-			interaction->normal = mesh->normals[mesh->faces[index].x];
-			interaction->color = mesh->normals[mesh->faces[index].x];
+			interaction->normal = normal_of(uvw_of(interaction->position));
 			return true;
 		}
 
@@ -222,7 +255,40 @@ namespace renderme
 
 	auto Triangle::imgui_config() const noexcept ->void
 	{
-		
+
+	}
+
+	auto Triangle::uvw_of(glm::vec3 point) const noexcept -> glm::vec3
+	{
+		return barycentric_mat * point;
+	}
+
+	auto Triangle::position_of(glm::vec3 uvw) const noexcept -> glm::vec3
+	{
+		return uvw.x * (mesh->positions[mesh->faces[index].x]) +
+			uvw.y * (mesh->positions[mesh->faces[index].y]) +
+			uvw.z * (mesh->positions[mesh->faces[index].z]);
+	}
+
+	auto Triangle::normal_of(glm::vec3 uvw) const noexcept -> glm::vec3
+	{
+		return glm::normalize(
+			uvw.x * (mesh->normals[mesh->faces[index].x]) +
+			uvw.y * (mesh->normals[mesh->faces[index].y]) +
+			uvw.z * (mesh->normals[mesh->faces[index].z])
+		);
+	}
+
+	auto Triangle::texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2
+	{
+		return uvw.x * (mesh->uvs[mesh->faces[index].x]) +
+			uvw.y * (mesh->uvs[mesh->faces[index].y]) +
+			uvw.z * (mesh->uvs[mesh->faces[index].z]);
+	}
+
+	auto Triangle::surface_area() const noexcept -> float
+	{
+		return _surface_area;
 	}
 
 }

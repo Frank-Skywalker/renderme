@@ -4,7 +4,6 @@
 #include<core/log.hpp>
 #include<shapes/triangle.hpp>
 #include<cameras/perspective.hpp>
-#include<materials/phong.hpp>
 #include<integrators/zbuffer.hpp>
 #include<integrators/path-tracer.hpp>
 #include<samplers/uniform.hpp>
@@ -116,17 +115,22 @@ namespace renderme
 	{
 		std::string mat_name = json.at("material");
 		if (auto iter = cache.name_to_material.find(mat_name); iter != cache.name_to_material.end()) {
-			auto light = std::make_unique<Light>();
-			light->material = iter->second;
-			light->radiance.r = json.at("radiance").at(0);
-			light->radiance.g = json.at("radiance").at(1);
-			light->radiance.b = json.at("radiance").at(2);
-			light->radiance = light->radiance / glm::vec3(255.f, 255.f, 255.f);
-			cache.parsing_lights.push_back(std::move(light));
+			// Parse radiance
+			glm::vec3 radiance;
+			radiance.r = json.at("radiance").at(0);
+			radiance.g = json.at("radiance").at(1);
+			radiance.b = json.at("radiance").at(2);
+			radiance = radiance / glm::vec3(255.f, 255.f, 255.f);
 
+			for (auto const& primitive : cache.parsing_render_primitives) {
+				auto shape_prim = dynamic_cast<Shape_Primitive const*>(primitive.get());
+				if (shape_prim->material->name == mat_name) {
+					auto light = std::make_unique<Area_Light>(iter->second, radiance, shape_prim->shape);
+					cache.parsing_lights.push_back(std::move(light));
+				}
+			}
 			// TODO
-			auto mat = dynamic_cast<Phong_Material*>(iter->second);
-			mat->emition = light->radiance;
+			iter->second->emition = radiance;
 		}
 		else {
 			throw std::logic_error("Invalid material name for light");
@@ -264,7 +268,7 @@ namespace renderme
 			return iter->second;
 		}
 
-		auto phong_material = std::make_unique<Phong_Material>(aimaterial->GetName().C_Str());
+		auto phong_material = std::make_unique<Material>(aimaterial->GetName().C_Str());
 
 		aiColor4D diffuse;
 		if (aiGetMaterialColor(aimaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse) != aiReturn_SUCCESS) {

@@ -16,6 +16,12 @@ namespace renderme
 		virtual auto intersect_shadow(Ray const& ray) const noexcept ->bool = 0;
 		virtual auto imgui_config() const noexcept ->void = 0;
 
+		virtual auto surface_area() const noexcept -> float = 0;
+		virtual auto uvw_of(glm::vec3 point) const noexcept -> glm::vec3 = 0;
+		virtual auto position_of(glm::vec3 uvw) const noexcept -> glm::vec3 = 0;
+		virtual auto normal_of(glm::vec3 uvw) const noexcept -> glm::vec3 = 0;
+		virtual auto texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2 =0;
+
 		auto object_to_world() const noexcept -> Transform const*;
 		auto world_to_object() const noexcept -> Transform const*;
 

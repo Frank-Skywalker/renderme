@@ -3,8 +3,6 @@
 #include <core/shader.hpp>
 #include <core/log.hpp>
 
-#include <materials/phong.hpp>
-
 #include <imgui/imgui.h>
 
 #include <numbers>
@@ -156,7 +154,7 @@ namespace renderme
 
 	auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction, Path_Tracer::Ray_Type* out_type) -> Ray
 	{
-		auto material = dynamic_cast<Phong_Material const*>(interaction.material);
+		auto material = interaction.material;
 
 		// Try generate with refraction ray
 		if (material->refraction_index > 1.0f) {
@@ -201,9 +199,13 @@ namespace renderme
 	}
 
 
-	auto compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& camera) -> glm::vec3
+	auto compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& scene) -> glm::vec3
 	{
-		return glm::vec3();
+		glm::vec3 direct_light(0.f, 0.f, 0.f);
+		for (auto const& light : scene.lights) {
+			direct_light += light->light_up(interaction, scene);
+		}
+		return direct_light;
 	}
 
 	auto Path_Tracer::trace(Ray ray, Scene const& scene, int depth) -> glm::vec3
@@ -211,12 +213,13 @@ namespace renderme
 		Interaction interaction;
 		// Ray has no intersection with the scene
 		if (!scene.intersect(ray, &interaction)) {
-			return interaction.color;
+			return glm::vec3(0.f, 0.f, 0.f);
 		}
 
 		// I don't wanna do this...
 		// Can't think of a better architecture for now
-		auto material = dynamic_cast<Phong_Material const*>(interaction.material);
+		//auto material = dynamic_cast<Phong_Material const*>(interaction.material);
+		auto material = interaction.material;
 
 		glm::vec3 result = material->emition;
 		// Maximum depth reached
