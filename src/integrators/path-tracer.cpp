@@ -6,10 +6,13 @@
 #include <imgui/imgui.h>
 
 #include <numbers>
+#include <thread>
 
 #define RR_PATH_TRACER_MAX_ITERATION 100
 #define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 1
 #define RR_PATH_TRACER_MAX_DEPTH 4
+
+#define RR_PATH_TRACER_TILE_SIZE 64
 
 namespace renderme
 {
@@ -52,24 +55,53 @@ namespace renderme
 		++iteration_counter;
 		std::string msg = "Path Tracing Iteration " + std::to_string(iteration_counter);
 		log(Status::log, msg);
-#pragma omp parallel for schedule(dynamic, 1)
-		for (auto x = 0; x < film->resolution().x; ++x) {
-			for (auto y = 0; y < film->resolution().y; ++y) {
-				//msg = "Ray pos: " + std::to_string(x) + ", " + std::to_string(y);
-				//log(Status::log, msg);
-				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
-				auto ray = camera->generate_ray(sample);
-				auto new_color = trace(std::move(ray), scene, 0);
+		//#pragma omp parallel for schedule(dynamic, 1)
+		//		for (auto x = 0; x < film->resolution().x; ++x) {
+		//			for (auto y = 0; y < film->resolution().y; ++y) {
+		//				//msg = "Ray pos: " + std::to_string(x) + ", " + std::to_string(y);
+		//				//log(Status::log, msg);
+		//				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
+		//				auto ray = camera->generate_ray(sample);
+		//				auto new_color = trace(std::move(ray), scene, 0);
+		//
+		//				if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
+		//					auto& last_color = film->pixel_of(glm::uvec2(x, y));
+		//					if (last_color != film->clear_color()) {
+		//						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
+		//					}
+		//					film->set_pixel(glm::uvec2(x, y), new_color);
+		//				}
+		//			}
+		//		}
 
-				if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
-					auto& last_color = film->pixel_of(glm::uvec2(x, y));
-					if (last_color != film->clear_color()) {
-						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
+		auto x_tiles = film->resolution().x % RR_PATH_TRACER_TILE_SIZE == 0 ? film->resolution().x / RR_PATH_TRACER_TILE_SIZE : film->resolution().x / RR_PATH_TRACER_TILE_SIZE + 1;
+		auto y_tiles = film->resolution().y % RR_PATH_TRACER_TILE_SIZE == 0 ? film->resolution().y / RR_PATH_TRACER_TILE_SIZE : film->resolution().y / RR_PATH_TRACER_TILE_SIZE + 1;
+
+		for (auto y_tile = 0u; y_tile < y_tiles; ++y_tile) {
+			for (auto x_tile = 0u; x_tile < x_tiles; ++x_tile) {
+
+				std::thread thread([&]() {
+					auto y_begin = y_tile * RR_PATH_TRACER_TILE_SIZE;
+					auto x_begin = x_tile * RR_PATH_TRACER_TILE_SIZE;
+					for (auto x = x_begin; x < x_begin + RR_PATH_TRACER_TILE_SIZE && x < film->resolution().x; ++x) {
+						for (auto y = y_begin; y < y_begin + RR_PATH_TRACER_TILE_SIZE && y < film->resolution().y; ++y) {
+							auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
+							auto ray = camera->generate_ray(sample);
+							auto new_color = trace(std::move(ray), scene, 0);
+
+							if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
+								auto& last_color = film->pixel_of(glm::uvec2(x, y));
+								if (last_color != film->clear_color()) {
+									new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
+								}
+								film->set_pixel(glm::uvec2(x, y), new_color);
+							}
+						}
 					}
-					film->set_pixel(glm::uvec2(x, y), new_color);
-				}
+					});
 			}
 		}
+
 
 		if (iteration_counter % RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION == 0) {
 			auto path = "/result/" + scene.name + ".bmp";

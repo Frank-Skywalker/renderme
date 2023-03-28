@@ -7,7 +7,7 @@
 namespace renderme
 {
 	Texture::Texture(Texture_Type type, Runtime_Path path)
-		:type{type}
+		:type{ type }
 	{
 		//Texture loading
 		auto data = stbi_load(path.full_path().c_str(), &width, &height, &num_components, 0);
@@ -54,7 +54,7 @@ namespace renderme
 	}
 
 	Texture::Texture(Texture_Type type, glm::vec3 color)
-		:type{type}
+		:type{ type }
 	{
 		format = GL_RGB;
 		num_components = 3;
@@ -105,8 +105,25 @@ namespace renderme
 
 	auto Texture::color_of(glm::vec2 uv) const noexcept -> glm::vec3
 	{
-		auto clamp_uv = glm::fclamp(uv, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f));
-		int index = clamp_uv.y * height * width + clamp_uv.x * width - 1;
+		//auto clamp_uv = glm::fclamp(uv, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f));
+		auto repeat = [](float x)->float {
+			if (x < 0) {
+				while (x < 0)
+					x += 1.0f;
+			}
+			else {
+				while (x > 0)
+					x -= 1.0f;
+				x += 1.0f;
+			}
+			return x;
+		};
+
+		auto repeat_uv = glm::vec2(repeat(uv.x), repeat(uv.y));
+		int index = repeat_uv.y * height * width + repeat_uv.x * width;
+		//if (index < 0) {
+		//	index = 0;
+		//}
 		if (index >= height * width) {
 			index = height * width - 1;
 		}
