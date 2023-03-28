@@ -5,4 +5,4 @@
 #define RR_ROOT_PATH "@PROJECT_SOURCE_DIR@"
 #cmakedefine RR_ENABLE_CUDA
 
-#define RR_EPSILON 1e-10
+#define RR_EPSILON 1e-5

@@ -9,7 +9,7 @@
 #include <array>
 #include <iostream>
 
-#define RR_BVH_MAX_PRIMITIVE_NUM_PER_NODE 1
+#define RR_BVH_MAX_PRIMITIVE_NUM_PER_NODE 4
 #define RR_BVH_SAH_APROXIMATE_LIMIT 2
 #define RR_BVH_SAH_BUCKET_NUM 12
 

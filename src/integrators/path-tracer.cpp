@@ -7,7 +7,7 @@
 
 #include <numbers>
 
-#define RR_PATH_TRACER_MAX_ITERATION 10
+#define RR_PATH_TRACER_MAX_ITERATION 100
 #define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 2
 #define RR_PATH_TRACER_MAX_DEPTH 5
 
@@ -50,10 +50,13 @@ namespace renderme
 		}
 
 		++iteration_counter;
-		log(Status::log, "Path Tracing Begins");
+		std::string msg = "Path Tracing Iteration " + std::to_string(iteration_counter);
+		log(Status::log, msg);
 #pragma omp parallel for schedule(dynamic, 1)
 		for (auto x = 0; x < film->resolution().x; ++x) {
 			for (auto y = 0; y < film->resolution().y; ++y) {
+				//msg = "Ray pos: " + std::to_string(x) + ", " + std::to_string(y);
+				//log(Status::log, msg);
 				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
 				auto ray = camera->generate_ray(sample);
 				auto new_color = trace(std::move(ray), scene, 0);
@@ -83,13 +86,12 @@ namespace renderme
 	}
 
 
-	auto fresnel(glm::vec3 const& ray_dir, glm::vec3 const& normal, float ri_from, float ri_to) -> float
+	auto fresnel(float cos, float ri_from, float ri_to) -> float
 	{
 		// Calculate frenel according to Schlick method
-		auto cos_von = glm::dot(ray_dir, normal);
 		auto f0 = (ri_from - ri_to) / (ri_from + ri_to);
 		f0 *= f0;
-		auto fc = std::powf(1 - std::fabs(cos_von), 5.0f);
+		auto fc = std::powf(1.f - std::fabs(cos), 5.0f);
 		return f0 + (1.f - f0) * fc;
 	}
 
@@ -160,26 +162,29 @@ namespace renderme
 
 		// Try generate with refraction ray
 		if (material->refraction_index(uv) > 1.0f) {
-			auto cos_von = glm::dot(-ray.direction, interaction.normal);
+			auto cos_von = glm::dot(ray.direction, interaction.normal);
+			glm::vec3 refract_normal;
 			// Refract index of both sides of the surface
 			// Init to refract index of the air(1.0f)
 			float ri_from = 1.0f;
 			float ri_to = 1.0f;
 
 			// Ray direction from outside to inside of the surface
-			if (cos_von > 0) {
+			if (cos_von < 0) {
 				ri_to = material->refraction_index(uv);
+				refract_normal = interaction.normal;
 			}
 			// Ray direction from inside to outside of the surface
 			else {
 				ri_from = material->refraction_index(uv);
+				refract_normal = -interaction.normal;
 			}
 
-			auto fres = fresnel(ray.direction, interaction.normal, ri_from, ri_to);
+			auto fres = fresnel(cos_von, ri_from, ri_to);
 			auto percentage = russian_roulette();
 			if (fres < percentage) {
 				// Create refrac ray
-				auto refract_dir = refract_direction(ray.direction, interaction.normal, ri_from, ri_to);
+				auto refract_dir = refract_direction(ray.direction, refract_normal, ri_from, ri_to);
 				*out_type = Path_Tracer::Ray_Type::refract;
 				return Ray(interaction.position, refract_dir, RR_EPSILON);
 			}

@@ -72,7 +72,9 @@ namespace renderme
 			return glm::vec3(0.f, 0.f, 0.f);
 		}
 
-		return interaction.material->diffuse(interaction.uv);
+		return interaction.material->diffuse(interaction.uv)
+			+ interaction.material->specular(interaction.uv)
+			+ interaction.material->emition(interaction.uv);
 	}
 
 }

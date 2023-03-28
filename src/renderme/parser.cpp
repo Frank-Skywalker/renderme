@@ -125,7 +125,7 @@ namespace renderme
 			radiance.r = json.at("radiance").at(0);
 			radiance.g = json.at("radiance").at(1);
 			radiance.b = json.at("radiance").at(2);
-			radiance = radiance / glm::vec3(255.f, 255.f, 255.f);
+			//radiance = radiance / glm::vec3(255.f, 255.f, 255.f);
 
 			for (auto const& primitive : cache.parsing_render_primitives) {
 				auto shape_prim = dynamic_cast<Shape_Primitive const*>(primitive.get());

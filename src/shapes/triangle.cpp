@@ -240,7 +240,7 @@ namespace renderme
 
 		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		v3 = glm::vec3(ro.x, ro.y, ro.z);
+		v3 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
 
 		float det_t = glm::determinant(glm::mat3(v1, v2, v3));
 

@@ -19,7 +19,7 @@ namespace renderme
 		auto result = glm::vec3(0.f, 0.f, 0.f);
 		auto uv = interaction.uv;
 
-		auto& material = interaction.material;
+		auto material = interaction.material;
 		for (auto i = 0u; i < RR_AREA_LIGHT_SAMPLE_NUM; ++i) {
 			// Randomly create sample uvw
 			auto uvw = glm::vec3(std::rand() / RAND_MAX, std::rand() / RAND_MAX, std::rand() / RAND_MAX);

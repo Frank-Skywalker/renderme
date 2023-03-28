@@ -49,7 +49,7 @@ namespace renderme
 			//Metadata
 			glm::ivec2 framebuffer_size{ 500, 500 };
 			//glm::ivec2 framebuffer_size{1280, 720};
-			glm::vec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
+			glm::vec4 clear_color{0.f, 0.f, 0.f, 1.00f};
 		};
 
 		struct Info
@@ -92,7 +92,7 @@ namespace renderme
 		auto render() const noexcept->void;
 		auto imgui_config()->void;
 	private:
-		Runtime_Path app_path{ "/config/cube.json" };
+		Runtime_Path app_path{ "/config/cornell-box.json" };
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;

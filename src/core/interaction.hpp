@@ -11,7 +11,7 @@ namespace renderme
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 uv;
-		Material const* material;
-		Primitive const* primitive;
+		Material const* material{nullptr};
+		Primitive const* primitive{nullptr};
 	};
 }
