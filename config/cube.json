@@ -29,10 +29,10 @@
   ],
   "samplers": [
     {
-      "type": "uniform"
+      "type": "jitter"
     },
     {
-      "type": "jitter"
+      "type": "uniform"
     },
     {
       "type": "random"

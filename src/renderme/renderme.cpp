@@ -102,10 +102,28 @@ namespace renderme
 		////////////OpengGL Configuration//////////////
 		glEnable(GL_DEPTH_TEST);
 
+	}
 
+
+	Renderme::~Renderme()
+	{
+		////////////ImGui Cleanup///////////
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+
+
+		////////////GLFW Cleanup///////////
+		glfwDestroyWindow(window);
+		glfwTerminate();
+	}
+
+
+	auto Renderme::parse_from_file(Runtime_Path path) -> void
+	{
 		///////////Data Members Init/////////////////
 		try {
-			std::ifstream f(app_path.full_path());
+			std::ifstream f(path.full_path());
 			nlohmann::json j = nlohmann::json::parse(f);
 
 			config.framebuffer_size.x = j.at("width");
@@ -142,20 +160,6 @@ namespace renderme
 		for (auto& sampler : samplers) {
 			sampler->reset_sample_space(config.framebuffer_size);
 		}
-	}
-
-
-	Renderme::~Renderme()
-	{
-		////////////ImGui Cleanup///////////
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-
-
-		////////////GLFW Cleanup///////////
-		glfwDestroyWindow(window);
-		glfwTerminate();
 	}
 
 

@@ -40,7 +40,7 @@ namespace renderme
 			float line_width_point_size;
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
-			bool enable_io{true};
+			bool enable_io{false};
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
 			unsigned int sampler_index{ 0 };
@@ -74,6 +74,7 @@ namespace renderme
 		//////Frontend//////
 	public:
 		auto main_loop()->void;
+		auto parse_from_file(Runtime_Path path) -> void;
 	private:
 		auto update()->void;
 		auto process_io()->void;
@@ -92,7 +93,6 @@ namespace renderme
 		auto render() const noexcept->void;
 		auto imgui_config()->void;
 	private:
-		Runtime_Path app_path{ "/config/cornell-box.json" };
 		State state{State::uninit};
 		std::vector<std::unique_ptr<Scene>> scenes;
 		std::vector<std::unique_ptr<Integrator>> integrators;
