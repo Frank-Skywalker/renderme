@@ -169,30 +169,27 @@ namespace renderme
 		auto b = mesh->positions[mesh->faces[index].y];
 		auto c = mesh->positions[mesh->faces[index].z];
 
-		auto ro = ray.origin;
-		auto rd = ray.direction;
-
-		auto v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		auto v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		auto v3 = glm::vec3(rd.x, rd.y, rd.z);
+		auto v1 = a - b;
+		auto v2 = a - c;
+		auto v3 = ray.direction;
 
 		float det_a = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
-		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		v3 = glm::vec3(rd.x, rd.y, rd.z);
+		v1 = a - ray.origin;
+		v2 = a - c;
+		v3 = ray.direction;
 
 		float det_beta = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		v2 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
-		v3 = glm::vec3(rd.x, rd.y, rd.z);
+		v1 = a - b;
+		v2 = a - ray.origin;
+		v3 = ray.direction;
 
 		float det_gamma = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		v3 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v1 = a - b;
+		v2 = a - c;
+		v3 = a - ray.origin;
 
 		float det_t = glm::determinant(glm::mat3(v1, v2, v3));
 
@@ -220,30 +217,27 @@ namespace renderme
 		auto b = mesh->positions[mesh->faces[index].y];
 		auto c = mesh->positions[mesh->faces[index].z];
 
-		auto ro = ray.origin;
-		auto rd = ray.direction;
-
-		auto v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		auto v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		auto v3 = glm::vec3(rd.x, rd.y, rd.z);
+		auto v1 = a - b;
+		auto v2 = a - c;
+		auto v3 = ray.direction;
 
 		float det_a = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
-		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		v3 = glm::vec3(rd.x, rd.y, rd.z);
+		v1 = a - ray.origin;
+		v2 = a - c;
+		v3 = ray.direction;
 
 		float det_beta = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		v2 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
-		v3 = glm::vec3(rd.x, rd.y, rd.z);
+		v1 = a - b;
+		v2 = a - ray.origin;
+		v3 = ray.direction;
 
 		float det_gamma = glm::determinant(glm::mat3(v1, v2, v3));
 
-		v1 = glm::vec3(a.x - b.x, a.y - b.y, a.z - b.z);
-		v2 = glm::vec3(a.x - c.x, a.y - c.y, a.z - c.z);
-		v3 = glm::vec3(a.x - ro.x, a.y - ro.y, a.z - ro.z);
+		v1 = a - b;
+		v2 = a - c;
+		v3 = a - ray.origin;
 
 		float det_t = glm::determinant(glm::mat3(v1, v2, v3));
 
