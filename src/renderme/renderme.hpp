@@ -40,7 +40,7 @@ namespace renderme
 			float line_width_point_size;
 			bool raytrace{false};
 			bool show_imgui_demo_window{false};
-			bool enable_io{false};
+			bool enable_io{true};
 			unsigned int scene_index{0};
 			unsigned int integrator_index{0};
 			unsigned int sampler_index{ 0 };

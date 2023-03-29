@@ -201,9 +201,11 @@ namespace renderme
 		{
 			*t_hit = t;
 			interaction->position = ray.point_at(t);
-			auto uvw = uvw_of(interaction->position);
-			interaction->normal = normal_of(uvw);
-			interaction->uv = texture_coordinate_of(uvw);
+			//auto uvw = uvw_of(interaction->position);
+			interaction->normal = override_normal;
+			auto face = mesh->faces[index];
+			interaction->uv = (1.f - beta - gamma) * mesh->uvs[face.x] + beta * mesh->uvs[face.y] + gamma * mesh->uvs[face.z];
+			//interaction->uv = texture_coordinate_of(uvw);
 			return true;
 		}
 
