@@ -65,6 +65,7 @@ namespace renderme
 
 	private:
 		Triangle_Mesh const* mesh;
+		glm::vec3 override_normal;
 		unsigned int index;
 		glm::mat3 barycentric_mat;
 		float _surface_area;

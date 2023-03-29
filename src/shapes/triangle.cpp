@@ -151,6 +151,9 @@ namespace renderme
 		auto edge1 = p1 - p0;
 		auto edge2 = p2 - p0;
 		_surface_area = glm::length(glm::cross(edge1, edge2)) / 2.f;
+
+		// Calculate override normal
+		override_normal = glm::cross(edge1, edge2);
 	}
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
@@ -274,11 +277,12 @@ namespace renderme
 
 	auto Triangle::normal_of(glm::vec3 uvw) const noexcept -> glm::vec3
 	{
-		return glm::normalize(
-			uvw.x * (mesh->normals[mesh->faces[index].x]) +
-			uvw.y * (mesh->normals[mesh->faces[index].y]) +
-			uvw.z * (mesh->normals[mesh->faces[index].z])
-		);
+		return override_normal;
+		//return glm::normalize(
+		//	uvw.x * (mesh->normals[mesh->faces[index].x]) +
+		//	uvw.y * (mesh->normals[mesh->faces[index].y]) +
+		//	uvw.z * (mesh->normals[mesh->faces[index].z])
+		//);
 	}
 
 	auto Triangle::texture_coordinate_of(glm::vec3 uvw) const noexcept -> glm::vec2

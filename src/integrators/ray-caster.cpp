@@ -5,8 +5,10 @@
 
 #include <imgui/imgui.h>
 #include <thread>
+#include <array>
 
-#define RR_PATH_TRACER_TILE_SIZE 32
+#define RR_RAY_CASTING_THREAD_COUNT_X 4
+#define RR_RAY_CASTING_THREAD_COUNT_Y 4
 
 namespace renderme
 {
@@ -44,39 +46,47 @@ namespace renderme
 		film->clear();
 
 		//#pragma omp parallel for schedule(dynamic, 1)
-				//for (auto x = 0; x < film->resolution().x; ++x) {
-				//	for (auto y = 0; y < film->resolution().y; ++y) {
-				//		auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
-				//		auto ray = camera->generate_ray(sample);
-				//		auto color = cast(std::move(ray), scene);
-				//		if (color != glm::vec3(0.f, 0.f, 0.f)) {
-				//			film->set_pixel(glm::uvec2(x, y), color);
-				//		}
-				//	}
-				//}
+		//		for (auto x = 0; x < film->resolution().x; ++x) {
+		//			for (auto y = 0; y < film->resolution().y; ++y) {
+		//				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
+		//				auto ray = camera->generate_ray(sample);
+		//				auto color = cast(std::move(ray), scene);
+		//				if (color != glm::vec3(0.f, 0.f, 0.f)) {
+		//					film->set_pixel(glm::uvec2(x, y), color);
+		//				}
+		//			}
+		//		}
 
-		auto x_tiles = film->resolution().x % RR_PATH_TRACER_TILE_SIZE == 0 ? film->resolution().x / RR_PATH_TRACER_TILE_SIZE : film->resolution().x / RR_PATH_TRACER_TILE_SIZE + 1;
-		auto y_tiles = film->resolution().y % RR_PATH_TRACER_TILE_SIZE == 0 ? film->resolution().y / RR_PATH_TRACER_TILE_SIZE : film->resolution().y / RR_PATH_TRACER_TILE_SIZE + 1;
+		std::vector<std::thread> threads;
+		int pixels_per_tile_x = std::ceil(float(film->resolution().x) / float(RR_RAY_CASTING_THREAD_COUNT_X));
+		int pixels_per_tile_y = std::ceil(float(film->resolution().y) / float(RR_RAY_CASTING_THREAD_COUNT_Y));
 
-		for (auto y_tile = 0u; y_tile < y_tiles; ++y_tile) {
-			for (auto x_tile = 0u; x_tile < x_tiles; ++x_tile) {
+		auto render_tile = [&](int x_tile, int y_tile)->void {
+			auto x_begin = x_tile * pixels_per_tile_x;
+			auto y_begin = y_tile * pixels_per_tile_y;
 
-				std::thread thread([&]() {
-					auto y_begin = y_tile * RR_PATH_TRACER_TILE_SIZE;
-					auto x_begin = x_tile * RR_PATH_TRACER_TILE_SIZE;
-					for (auto x = x_begin; x < x_begin + RR_PATH_TRACER_TILE_SIZE && x < film->resolution().x; ++x) {
-						for (auto y = y_begin; y < y_begin + RR_PATH_TRACER_TILE_SIZE && y < film->resolution().y; ++y) {
-							auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
-							auto ray = camera->generate_ray(sample);
-							auto color = cast(std::move(ray), scene);
-							if (color != glm::vec3(0.f, 0.f, 0.f)) {
-								film->set_pixel(glm::uvec2(x, y), color);
-							}
-						}
+			for (auto x = x_begin; x < x_begin + pixels_per_tile_x && x < film->resolution().x; ++x) {
+				for (auto y = y_begin; y < y_begin + pixels_per_tile_y && y < film->resolution().y; ++y) {
+					auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
+					auto ray = camera->generate_ray(sample);
+					auto color = cast(std::move(ray), scene);
+					if (color != glm::vec3(0.f, 0.f, 0.f)) {
+						film->set_pixel(glm::uvec2(x, y), color);
 					}
-					});
+				}
+			}
+		};
+
+		for (auto x_tile = 0u; x_tile < RR_RAY_CASTING_THREAD_COUNT_X; ++x_tile) {
+			for (auto y_tile = 0u; y_tile < RR_RAY_CASTING_THREAD_COUNT_Y; ++y_tile) {
+				threads.push_back(std::thread(render_tile, x_tile, y_tile));
 			}
 		}
+
+		for (auto& thread : threads) {
+			thread.join();
+		}
+
 	}
 
 	auto Ray_Caster::imgui_config() ->void
@@ -99,7 +109,7 @@ namespace renderme
 		//return interaction.material->diffuse(interaction.uv)
 		//	+ interaction.material->specular(interaction.uv)
 		//	+ interaction.material->emition(interaction.uv);
-		return interaction.material->diffuse(interaction.uv);
+		return interaction.normal;
 	}
 
 }
