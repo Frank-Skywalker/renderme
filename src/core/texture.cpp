@@ -105,11 +105,25 @@ namespace renderme
 
 	auto Texture::color_of(glm::vec2 uv) const noexcept -> glm::vec3
 	{
-		auto clamp_uv = glm::fclamp(uv, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f));
-		int index = clamp_uv.y * height * width + clamp_uv.x * width;
-		//if (index < 0) {
-		//	index = 0;
-		//}
+		//auto clamp_uv = glm::fclamp(uv, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f));
+
+		// GL_REPEAT Mode
+		auto do_repeat = [](float v)->float {
+			return v - std::floorf(v);
+		};
+		auto repeat_uv = glm::vec2(do_repeat(uv.x), do_repeat(uv.y));
+
+		// WARNING!!!
+		// BUG Here: must get index first
+		// clamp_uv is float value, error accumulation happens here
+		//int index = clamp_uv.y * height * width + clamp_uv.x * width;
+		int y = repeat_uv.y * height;
+		int x = repeat_uv.x * width;
+		int index = y * width + x;
+
+		if (index < 0) {
+			index = 1;
+		}
 		if (index >= height * width) {
 			index = height * width - 1;
 		}
