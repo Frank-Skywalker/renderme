@@ -190,7 +190,7 @@ namespace renderme
 		auto uv = interaction.uv;
 
 		// Try generate with refraction ray
-		if (material->refraction_index(uv) > 1.0f) {
+		if (material->refraction_index(uv) != 1.0f) {
 			auto cos_von = glm::dot(ray.direction, interaction.normal);
 			glm::vec3 refract_normal;
 			// Refract index of both sides of the surface
@@ -212,11 +212,19 @@ namespace renderme
 			auto fres = fresnel(cos_von, ri_from, ri_to);
 			auto rr = random01();
 			if (fres < rr) {
-				// Create refrac ray
+				// Create refract ray
 				auto refract_dir = refract_direction(ray.direction, refract_normal, ri_from, ri_to);
 				*out_type = Path_Tracer::Ray_Type::refract;
 				*out_russian_roulette = rr;
 				return Ray(interaction.position, refract_dir, RR_EPSILON);
+			}
+			else {
+				// Create reflect ray
+				auto main_dir = reflect_direction(ray.direction, refract_normal);
+				// Set Ray_Type as refract here to make sure it has color(ks may be 0,0,0)
+				*out_type = Path_Tracer::Ray_Type::refract;
+				*out_russian_roulette = rr;
+				return Ray(interaction.position, main_dir, RR_EPSILON);
 			}
 		}
 
@@ -274,7 +282,8 @@ namespace renderme
 
 		// Compute indirect light component
 		auto indirect_component = trace(ray, scene, depth + 1);
-		// Do russian roulette
+
+		//// Do russian roulette
 		//indirect_component /= russian_roulette;
 		switch (type) {
 		case Ray_Type::diffuse:
