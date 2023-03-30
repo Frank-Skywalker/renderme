@@ -75,8 +75,9 @@ configure_file(
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
-find_package(OpenMP REQUIRED)
-target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
+# Do not use openmp
+#find_package(OpenMP REQUIRED)
+#target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
 
 target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} glfw)

@@ -45,18 +45,6 @@ namespace renderme
 		last_hash = new_hash;
 		film->clear();
 
-		//#pragma omp parallel for schedule(dynamic, 1)
-		//		for (auto x = 0; x < film->resolution().x; ++x) {
-		//			for (auto y = 0; y < film->resolution().y; ++y) {
-		//				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
-		//				auto ray = camera->generate_ray(sample);
-		//				auto color = cast(std::move(ray), scene);
-		//				if (color != glm::vec3(0.f, 0.f, 0.f)) {
-		//					film->set_pixel(glm::uvec2(x, y), color);
-		//				}
-		//			}
-		//		}
-
 		std::vector<std::thread> threads;
 		int pixels_per_tile_x = std::ceil(float(film->resolution().x) / float(RR_RAY_CASTING_THREAD_COUNT_X));
 		int pixels_per_tile_y = std::ceil(float(film->resolution().y) / float(RR_RAY_CASTING_THREAD_COUNT_Y));

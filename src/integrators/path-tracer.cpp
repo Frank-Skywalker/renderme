@@ -58,24 +58,6 @@ namespace renderme
 
 		++iteration_counter;
 		auto t_begin = std::chrono::high_resolution_clock().now();
-		//#pragma omp parallel for schedule(dynamic, 1)
-		//		for (auto x = 0; x < film->resolution().x; ++x) {
-		//			for (auto y = 0; y < film->resolution().y; ++y) {
-		//				//msg = "Ray pos: " + std::to_string(x) + ", " + std::to_string(y);
-		//				//log(Status::log, msg);
-		//				auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
-		//				auto ray = camera->generate_ray(sample);
-		//				auto new_color = trace(std::move(ray), scene, 0);
-		//
-		//				if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
-		//					auto& last_color = film->pixel_of(glm::uvec2(x, y));
-		//					if (last_color != film->clear_color()) {
-		//						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
-		//					}
-		//					film->set_pixel(glm::uvec2(x, y), new_color);
-		//				}
-		//			}
-		//		}
 
 		std::vector<std::thread> threads;
 		int pixels_per_tile_x = std::ceil(float(film->resolution().x) / float(RR_PATH_TRACING_THREAD_COUNT_X));
