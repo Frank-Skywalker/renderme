@@ -2,6 +2,7 @@
 
 #include <core/shader.hpp>
 #include <core/random.hpp>
+#include <core/gamma.hpp>
 #include <core/log.hpp>
 
 #include <imgui/imgui.h>
@@ -72,8 +73,9 @@ namespace renderme
 					auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
 					auto ray = camera->generate_ray(sample);
 					auto new_color = trace(std::move(ray), scene, 0);
-
 					if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
+						//// Do gamma transform
+						//new_color = gamma(new_color);
 						auto& last_color = film->pixel_of(glm::uvec2(x, y));
 						if (last_color != film->clear_color()) {
 							new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
@@ -279,7 +281,8 @@ namespace renderme
 		default:
 			log(Status::fatal, "Invalid ray type");
 		}
-		result += indirect_component + material->ambient(uv);
+		//result += indirect_component + material->ambient(uv);
+		result += indirect_component;
 
 		// Compute direct light component
 		//auto direct_component = compute_direct_light(ray, interaction, scene);
