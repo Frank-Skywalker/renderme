@@ -208,8 +208,7 @@ namespace renderme
 			}
 
 			auto fres = fresnel(cos_von, ri_from, ri_to);
-			auto percentage = random01();
-			if (fres < percentage) {
+			if (fres < random01()) {
 				// Create refrac ray
 				auto refract_dir = refract_direction(ray.direction, refract_normal, ri_from, ri_to);
 				*out_type = Path_Tracer::Ray_Type::refract;
@@ -217,9 +216,10 @@ namespace renderme
 			}
 		}
 
-		auto kd_ks_ratio = glm::length(material->diffuse(uv)) / glm::length(material->specular(uv));
-		auto percentage = random01();
-		if (kd_ks_ratio < percentage) {
+		auto diffuse_strength = glm::length(material->diffuse(uv));
+		auto specular_strength = glm::length(material->specular(uv));
+		auto percentage = diffuse_strength / (diffuse_strength + specular_strength);
+		if ( percentage < random01()) {
 			auto main_dir = reflect_direction(ray.direction, interaction.normal);
 			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent(uv));
 			*out_type = Path_Tracer::Ray_Type::specular;
