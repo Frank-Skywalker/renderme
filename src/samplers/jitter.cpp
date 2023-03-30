@@ -1,5 +1,5 @@
 #include"jitter.hpp"
-
+#include <core/random.hpp>
 #include <core/log.hpp>
 
 namespace renderme
@@ -17,7 +17,7 @@ namespace renderme
 		}
 
 		auto min_corner = glm::vec2(pos);
-		auto offset = glm::vec2(std::rand(), std::rand()) / float(RAND_MAX);
+		auto offset = glm::vec2(random01(), random01());
 		auto result_sample_space = min_corner + offset;
 		return result_sample_space / glm::vec2(sample_space)  * 2.0f - 1.0f;
 	}

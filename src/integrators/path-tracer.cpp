@@ -1,6 +1,7 @@
 #include "path-tracer.hpp"
 
 #include <core/shader.hpp>
+#include <core/random.hpp>
 #include <core/log.hpp>
 
 #include <imgui/imgui.h>
@@ -158,16 +159,12 @@ namespace renderme
 		return glm::normalize(dir);
 	}
 
-	auto russian_roulette() -> float
-	{
-		return float(std::rand()) / float(RAND_MAX);
-	}
 
 	auto brdf_importance_sample_diffuse(glm::vec3 const& main_dir) -> glm::vec3
 	{
 		// Sample over sphere coordinates
-		float phi = russian_roulette() * 2.f * std::numbers::pi;
-		float theta = std::asinf(std::sqrtf(russian_roulette()));
+		float phi = random01() * 2.f * std::numbers::pi;
+		float theta = std::asinf(std::sqrtf(random01()));
 
 		glm::vec3 sample(std::sinf(theta) * std::cosf(phi), std::cosf(theta), std::sinf(theta) * std::sinf(phi));
 		glm::vec3 front;
@@ -186,8 +183,8 @@ namespace renderme
 	auto brdf_importance_sample_specular(glm::vec3 const& main_dir, float specular_exponent) -> glm::vec3
 	{
 		// Sample over sphere coordinates
-		float phi = russian_roulette() * 2.f * std::numbers::pi;
-		float theta = std::acosf(std::powf(russian_roulette(), 1.f / (specular_exponent + 1.f)));
+		float phi = random01() * 2.f * std::numbers::pi;
+		float theta = std::acosf(std::powf(random01(), 1.f / (specular_exponent + 1.f)));
 
 		glm::vec3 sample(std::sinf(theta) * std::cosf(phi), std::cosf(theta), std::sinf(theta) * std::sinf(phi));
 		glm::vec3 front;
@@ -229,7 +226,7 @@ namespace renderme
 			}
 
 			auto fres = fresnel(cos_von, ri_from, ri_to);
-			auto percentage = russian_roulette();
+			auto percentage = random01();
 			if (fres < percentage) {
 				// Create refrac ray
 				auto refract_dir = refract_direction(ray.direction, refract_normal, ri_from, ri_to);
@@ -239,7 +236,7 @@ namespace renderme
 		}
 
 		auto kd_ks_ratio = glm::length(material->diffuse(uv)) / glm::length(material->specular(uv));
-		auto percentage = russian_roulette();
+		auto percentage = random01();
 		if (kd_ks_ratio < percentage) {
 			auto main_dir = reflect_direction(ray.direction, interaction.normal);
 			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent(uv));

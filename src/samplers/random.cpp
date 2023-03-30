@@ -1,6 +1,6 @@
 #include "random.hpp"
+#include <core/random.hpp>
 #include <core/log.hpp>
-#include <cstdlib>
 namespace renderme
 {
 	Random_Sampler::Random_Sampler(glm::uvec2 _sample_space)
@@ -16,8 +16,8 @@ namespace renderme
 			log(Status::fatal, "Exists sample space");
 		}
 
-		auto random = glm::vec2(std::rand(), std::rand());
-		return random / float(RAND_MAX) * 2.0f - 1.0f;
+		auto random = glm::vec2(random01(), random01());
+		return random * 2.0f - 1.0f;
 	}
 
 	auto Random_Sampler::hash() const noexcept-> std::size_t
