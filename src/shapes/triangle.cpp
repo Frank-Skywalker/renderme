@@ -153,7 +153,8 @@ namespace renderme
 		_surface_area = glm::length(glm::cross(edge1, edge2)) / 2.f;
 
 		// Calculate override normal
-		override_normal = glm::cross(edge1, edge2);
+		//override_normal = glm::cross(edge1, edge2);
+		override_normal = glm::normalize(mesh->normals[mesh->faces[index].x] + mesh->normals[mesh->faces[index].y] + mesh->normals[mesh->faces[index].z]);
 	}
 
 	auto Triangle::gl_draw(Shader const& shader) const noexcept -> void
@@ -199,11 +200,12 @@ namespace renderme
 
 		if (ray.is_valid(t) && beta > 0 && gamma > 0 && beta + gamma < 1)
 		{
+			auto face = mesh->faces[index];
+
 			*t_hit = t;
 			interaction->position = ray.point_at(t);
 			//auto uvw = uvw_of(interaction->position);
 			interaction->normal = override_normal;
-			auto face = mesh->faces[index];
 			interaction->uv = (1.f - beta - gamma) * mesh->uvs[face.x] + beta * mesh->uvs[face.y] + gamma * mesh->uvs[face.z];
 			//interaction->uv = texture_coordinate_of(uvw);
 			return true;

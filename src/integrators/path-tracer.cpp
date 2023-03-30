@@ -11,7 +11,7 @@
 
 #define RR_PATH_TRACER_MAX_ITERATION 100
 #define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 1
-#define RR_PATH_TRACER_MAX_DEPTH 4
+#define RR_PATH_TRACER_MAX_DEPTH 5
 
 #define RR_PATH_TRACING_THREAD_COUNT_X 4
 #define RR_PATH_TRACING_THREAD_COUNT_Y 4
@@ -274,9 +274,11 @@ namespace renderme
 		auto material = interaction.material;
 		auto uv = interaction.uv;
 
-		glm::vec3 result = material->emition(uv) + material->ambient(uv);
+		// Add emisive color and ambient color
+		glm::vec3 result = material->emition(uv);
+
 		// Maximum depth reached
-		if (depth > RR_PATH_TRACER_MAX_DEPTH) {
+		if (depth >= RR_PATH_TRACER_MAX_DEPTH) {
 			return result;
 		}
 
@@ -298,7 +300,7 @@ namespace renderme
 		default:
 			log(Status::fatal, "Invalid ray type");
 		}
-		result += indirect_component;
+		result += indirect_component + material->ambient(uv);
 
 		// Compute direct light component
 		//auto direct_component = compute_direct_light(ray, interaction, scene);
