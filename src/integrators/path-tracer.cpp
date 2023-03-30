@@ -18,6 +18,8 @@
 #define RR_PATH_TRACING_THREAD_COUNT_X 4
 #define RR_PATH_TRACING_THREAD_COUNT_Y 4
 
+#define RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
+
 namespace renderme
 {
 	Path_Tracer::Path_Tracer()
@@ -101,7 +103,7 @@ namespace renderme
 		total_time += t_duration;
 		std::string msg = "Path Tracing Iteration " + std::to_string(iteration_counter) + "\n"
 			+ "  Iteration time " + std::to_string(t_duration) + "s\n"
-			+ "  Total time " + std::to_string(total_time/60.f) + "min\n";
+			+ "  Total time " + std::to_string(total_time / 60.f) + "min\n";
 		log(Status::log, msg);
 
 		if (iteration_counter % RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION == 0) {
@@ -232,7 +234,7 @@ namespace renderme
 		auto specular_strength = glm::length(material->specular(uv));
 		auto percentage = diffuse_strength / (diffuse_strength + specular_strength);
 		auto rr = random01();
-		if ( percentage < rr) {
+		if (percentage < rr) {
 			auto main_dir = reflect_direction(ray.direction, interaction.normal);
 			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent(uv));
 			*out_type = Path_Tracer::Ray_Type::specular;
@@ -283,8 +285,11 @@ namespace renderme
 		// Compute indirect light component
 		auto indirect_component = trace(ray, scene, depth + 1);
 
-		//// Do russian roulette
-		//indirect_component /= russian_roulette;
+#ifdef RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
+		// Do russian roulette
+		indirect_component /= russian_roulette;
+#endif
+
 		switch (type) {
 		case Ray_Type::diffuse:
 			indirect_component *= material->diffuse(uv);
@@ -301,9 +306,11 @@ namespace renderme
 		//result += indirect_component + material->ambient(uv);
 		result += indirect_component;
 
+#ifdef RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
 		// Compute direct light component
-		//auto direct_component = compute_direct_light(interaction, scene);
-		//result += direct_component;
+		auto direct_component = compute_direct_light(interaction, scene);
+		result += direct_component;
+#endif
 
 		return result;
 	}
