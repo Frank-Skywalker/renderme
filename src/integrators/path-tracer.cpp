@@ -73,15 +73,15 @@ namespace renderme
 					auto sample = sampler->get_ndc_sample(glm::uvec2(x, y));
 					auto ray = camera->generate_ray(sample);
 					auto new_color = trace(std::move(ray), scene, 0);
-					if (new_color != glm::vec3(0.f, 0.f, 0.f)) {
-						//// Do gamma transform
-						//new_color = gamma(new_color);
-						auto& last_color = film->pixel_of(glm::uvec2(x, y));
-						if (last_color != film->clear_color()) {
-							new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
-						}
-						film->set_pixel(glm::uvec2(x, y), new_color);
+
+					// Do gamma transform
+					new_color = gamma(new_color);
+					auto& last_color = film->pixel_of(glm::uvec2(x, y));
+					if (last_color != film->clear_color()) {
+						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
 					}
+					film->set_pixel(glm::uvec2(x, y), new_color);
+
 				}
 			}
 		};
@@ -184,7 +184,7 @@ namespace renderme
 		return glm::normalize(sample.x * right + sample.y * main_dir + sample.z * front);
 	}
 
-	auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction, Path_Tracer::Ray_Type* out_type) -> Ray
+	auto mont_carlo_sample_new_ray(Ray const& ray, Interaction const& interaction, Path_Tracer::Ray_Type* out_type, float* out_russian_roulette) -> Ray
 	{
 		auto material = interaction.material;
 		auto uv = interaction.uv;
@@ -210,10 +210,12 @@ namespace renderme
 			}
 
 			auto fres = fresnel(cos_von, ri_from, ri_to);
-			if (fres < random01()) {
+			auto rr = random01();
+			if (fres < rr) {
 				// Create refrac ray
 				auto refract_dir = refract_direction(ray.direction, refract_normal, ri_from, ri_to);
 				*out_type = Path_Tracer::Ray_Type::refract;
+				*out_russian_roulette = rr;
 				return Ray(interaction.position, refract_dir, RR_EPSILON);
 			}
 		}
@@ -221,21 +223,24 @@ namespace renderme
 		auto diffuse_strength = glm::length(material->diffuse(uv));
 		auto specular_strength = glm::length(material->specular(uv));
 		auto percentage = diffuse_strength / (diffuse_strength + specular_strength);
-		if ( percentage < random01()) {
+		auto rr = random01();
+		if ( percentage < rr) {
 			auto main_dir = reflect_direction(ray.direction, interaction.normal);
 			auto sample_dir = brdf_importance_sample_specular(main_dir, material->specular_exponent(uv));
 			*out_type = Path_Tracer::Ray_Type::specular;
+			*out_russian_roulette = rr;
 			return Ray(interaction.position, sample_dir, RR_EPSILON);
 		}
 		else {
 			auto sample_dir = brdf_importance_sample_diffuse(interaction.normal);
 			*out_type = Path_Tracer::Ray_Type::diffuse;
+			*out_russian_roulette = rr;
 			return Ray(interaction.position, sample_dir, RR_EPSILON);
 		}
 	}
 
 
-	auto compute_direct_light(Ray const& ray, Interaction const& interaction, Scene const& scene) -> glm::vec3
+	auto compute_direct_light(Interaction const& interaction, Scene const& scene) -> glm::vec3
 	{
 		glm::vec3 direct_light(0.f, 0.f, 0.f);
 		for (auto const& light : scene.lights) {
@@ -264,10 +269,13 @@ namespace renderme
 		}
 
 		Ray_Type type;
-		ray = mont_carlo_sample_new_ray(ray, interaction, &type);
+		float russian_roulette;
+		ray = mont_carlo_sample_new_ray(ray, interaction, &type, &russian_roulette);
 
 		// Compute indirect light component
 		auto indirect_component = trace(ray, scene, depth + 1);
+		// Do russian roulette
+		indirect_component /= russian_roulette;
 		switch (type) {
 		case Ray_Type::diffuse:
 			indirect_component *= material->diffuse(uv);
@@ -285,7 +293,7 @@ namespace renderme
 		result += indirect_component;
 
 		// Compute direct light component
-		//auto direct_component = compute_direct_light(ray, interaction, scene);
+		//auto direct_component = compute_direct_light(interaction, scene);
 		//result += direct_component;
 
 		return result;
