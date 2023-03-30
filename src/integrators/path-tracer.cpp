@@ -75,7 +75,7 @@ namespace renderme
 					auto new_color = trace(std::move(ray), scene, 0);
 
 					// Do gamma transform
-					new_color = gamma(new_color);
+					new_color = inv_gamma(new_color);
 					auto& last_color = film->pixel_of(glm::uvec2(x, y));
 					if (last_color != film->clear_color()) {
 						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
@@ -275,7 +275,7 @@ namespace renderme
 		// Compute indirect light component
 		auto indirect_component = trace(ray, scene, depth + 1);
 		// Do russian roulette
-		indirect_component /= russian_roulette;
+		//indirect_component /= russian_roulette;
 		switch (type) {
 		case Ray_Type::diffuse:
 			indirect_component *= material->diffuse(uv);
