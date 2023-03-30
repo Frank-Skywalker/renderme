@@ -18,7 +18,10 @@
 #define RR_PATH_TRACING_THREAD_COUNT_X 4
 #define RR_PATH_TRACING_THREAD_COUNT_Y 4
 
+#define RR_PATH_TRACING_GAMMA_CORRECTION
+#define RR_PATH_TRACING_USE_RUSSIAN_ROULETTE
 #define RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
+#define RR_PATH_TRACING_USE_AMBIENT_LIGHT
 
 namespace renderme
 {
@@ -76,8 +79,10 @@ namespace renderme
 					auto ray = camera->generate_ray(sample);
 					auto new_color = trace(std::move(ray), scene, 0);
 
+#ifdef RR_PATH_TRACING_GAMMA_CORRECTION
 					// Do gamma transform
 					new_color = inv_gamma(new_color);
+#endif
 					auto& last_color = film->pixel_of(glm::uvec2(x, y));
 					if (last_color != film->clear_color()) {
 						new_color = (last_color * float(iteration_counter - 1) + new_color) / float(iteration_counter);
@@ -285,7 +290,7 @@ namespace renderme
 		// Compute indirect light component
 		auto indirect_component = trace(ray, scene, depth + 1);
 
-#ifdef RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
+#ifdef RR_PATH_TRACING_USE_RUSSIAN_ROULETTE
 		// Do russian roulette
 		indirect_component /= russian_roulette;
 #endif
@@ -303,13 +308,17 @@ namespace renderme
 		default:
 			log(Status::fatal, "Invalid ray type");
 		}
-		//result += indirect_component + material->ambient(uv);
 		result += indirect_component;
 
 #ifdef RR_PATH_TRACING_COMPUTE_DIRECT_LIGHT
 		// Compute direct light component
 		auto direct_component = compute_direct_light(interaction, scene);
 		result += direct_component;
+#endif
+
+#ifdef RR_PATH_TRACING_USE_AMBIENT_LIGHT
+		// Add ambient component
+		result += material->ambient(uv);
 #endif
 
 		return result;
