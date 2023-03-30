@@ -36,6 +36,11 @@ namespace renderme
 		}
 	}
 
+	auto Phong_Material::ambient(glm::vec2 uv) const noexcept ->glm::vec3
+	{
+		return diffuse(uv) * glm::vec3(0.1f, 0.1f, 0.1f);
+	}
+
 	auto Phong_Material::diffuse(glm::vec2 uv) const noexcept ->glm::vec3
 	{
 		if (textures[size_t(Texture_Type::diffuse)] != nullptr) {

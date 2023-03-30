@@ -13,6 +13,7 @@ namespace renderme
 		auto gl_draw(Shader const& shader) const noexcept ->void;
 
 
+		auto ambient(glm::vec2 uv) const noexcept ->glm::vec3 override;
 		auto diffuse(glm::vec2 uv) const noexcept ->glm::vec3 override;
 		auto specular(glm::vec2 uv) const noexcept ->glm::vec3 override;
 		auto specular_exponent(glm::vec2 uv) const noexcept ->float override;

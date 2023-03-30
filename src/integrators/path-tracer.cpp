@@ -274,7 +274,7 @@ namespace renderme
 		auto material = interaction.material;
 		auto uv = interaction.uv;
 
-		glm::vec3 result = material->emition(uv);
+		glm::vec3 result = material->emition(uv) + material->ambient(uv);
 		// Maximum depth reached
 		if (depth > RR_PATH_TRACER_MAX_DEPTH) {
 			return result;
