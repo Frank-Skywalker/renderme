@@ -23,6 +23,7 @@ namespace renderme
 
 		std::size_t last_hash;
 		int iteration_counter{ 0 };
+		float total_time{ 0.f };
 	};
 
 }

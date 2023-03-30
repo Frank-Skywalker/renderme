@@ -7,6 +7,7 @@
 
 #include <numbers>
 #include <thread>
+#include <chrono>
 
 #define RR_PATH_TRACER_MAX_ITERATION 100
 #define RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION 1
@@ -47,6 +48,7 @@ namespace renderme
 			last_hash = new_hash;
 			film->clear();
 			iteration_counter = 0;
+			total_time = 0.f;
 		}
 
 		if (iteration_counter == RR_PATH_TRACER_MAX_ITERATION) {
@@ -54,9 +56,7 @@ namespace renderme
 		}
 
 		++iteration_counter;
-		std::string msg = "Path Tracing Iteration " + std::to_string(iteration_counter);
-		log(Status::log, msg);
-
+		auto t_begin = std::chrono::high_resolution_clock().now();
 		//#pragma omp parallel for schedule(dynamic, 1)
 		//		for (auto x = 0; x < film->resolution().x; ++x) {
 		//			for (auto y = 0; y < film->resolution().y; ++y) {
@@ -110,6 +110,14 @@ namespace renderme
 		for (auto& thread : threads) {
 			thread.join();
 		}
+
+		auto t_end = std::chrono::high_resolution_clock().now();
+		auto t_duration = std::chrono::duration_cast<std::chrono::duration<float>>(t_end - t_begin).count();
+		total_time += t_duration;
+		std::string msg = "Path Tracing Iteration " + std::to_string(iteration_counter) + "\n"
+			+ "  Iteration time " + std::to_string(t_duration) + "s\n"
+			+ "  Total time " + std::to_string(total_time/60.f) + "min\n";
+		log(Status::log, msg);
 
 		if (iteration_counter % RR_PATH_TRACER_EXPORT_IMG_AFTER_ITERATION == 0) {
 			auto path = "/result/" + scene.name + ".bmp";
@@ -293,8 +301,8 @@ namespace renderme
 		result += indirect_component;
 
 		// Compute direct light component
-		auto direct_component = compute_direct_light(ray, interaction, scene);
-		result += direct_component;
+		//auto direct_component = compute_direct_light(ray, interaction, scene);
+		//result += direct_component;
 
 		return result;
 	}
