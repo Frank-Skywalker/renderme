@@ -12,8 +12,6 @@ OpenGL
 
 The project is built using CMake
 
-There are two ways of doing this
-
 #### Build Using Visual Studio with CMake (Recommended)
 
 Open the root directory with Visual Studio
