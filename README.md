@@ -10,27 +10,27 @@ OpenGL
 
 ## Build
 
-The project is built using CMake.
+The project is built using CMake
 
-There are two ways of doing this.
+There are two ways of doing this
 
 #### Build Using Visual Studio with CMake (Recommended)
 
-Open the root directory with Visual Studio. 
-VS will automatically run CMake, configure the project and generate CMake cache using CMakeLists.txt. 
-You can see this on the "Output" panel.
-After the CMake finishes its generation, you can select the build target "renderme.exe" on the upper tools panel.
+Open the root directory with Visual Studio
+VS will automatically run CMake, configure the project and generate CMake cache using CMakeLists.txt.
+You can see this on the "Output" panel
+After the CMake finishes its generation, you can select the build target "renderme.exe" on the upper tools panel
 
 #### Build Using CMake
 
-Run the subsequent commands at root directory using Shell:
+Run the subsequent shell commands at project root directory:
 
 ```shell
 mkdir build
 cd build
 cmake ..
 ```
-CMake will generate corresponding project according to your platform.
+CMake will generate corresponding project according to your platform
 
 
 
@@ -42,6 +42,7 @@ CMake will generate corresponding project according to your platform.
 - **/doc:** documents, project report **"path-tracing.md"** is here
 - **/external:** external dependency source files
 - **/lib:** library output
+- **/result:** path tracing image output path
 - **/src:** source files, path-tracing source files are **"/src/integrators/path-tracer.hpp"** and **"/src/integrators/path-tracer.cpp"**
 
 
@@ -49,6 +50,17 @@ CMake will generate corresponding project according to your platform.
 ## How To Use
 
 Just try try and you will know how to use renderme.
+
+#### Run Specific Scene
+
+renderme will run /config/stairscase.json by default
+
+You can specify config path in command-line parameter
+
+```shell
+# Run at project root path
+./bin/renderme.exe /config/cornell-box.json
+```
 
 #### Path Tracing Mode
 Select **Path Tracing** at CONFIG menu under **"Renderme Config"**
