@@ -52,7 +52,7 @@ namespace renderme
 	auto Phong_Material::specular(glm::vec2 uv) const noexcept ->glm::vec3
 	{
 		if (textures[size_t(Texture_Type::specular)] != nullptr) {
-			return textures[size_t(Texture_Type::diffuse)]->color_of(uv);
+			return textures[size_t(Texture_Type::specular)]->color_of(uv);
 		}
 		return _specular;
 	}
