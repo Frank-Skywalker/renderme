@@ -2,7 +2,7 @@
 
 auto main(int argc, char* argv[]) -> int
 {
-    std::string app_path="/config/cornell-box.json";
+    std::string app_path="/config/stairscase.json";
 
     if (argc > 1) {
         app_path = argv[1];
