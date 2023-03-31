@@ -402,24 +402,8 @@ namespace renderme
 
 	auto Renderme::imgui_config()->void
 	{
-		ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
-		ImGui::ColorEdit4("Clear Color", glm::value_ptr(config.clear_color));
-
-		if (ImGui::BeginCombo("GL Draw Mode", std::to_string(config.gl_draw_mode).c_str())) {
-			for (auto mode = GL_Draw_Mode::fill; mode <= GL_Draw_Mode::point; mode = (GL_Draw_Mode)(mode + 1)) {
-				const bool is_selected = (mode == config.gl_draw_mode);
-				if (ImGui::Selectable(std::to_string(mode).c_str(), is_selected)) {
-					config.gl_draw_mode = mode;
-				}
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-		}
-		ImGui::SliderFloat("Line Width/Point Size", &config.line_width_point_size, 0.0f, 10.0f);
-
+		ImGui::Checkbox("Path Tracing", &config.raytrace);
 		ImGui::Checkbox("Enable IO", &config.enable_io);
-		ImGui::Checkbox("Non-Realtime", &config.raytrace);
 		if (scenes.size() > 0) {
 			ImGui::SliderInt("Scene", (int*)&config.scene_index, 0, scenes.size() - 1);
 		}
@@ -435,6 +419,23 @@ namespace renderme
 		if (cameras.size() > config.scene_index) {
 			config.camera_index = config.scene_index;
 		}
+
+		//ImGui::Checkbox("Show ImGUI demo window", &config.show_imgui_demo_window);
+		ImGui::ColorEdit4("Clear Color", glm::value_ptr(config.clear_color));
+
+		if (ImGui::BeginCombo("GL Draw Mode", std::to_string(config.gl_draw_mode).c_str())) {
+			for (auto mode = GL_Draw_Mode::fill; mode <= GL_Draw_Mode::point; mode = (GL_Draw_Mode)(mode + 1)) {
+				const bool is_selected = (mode == config.gl_draw_mode);
+				if (ImGui::Selectable(std::to_string(mode).c_str(), is_selected)) {
+					config.gl_draw_mode = mode;
+				}
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::SliderFloat("Line Width/Point Size", &config.line_width_point_size, 0.0f, 10.0f);
+
 	}
 
 
