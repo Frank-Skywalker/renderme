@@ -1,4 +1,4 @@
-# ZBuffer Report
+# Path Tracing Report
 
 ##### 22221332 陈九润
 
