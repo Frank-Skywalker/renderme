@@ -62,8 +62,7 @@ foreach(LIB_DIRECTORY ${LIB_DIRECTORIES})
 endforeach(LIB_DIRECTORY)
 
 ############ config part #################
-# use double or not
-option(RR_ENABLE_CUDA "use CUDA to pipeline" OFF)
+#option(RR_ENABLE_CUDA "use CUDA to pipeline" OFF)
 
 # configure a header file to pass some of the CMake settings to the source code
 configure_file(
@@ -75,10 +74,6 @@ configure_file(
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
-# Do not use openmp
-#find_package(OpenMP REQUIRED)
-#target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
-
 target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} glfw)
 target_link_libraries(${PROJECT_NAME} glew)
@@ -86,12 +81,12 @@ target_link_libraries(${PROJECT_NAME} nlohmann_json::nlohmann_json)
 target_link_libraries(${PROJECT_NAME} hah)
 
 # Find CUDA
-if(RR_ENABLE_CUDA)
-    find_package(CUDA REQUIRED)
-    if(CUDA_FOUND)
-        message(STATUS ${CUDA_INCLUDE_DIRS})
-        include_directories(${CUDA_INCLUDE_DIRS})
-    else(CUDA_FOUND)
-        message(FATAL_ERROR "CUDA not found")
-    endif(CUDA_FOUND)
-endif(USE_CUDA)
+#if(RR_ENABLE_CUDA)
+#    find_package(CUDA REQUIRED)
+#    if(CUDA_FOUND)
+#        message(STATUS ${CUDA_INCLUDE_DIRS})
+#        include_directories(${CUDA_INCLUDE_DIRS})
+#    else(CUDA_FOUND)
+#        message(FATAL_ERROR "CUDA not found")
+#    endif(CUDA_FOUND)
+#endif(USE_CUDA)
